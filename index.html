@@ -9,46 +9,84 @@
 <body>
   <header class="topbar">
     <div class="brand">RP Social</div>
-    <div class="right">
+    <div class="top-actions">
       <button id="btnLogout" class="btn ghost hidden">Logout</button>
     </div>
   </header>
 
   <main class="wrap">
+    <section class="hero">
+      <div class="hero-card">
+        <h1>Roleplay like a feed.</h1>
+        <p class="muted">Post in-character updates, follow the vibe, and keep a simple wallet balance for your RP economy.</p>
+      </div>
+      <div class="hero-card glow"></div>
+    </section>
+
     <!-- AUTH -->
     <section id="authView" class="card">
-      <h1>Login</h1>
-      <p class="muted">Use your username + password.</p>
+      <div class="tabs">
+        <button class="tab active" data-tab="login">Login</button>
+        <button class="tab" data-tab="signup">Sign up</button>
+        <button class="tab" data-tab="forgot">Forgot</button>
+      </div>
 
-      <form id="loginForm" class="grid">
-        <label>Username
-          <input id="loginUsername" autocomplete="username" required />
-        </label>
-        <label>Password
-          <input id="loginPassword" type="password" autocomplete="current-password" required />
-        </label>
-        <button class="btn primary" type="submit">Login</button>
-      </form>
+      <div class="tabpane" id="pane-login">
+        <h2>Login</h2>
+        <p class="muted">Type your username + password.</p>
+        <form id="loginForm" class="grid">
+          <label>Username
+            <input id="loginUsername" autocomplete="username" required />
+          </label>
+          <label>Password
+            <input id="loginPassword" type="password" autocomplete="current-password" required />
+          </label>
+          <button class="btn primary" type="submit">Login</button>
+        </form>
+        <p id="authMsg" class="msg"></p>
+      </div>
 
-      <hr />
+      <div class="tabpane hidden" id="pane-signup">
+        <h2>Create account</h2>
+        <p class="muted">Signup needs email too (Supabase uses email+password), but your username is what shows publicly.</p>
+        <form id="signupForm" class="grid">
+          <label>Username (public)
+            <input id="signupUsername" required />
+          </label>
+          <label>Email
+            <input id="signupEmail" type="email" autocomplete="email" required />
+          </label>
+          <label>Password
+            <input id="signupPassword" type="password" autocomplete="new-password" required />
+          </label>
+          <button class="btn" type="submit">Create account</button>
+        </form>
+        <p id="signupMsg" class="msg"></p>
+      </div>
 
-      <h2>Create account</h2>
-      <p class="muted">Signup requires email too (Supabase Auth uses email+password). You’ll still login with username.</p>
+      <div class="tabpane hidden" id="pane-forgot">
+        <h2>Reset password</h2>
+        <p class="muted">Enter your email, then check your inbox for the reset link.</p>
+        <form id="forgotForm" class="grid">
+          <label>Email
+            <input id="forgotEmail" type="email" required />
+          </label>
+          <button class="btn" type="submit">Send reset email</button>
+        </form>
+        <p id="forgotMsg" class="msg"></p>
 
-      <form id="signupForm" class="grid">
-        <label>Username (public)
-          <input id="signupUsername" required />
-        </label>
-        <label>Email
-          <input id="signupEmail" type="email" autocomplete="email" required />
-        </label>
-        <label>Password
-          <input id="signupPassword" type="password" autocomplete="new-password" required />
-        </label>
-        <button class="btn" type="submit">Create account</button>
-      </form>
-
-      <p id="authMsg" class="msg"></p>
+        <div id="resetBox" class="soft hidden">
+          <h3>Set new password</h3>
+          <p class="muted">If you opened the link from the email, set your new password here.</p>
+          <form id="resetForm" class="grid">
+            <label>New password
+              <input id="newPassword" type="password" required />
+            </label>
+            <button class="btn primary" type="submit">Update password</button>
+          </form>
+          <p id="resetMsg" class="msg"></p>
+        </div>
+      </div>
     </section>
 
     <!-- APP -->
@@ -56,8 +94,8 @@
       <section class="card">
         <div class="row">
           <div>
-            <h1 id="whoami">Feed</h1>
-            <p class="muted" id="walletLine">Wallet: —</p>
+            <h2 id="whoami">@user</h2>
+            <p class="muted" id="walletLine">Wallet: 0</p>
           </div>
         </div>
 
@@ -72,25 +110,17 @@
       </section>
 
       <section class="card">
-        <h2>Recent posts</h2>
+        <div class="row">
+          <h2>Feed</h2>
+          <button id="btnRefresh" class="btn ghost">Refresh</button>
+        </div>
         <div id="feed" class="feed"></div>
       </section>
-
-      <!-- Admin panel (only visible if is_admin = true) -->
-      <section id="adminPanel" class="card hidden">
-        <h2>Admin: reset user password</h2>
-        <form id="adminResetForm" class="grid">
-          <label>Target username
-            <input id="adminTargetUsername" required />
-          </label>
-          <label>New password
-            <input id="adminNewPassword" type="password" required />
-          </label>
-          <button class="btn danger" type="submit">Reset password</button>
-        </form>
-        <p id="adminMsg" class="msg"></p>
-      </section>
     </section>
+
+    <footer class="foot muted">
+      Built with GitHub Pages + Supabase.
+    </footer>
   </main>
 
   <script type="module" src="./app.js"></script>
