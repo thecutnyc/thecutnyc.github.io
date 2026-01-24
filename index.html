@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RP Social</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">RP Social</div>
+    <div class="right">
+      <button id="btnLogout" class="btn ghost hidden">Logout</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- AUTH -->
+    <section id="authView" class="card">
+      <h1>Login</h1>
+      <p class="muted">Use your username + password.</p>
+
+      <form id="loginForm" class="grid">
+        <label>Username
+          <input id="loginUsername" autocomplete="username" required />
+        </label>
+        <label>Password
+          <input id="loginPassword" type="password" autocomplete="current-password" required />
+        </label>
+        <button class="btn primary" type="submit">Login</button>
+      </form>
+
+      <hr />
+
+      <h2>Create account</h2>
+      <p class="muted">Signup requires email too (Supabase Auth uses email+password). You’ll still login with username.</p>
+
+      <form id="signupForm" class="grid">
+        <label>Username (public)
+          <input id="signupUsername" required />
+        </label>
+        <label>Email
+          <input id="signupEmail" type="email" autocomplete="email" required />
+        </label>
+        <label>Password
+          <input id="signupPassword" type="password" autocomplete="new-password" required />
+        </label>
+        <button class="btn" type="submit">Create account</button>
+      </form>
+
+      <p id="authMsg" class="msg"></p>
+    </section>
+
+    <!-- APP -->
+    <section id="appView" class="hidden">
+      <section class="card">
+        <div class="row">
+          <div>
+            <h1 id="whoami">Feed</h1>
+            <p class="muted" id="walletLine">Wallet: —</p>
+          </div>
+        </div>
+
+        <form id="postForm" class="grid">
+          <label>Post
+            <textarea id="postContent" maxlength="280" placeholder="Write an in-character post…"></textarea>
+          </label>
+          <button class="btn primary" type="submit">Post</button>
+        </form>
+
+        <p id="postMsg" class="msg"></p>
+      </section>
+
+      <section class="card">
+        <h2>Recent posts</h2>
+        <div id="feed" class="feed"></div>
+      </section>
+
+      <!-- Admin panel (only visible if is_admin = true) -->
+      <section id="adminPanel" class="card hidden">
+        <h2>Admin: reset user password</h2>
+        <form id="adminResetForm" class="grid">
+          <label>Target username
+            <input id="adminTargetUsername" required />
+          </label>
+          <label>New password
+            <input id="adminNewPassword" type="password" required />
+          </label>
+          <button class="btn danger" type="submit">Reset password</button>
+        </form>
+        <p id="adminMsg" class="msg"></p>
+      </section>
+    </section>
+  </main>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
