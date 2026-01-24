@@ -9,94 +9,69 @@
 <body>
   <header class="topbar">
     <div class="brand">The Cut NYC</div>
+
+    <nav class="nav">
+      <button class="navbtn active" data-view="feedView">Feed</button>
+      <button class="navbtn" data-view="walletView">Wallet</button>
+      <button class="navbtn" data-view="settingsView">Settings</button>
+    </nav>
+
     <div class="top-actions">
       <button id="btnLogout" class="btn ghost hidden">Logout</button>
     </div>
   </header>
 
   <main class="wrap">
-    <section class="hero">
-      <div class="hero-card">
-        <h1>Roleplay like a feed.</h1>
-        <p class="muted">Post in-character updates, follow the vibe, and keep a simple wallet balance for your RP economy.</p>
-      </div>
-      <div class="hero-card glow"></div>
-    </section>
-
     <!-- AUTH -->
     <section id="authView" class="card">
-      <div class="tabs">
-        <button class="tab active" data-tab="login">Login</button>
-        <button class="tab" data-tab="signup">Sign up</button>
-        <button class="tab" data-tab="forgot">Forgot</button>
-      </div>
+      <h2>Login</h2>
+      <p class="muted">Username + password.</p>
+      <form id="loginForm" class="grid">
+        <label>Username <input id="loginUsername" autocomplete="username" required /></label>
+        <label>Password <input id="loginPassword" type="password" autocomplete="current-password" required /></label>
+        <button class="btn primary" type="submit">Login</button>
+      </form>
 
-      <div class="tabpane" id="pane-login">
-        <h2>Login</h2>
-        <p class="muted">Type your username + password.</p>
-        <form id="loginForm" class="grid">
-          <label>Username
-            <input id="loginUsername" autocomplete="username" required />
-          </label>
-          <label>Password
-            <input id="loginPassword" type="password" autocomplete="current-password" required />
-          </label>
-          <button class="btn primary" type="submit">Login</button>
+      <hr />
+
+      <h2>Create account</h2>
+      <form id="signupForm" class="grid">
+        <label>Username (public) <input id="signupUsername" required /></label>
+        <label>Email <input id="signupEmail" type="email" autocomplete="email" required /></label>
+        <label>Password <input id="signupPassword" type="password" autocomplete="new-password" required /></label>
+        <button class="btn" type="submit">Create account</button>
+      </form>
+
+      <hr />
+
+      <h2>Forgot password</h2>
+      <form id="forgotForm" class="grid">
+        <label>Email <input id="forgotEmail" type="email" required /></label>
+        <button class="btn" type="submit">Send reset email</button>
+      </form>
+
+      <div id="resetBox" class="soft hidden">
+        <h3>Set new password</h3>
+        <form id="resetForm" class="grid">
+          <label>New password <input id="newPassword" type="password" required /></label>
+          <button class="btn primary" type="submit">Update password</button>
         </form>
-        <p id="authMsg" class="msg"></p>
+        <p id="resetMsg" class="msg"></p>
       </div>
 
-      <div class="tabpane hidden" id="pane-signup">
-        <h2>Create account</h2>
-        <p class="muted">Signup needs email too (Supabase uses email+password), but your username is what shows publicly.</p>
-        <form id="signupForm" class="grid">
-          <label>Username (public)
-            <input id="signupUsername" required />
-          </label>
-          <label>Email
-            <input id="signupEmail" type="email" autocomplete="email" required />
-          </label>
-          <label>Password
-            <input id="signupPassword" type="password" autocomplete="new-password" required />
-          </label>
-          <button class="btn" type="submit">Create account</button>
-        </form>
-        <p id="signupMsg" class="msg"></p>
-      </div>
-
-      <div class="tabpane hidden" id="pane-forgot">
-        <h2>Reset password</h2>
-        <p class="muted">Enter your email, then check your inbox for the reset link.</p>
-        <form id="forgotForm" class="grid">
-          <label>Email
-            <input id="forgotEmail" type="email" required />
-          </label>
-          <button class="btn" type="submit">Send reset email</button>
-        </form>
-        <p id="forgotMsg" class="msg"></p>
-
-        <div id="resetBox" class="soft hidden">
-          <h3>Set new password</h3>
-          <p class="muted">If you opened the link from the email, set your new password here.</p>
-          <form id="resetForm" class="grid">
-            <label>New password
-              <input id="newPassword" type="password" required />
-            </label>
-            <button class="btn primary" type="submit">Update password</button>
-          </form>
-          <p id="resetMsg" class="msg"></p>
-        </div>
-      </div>
+      <p id="authMsg" class="msg"></p>
     </section>
 
     <!-- APP -->
     <section id="appView" class="hidden">
-      <section class="card">
+      <!-- FEED -->
+      <section id="feedView" class="card">
         <div class="row">
           <div>
             <h2 id="whoami">@user</h2>
-            <p class="muted" id="walletLine">Wallet: 0</p>
+            <p class="muted" id="walletLine">Wallet: —</p>
           </div>
+          <button id="btnRefresh" class="btn ghost">Refresh</button>
         </div>
 
         <form id="postForm" class="grid">
@@ -107,20 +82,52 @@
         </form>
 
         <p id="postMsg" class="msg"></p>
+
+        <div class="divider"></div>
+        <div id="feed" class="feed"></div>
       </section>
 
-      <section class="card">
+      <!-- WALLET -->
+      <section id="walletView" class="card hidden">
         <div class="row">
-          <h2>Feed</h2>
-          <button id="btnRefresh" class="btn ghost">Refresh</button>
+          <div>
+            <h2>Wallet</h2>
+            <p class="muted">Add transactions (top-ups/spends) and keep history.</p>
+          </div>
+          <div class="pill" id="walletBalancePill">$0</div>
         </div>
-        <div id="feed" class="feed"></div>
+
+        <form id="walletForm" class="grid">
+          <label>Amount (use negative to spend)
+            <input id="walletAmount" type="number" step="1" placeholder="10 or -5" required />
+          </label>
+          <label>Note
+            <input id="walletNote" placeholder="Taxi, outfit, bribe, rent..." />
+          </label>
+          <button class="btn primary" type="submit">Add transaction</button>
+        </form>
+
+        <p id="walletMsg" class="msg"></p>
+        <div class="divider"></div>
+        <div id="walletList" class="list"></div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="settingsView" class="card hidden">
+        <h2>Settings</h2>
+        <p class="muted">Light profile stuff (you can expand later).</p>
+
+        <form id="settingsForm" class="grid">
+          <label>Bio
+            <input id="bioInput" placeholder="Short bio..." />
+          </label>
+          <button class="btn primary" type="submit">Save</button>
+        </form>
+        <p id="settingsMsg" class="msg"></p>
       </section>
     </section>
 
-    <footer class="foot muted">
-      Built with GitHub Pages + Supabase.
-    </footer>
+    <footer class="foot muted">The Cut NYC — GitHub Pages + Supabase.</footer>
   </main>
 
   <script type="module" src="./app.js"></script>
