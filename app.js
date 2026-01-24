@@ -1,65 +1,93 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const SUPABASE_URL = "https://eeihtokxisihnyizanuj.supabase.co"
+const SUPABASE_URL = "https://YOURPROJECT.supabase.co"
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWh0b2t4aXNpaG55aXphbnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyOTMwMzgsImV4cCI6MjA4NDg2OTAzOH0.BBt7cVENwwUMrVQv5SD5Z8L02lQts5ooXRVTv6LRavY"
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-// --- UI refs
-const authView = document.getElementById('authView')
-const appView = document.getElementById('appView')
-const btnLogout = document.getElementById('btnLogout')
-const btnRefresh = document.getElementById('btnRefresh')
+// ---------- tiny helpers (safe against nulls)
+const $ = (id) => document.getElementById(id)
+const setMsg = (el, t) => { if (el) el.textContent = t || '' }
+const show = (el) => { if (el) el.classList.remove('hidden') }
+const hide = (el) => { if (el) el.classList.add('hidden') }
+const esc = (s) => (s ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
 
-const authMsg = document.getElementById('authMsg')
-const resetBox = document.getElementById('resetBox')
-const resetMsg = document.getElementById('resetMsg')
-const walletMsg = document.getElementById('walletMsg')
-const settingsMsg = document.getElementById('settingsMsg')
+// ---------- refs (may be null depending on view)
+const authView = $('authView')
+const appView = $('appView')
+const btnLogout = $('btnLogout')
+const btnRefresh = $('btnRefresh')
 
-const whoami = document.getElementById('whoami')
-const walletLine = document.getElementById('walletLine')
-const walletBalancePill = document.getElementById('walletBalancePill')
+const authMsg = $('authMsg')
+const signupMsg = $('signupMsg')
+const forgotMsg = $('forgotMsg')
+const resetMsg = $('resetMsg')
+const resetBox = $('resetBox')
 
-const feed = document.getElementById('feed')
-const walletList = document.getElementById('walletList')
+const whoami = $('whoami')
+const walletLine = $('walletLine')
+const walletBalancePill = $('walletBalancePill')
 
-document.getElementById('loginForm').addEventListener('submit', onLogin)
-document.getElementById('signupForm').addEventListener('submit', onSignup)
-document.getElementById('forgotForm').addEventListener('submit', onForgot)
-document.getElementById('resetForm').addEventListener('submit', onReset)
+const postMsg = $('postMsg')
+const feed = $('feed')
 
-document.getElementById('postForm').addEventListener('submit', onPost)
-document.getElementById('walletForm').addEventListener('submit', onWalletTx)
-document.getElementById('settingsForm').addEventListener('submit', onSaveSettings)
+const walletMsg = $('walletMsg')
+const walletList = $('walletList')
 
-btnLogout.addEventListener('click', async () => { await supabase.auth.signOut(); await refreshUI() })
-btnRefresh.addEventListener('click', async () => { await loadFeed() })
+const settingsMsg = $('settingsMsg')
+const bioInput = $('bioInput')
 
-function setMsg(el, t){ if (el) el.textContent = t || '' }
-function show(el){ el.classList.remove('hidden') }
-function hide(el){ el.classList.add('hidden') }
-function esc(s){ return (s ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;') }
-
-function setActiveView(viewId){
-  document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'))
-  document.querySelector(`.navbtn[data-view="${viewId}"]`)?.classList.add('active')
-
-  document.getElementById('feedView').classList.toggle('hidden', viewId !== 'feedView')
-  document.getElementById('walletView').classList.toggle('hidden', viewId !== 'walletView')
-  document.getElementById('settingsView').classList.toggle('hidden', viewId !== 'settingsView')
-}
-
-document.querySelectorAll('.navbtn').forEach(btn => {
-  btn.addEventListener('click', async () => {
-    const v = btn.getAttribute('data-view')
-    setActiveView(v)
-    if (v === 'walletView') await loadWallet()
+// ---------- tabs (auth)
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    const tab = btn.getAttribute('data-tab')
+    setAuthPane(tab)
   })
 })
 
+function setAuthPane(tab){
+  $('pane-login')?.classList.toggle('hidden', tab !== 'login')
+  $('pane-signup')?.classList.toggle('hidden', tab !== 'signup')
+  $('pane-forgot')?.classList.toggle('hidden', tab !== 'forgot')
+}
+
+// ---------- top nav (app)
+document.querySelectorAll('.navbtn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    const view = btn.getAttribute('data-view')
+    setView(view)
+    if (view === 'walletView') await loadWallet()
+  })
+})
+
+function setView(viewId){
+  $('feedView')?.classList.toggle('hidden', viewId !== 'feedView')
+  $('walletView')?.classList.toggle('hidden', viewId !== 'walletView')
+  $('settingsView')?.classList.toggle('hidden', viewId !== 'settingsView')
+}
+
+// ---------- wire events
+$('loginForm')?.addEventListener('submit', onLogin)
+$('signupForm')?.addEventListener('submit', onSignup)
+$('forgotForm')?.addEventListener('submit', onForgot)
+$('resetForm')?.addEventListener('submit', onReset)
+
+$('postForm')?.addEventListener('submit', onPost)
+$('walletForm')?.addEventListener('submit', onWalletTx)
+$('settingsForm')?.addEventListener('submit', onSaveSettings)
+
+btnLogout?.addEventListener('click', async () => { await supabase.auth.signOut(); await refreshUI() })
+btnRefresh?.addEventListener('click', async () => { await loadFeed() })
+
+// ---------- main UI refresh
 async function refreshUI(){
-  setMsg(authMsg,''); setMsg(resetMsg,''); setMsg(walletMsg,''); setMsg(settingsMsg,'')
+  setMsg(authMsg,''); setMsg(signupMsg,''); setMsg(forgotMsg,''); setMsg(resetMsg,'')
+  setMsg(postMsg,''); setMsg(walletMsg,''); setMsg(settingsMsg,'')
+
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user){
@@ -75,23 +103,31 @@ async function refreshUI(){
     .eq('id', user.id)
     .single()
 
-  whoami.textContent = profile?.username ? `@${profile.username}` : '@signed_in'
-  document.getElementById('bioInput').value = profile?.bio ?? ''
+  if (whoami) whoami.textContent = profile?.username ? `@${profile.username}` : '@signed_in'
+  if (bioInput) bioInput.value = profile?.bio ?? ''
 
-  setActiveView('feedView')
+  setView('feedView')
+  document.querySelector('.navbtn[data-view="feedView"]')?.classList.add('active')
+
   await loadFeed()
   await loadWalletBalance()
 }
 
+// ---------- feed
 async function loadFeed(){
+  if (!feed) return
   feed.innerHTML = `<div class="muted">Loading…</div>`
+
   const { data, error } = await supabase
     .from('posts')
     .select('id, content, created_at, profiles(username)')
     .order('created_at', { ascending: false })
     .limit(40)
 
-  if (error){ feed.innerHTML = `<div class="muted">Error: ${esc(error.message)}</div>`; return }
+  if (error){
+    feed.innerHTML = `<div class="muted">Error: ${esc(error.message)}</div>`
+    return
+  }
 
   feed.innerHTML = ''
   for (const row of data){
@@ -109,48 +145,62 @@ async function loadFeed(){
 
 async function onPost(e){
   e.preventDefault()
-  setMsg(document.getElementById('postMsg'), '')
-  const content = document.getElementById('postContent').value.trim()
-  if (!content) return
+  setMsg(postMsg, '')
+
+  const content = $('postContent')?.value?.trim() ?? ''
+  if (!content) return setMsg(postMsg, 'Write something first.')
 
   const { data: { user } } = await supabase.auth.getUser()
-  const { error } = await supabase.from('posts').insert({ user_id: user.id, content })
-  if (error) return setMsg(document.getElementById('postMsg'), error.message)
+  if (!user) return setMsg(postMsg, 'Not logged in.')
 
-  document.getElementById('postContent').value = ''
+  const { error } = await supabase.from('posts').insert({ user_id: user.id, content })
+  if (error) return setMsg(postMsg, error.message)
+
+  $('postContent').value = ''
   await loadFeed()
 }
 
-// ---- Wallet
+// ---------- wallet (transaction-log)
 async function loadWalletBalance(){
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
 
+  // If you haven't created wallet_transactions yet, this will error; that's fine.
   const { data, error } = await supabase
     .from('wallet_transactions')
     .select('amount')
     .eq('user_id', user.id)
 
-  if (error) { walletLine.textContent = 'Wallet: —'; walletBalancePill.textContent = '$—'; return }
+  if (error){
+    if (walletLine) walletLine.textContent = 'Wallet: 0'
+    if (walletBalancePill) walletBalancePill.textContent = '$0'
+    return
+  }
 
   const balance = (data ?? []).reduce((acc, r) => acc + Number(r.amount || 0), 0)
-  walletLine.textContent = `Wallet: ${balance}`
-  walletBalancePill.textContent = `$${balance}`
+  if (walletLine) walletLine.textContent = `Wallet: ${balance}`
+  if (walletBalancePill) walletBalancePill.textContent = `$${balance}`
 }
 
 async function loadWallet(){
+  if (!walletList) return
   walletList.innerHTML = `<div class="muted">Loading…</div>`
   await loadWalletBalance()
 
   const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+
   const { data, error } = await supabase
     .from('wallet_transactions')
     .select('id, amount, note, created_at')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
-    .limit(50)
+    .limit(60)
 
-  if (error){ walletList.innerHTML = `<div class="muted">Error: ${esc(error.message)}</div>`; return }
+  if (error){
+    walletList.innerHTML = `<div class="muted">Wallet table missing or RLS blocked: ${esc(error.message)}</div>`
+    return
+  }
 
   walletList.innerHTML = ''
   for (const row of data){
@@ -174,66 +224,63 @@ async function onWalletTx(e){
   e.preventDefault()
   setMsg(walletMsg, '')
 
-  const amount = Number(document.getElementById('walletAmount').value)
-  const note = document.getElementById('walletNote').value.trim()
+  const amtRaw = $('walletAmount')?.value
+  const note = $('walletNote')?.value?.trim() ?? ''
+  const amount = Number(amtRaw)
 
   if (!Number.isFinite(amount) || amount === 0) return setMsg(walletMsg, 'Amount must be a non-zero number.')
 
   const { data: { user } } = await supabase.auth.getUser()
-  const { error } = await supabase.from('wallet_transactions').insert({
-    user_id: user.id,
-    amount,
-    note
-  })
+  if (!user) return setMsg(walletMsg, 'Not logged in.')
 
+  const { error } = await supabase.from('wallet_transactions').insert({ user_id: user.id, amount, note })
   if (error) return setMsg(walletMsg, error.message)
 
-  document.getElementById('walletAmount').value = ''
-  document.getElementById('walletNote').value = ''
+  $('walletAmount').value = ''
+  $('walletNote').value = ''
   await loadWallet()
 }
 
-// ---- Settings
+// ---------- settings
 async function onSaveSettings(e){
   e.preventDefault()
   setMsg(settingsMsg, 'Saving…')
 
-  const bio = document.getElementById('bioInput').value.trim()
   const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return setMsg(settingsMsg, 'Not logged in.')
 
-  const { error } = await supabase
-    .from('profiles')
-    .update({ bio })
-    .eq('id', user.id)
-
+  const bio = bioInput?.value?.trim() ?? ''
+  const { error } = await supabase.from('profiles').update({ bio }).eq('id', user.id)
   setMsg(settingsMsg, error ? error.message : 'Saved.')
 }
 
-// ---- Auth (username login via username->email lookup)
+// ---------- auth (username->email lookup, then signInWithPassword)
 async function onSignup(e){
   e.preventDefault()
-  setMsg(authMsg, 'Creating account…')
+  setMsg(signupMsg, 'Creating account…')
 
-  const username = document.getElementById('signupUsername').value.trim()
-  const email = document.getElementById('signupEmail').value.trim().toLowerCase()
-  const password = document.getElementById('signupPassword').value
+  const username = $('signupUsername')?.value?.trim() ?? ''
+  const email = ($('signupEmail')?.value ?? '').trim().toLowerCase()
+  const password = $('signupPassword')?.value ?? ''
+
+  if (!username.match(/^[a-zA-Z0-9_]{3,20}$/)) return setMsg(signupMsg, 'Username must be 3–20 chars (letters, numbers, underscore).')
 
   const { data, error } = await supabase.auth.signUp({ email, password })
-  if (error) return setMsg(authMsg, error.message)
+  if (error) return setMsg(signupMsg, error.message)
 
   const userId = data.user?.id
-  const { error: profErr } = await supabase.from('profiles').insert({
-    id: userId, username, email, wallet_balance: 0
-  })
-  setMsg(authMsg, profErr ? profErr.message : 'Account created. Login now.')
+  if (!userId) return setMsg(signupMsg, 'Signup ok, but no user returned. Check Supabase email confirmation settings.')
+
+  const { error: profErr } = await supabase.from('profiles').insert({ id: userId, username, email })
+  setMsg(signupMsg, profErr ? profErr.message : 'Account created. Go to Login.')
 }
 
 async function onLogin(e){
   e.preventDefault()
   setMsg(authMsg, 'Logging in…')
 
-  const username = document.getElementById('loginUsername').value.trim()
-  const password = document.getElementById('loginPassword').value
+  const username = $('loginUsername')?.value?.trim() ?? ''
+  const password = $('loginPassword')?.value ?? ''
 
   const { data: rows, error: uErr } = await supabase
     .from('profiles')
@@ -244,36 +291,42 @@ async function onLogin(e){
   if (uErr) return setMsg(authMsg, uErr.message)
   if (!rows || rows.length === 0) return setMsg(authMsg, 'Unknown username.')
 
-  const { error } = await supabase.auth.signInWithPassword({ email: rows[0].email, password })
+  const email = rows[0].email
+  const { error } = await supabase.auth.signInWithPassword({ email, password }) // [web:69]
   if (error) return setMsg(authMsg, error.message)
 
   await refreshUI()
 }
 
-// Password reset
+// Password reset email: resetPasswordForEmail supports redirectTo. [web:55]
 async function onForgot(e){
   e.preventDefault()
-  setMsg(authMsg, '')
-  setMsg(resetMsg, '')
-  const email = document.getElementById('forgotEmail').value.trim().toLowerCase()
+  setMsg(forgotMsg, 'Sending…')
+
+  const email = ($('forgotEmail')?.value ?? '').trim().toLowerCase()
   const redirectTo = window.location.origin + window.location.pathname
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo }) // [web:55]
-  setMsg(authMsg, error ? error.message : 'Sent reset email. Open the link, then set a new password.')
+  setMsg(forgotMsg, error ? error.message : 'Sent. Open the email link, then set your new password here.')
 }
 
+// Auth events (use PASSWORD_RECOVERY to show reset UI). [web:166]
 supabase.auth.onAuthStateChange((event) => {
   if (event === 'PASSWORD_RECOVERY') {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'))
+    document.querySelector('.tab[data-tab="forgot"]')?.classList.add('active')
+    setAuthPane('forgot')
     show(resetBox)
   }
-}) // listen to auth events [web:166]
+}) // [web:166]
 
 async function onReset(e){
   e.preventDefault()
   setMsg(resetMsg, 'Updating…')
-  const password = document.getElementById('newPassword').value
-  const { error } = await supabase.auth.updateUser({ password }) // [web:55]
-  setMsg(resetMsg, error ? error.message : 'Password updated. Login again.')
+
+  const password = $('newPassword')?.value ?? ''
+  const { error } = await supabase.auth.updateUser({ password }) // part of reset flow [web:55]
+  setMsg(resetMsg, error ? error.message : 'Password updated. Go to Login.')
 }
 
 // boot
