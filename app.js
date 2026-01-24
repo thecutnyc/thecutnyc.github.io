@@ -1,23 +1,24 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-fetch(SUPABASE_URL + "/auth/v1/health")
-  .then(r => console.log("Auth health status:", r.status))
-  .catch(e => console.log("Auth health failed:", e))
-
-
+// 1) PUT YOUR REAL VALUES HERE
 const SUPABASE_URL = "https://eeihtokxisihnyizanuj.supabase.co"
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWh0b2t4aXNpaG55aXphbnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyOTMwMzgsImV4cCI6MjA4NDg2OTAzOH0.BBt7cVENwwUMrVQv5SD5Z8L02lQts5ooXRVTv6LRavY"
 
+// ------------------------------------------------------------------
+// Supabase client
+// ------------------------------------------------------------------
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-// ---------- tiny helpers (safe against nulls)
+// Tiny helpers (safe against nulls)
 const $ = (id) => document.getElementById(id)
 const setMsg = (el, t) => { if (el) el.textContent = t || '' }
 const show = (el) => { if (el) el.classList.remove('hidden') }
 const hide = (el) => { if (el) el.classList.add('hidden') }
 const esc = (s) => (s ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
 
-// ---------- refs (may be null depending on view)
+// ------------------------------------------------------------------
+// Element refs
+// ------------------------------------------------------------------
 const authView = $('authView')
 const appView = $('appView')
 const btnLogout = $('btnLogout')
@@ -42,7 +43,9 @@ const walletList = $('walletList')
 const settingsMsg = $('settingsMsg')
 const bioInput = $('bioInput')
 
-// ---------- tabs (auth)
+// ------------------------------------------------------------------
+// Auth tabs (Login / Signup / Forgot)
+// ------------------------------------------------------------------
 document.querySelectorAll('.tab').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'))
@@ -58,7 +61,9 @@ function setAuthPane(tab){
   $('pane-forgot')?.classList.toggle('hidden', tab !== 'forgot')
 }
 
-// ---------- top nav (app)
+// ------------------------------------------------------------------
+// Top nav (Feed / Wallet / Settings)
+// ------------------------------------------------------------------
 document.querySelectorAll('.navbtn').forEach(btn => {
   btn.addEventListener('click', async () => {
     document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'))
@@ -75,7 +80,9 @@ function setView(viewId){
   $('settingsView')?.classList.toggle('hidden', viewId !== 'settingsView')
 }
 
-// ---------- wire events
+// ------------------------------------------------------------------
+// Wire form events
+// ------------------------------------------------------------------
 $('loginForm')?.addEventListener('submit', onLogin)
 $('signupForm')?.addEventListener('submit', onSignup)
 $('forgotForm')?.addEventListener('submit', onForgot)
@@ -88,7 +95,9 @@ $('settingsForm')?.addEventListener('submit', onSaveSettings)
 btnLogout?.addEventListener('click', async () => { await supabase.auth.signOut(); await refreshUI() })
 btnRefresh?.addEventListener('click', async () => { await loadFeed() })
 
-// ---------- main UI refresh
+// ------------------------------------------------------------------
+// Main UI refresh
+// ------------------------------------------------------------------
 async function refreshUI(){
   setMsg(authMsg,''); setMsg(signupMsg,''); setMsg(forgotMsg,''); setMsg(resetMsg,'')
   setMsg(postMsg,''); setMsg(walletMsg,''); setMsg(settingsMsg,'')
@@ -118,7 +127,9 @@ async function refreshUI(){
   await loadWalletBalance()
 }
 
-// ---------- feed
+// ------------------------------------------------------------------
+// Feed
+// ------------------------------------------------------------------
 async function loadFeed(){
   if (!feed) return
   feed.innerHTML = `<div class="muted">Loading…</div>`
@@ -165,12 +176,13 @@ async function onPost(e){
   await loadFeed()
 }
 
-// ---------- wallet (transaction-log)
+// ------------------------------------------------------------------
+// Wallet (transaction log in wallet_transactions)
+// ------------------------------------------------------------------
 async function loadWalletBalance(){
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
 
-  // If you haven't created wallet_transactions yet, this will error; that's fine.
   const { data, error } = await supabase
     .from('wallet_transactions')
     .select('amount')
@@ -203,7 +215,7 @@ async function loadWallet(){
     .limit(60)
 
   if (error){
-    walletList.innerHTML = `<div class="muted">Wallet table missing or RLS blocked: ${esc(error.message)}</div>`
+    walletList.innerHTML = `<div class="muted">Wallet table error: ${esc(error.message)}</div>`
     return
   }
 
@@ -246,7 +258,9 @@ async function onWalletTx(e){
   await loadWallet()
 }
 
-// ---------- settings
+// ------------------------------------------------------------------
+// Settings
+// ------------------------------------------------------------------
 async function onSaveSettings(e){
   e.preventDefault()
   setMsg(settingsMsg, 'Saving…')
@@ -259,7 +273,9 @@ async function onSaveSettings(e){
   setMsg(settingsMsg, error ? error.message : 'Saved.')
 }
 
-// ---------- auth (username->email lookup, then signInWithPassword)
+// ------------------------------------------------------------------
+// Auth: signup + username login
+// ------------------------------------------------------------------
 async function onSignup(e){
   e.preventDefault()
   setMsg(signupMsg, 'Creating account…')
@@ -268,13 +284,15 @@ async function onSignup(e){
   const email = ($('signupEmail')?.value ?? '').trim().toLowerCase()
   const password = $('signupPassword')?.value ?? ''
 
-  if (!username.match(/^[a-zA-Z0-9_]{3,20}$/)) return setMsg(signupMsg, 'Username must be 3–20 chars (letters, numbers, underscore).')
+  if (!username.match(/^[a-zA-Z0-9_]{3,20}$/)) {
+    return setMsg(signupMsg, 'Username must be 3–20 chars (letters, numbers, underscore).')
+  }
 
   const { data, error } = await supabase.auth.signUp({ email, password })
   if (error) return setMsg(signupMsg, error.message)
 
   const userId = data.user?.id
-  if (!userId) return setMsg(signupMsg, 'Signup ok, but no user returned. Check Supabase email confirmation settings.')
+  if (!userId) return setMsg(signupMsg, 'Signup ok, but no user returned (check email confirm settings in Supabase).')
 
   const { error: profErr } = await supabase.from('profiles').insert({ id: userId, username, email })
   setMsg(signupMsg, profErr ? profErr.message : 'Account created. Go to Login.')
@@ -303,7 +321,9 @@ async function onLogin(e){
   await refreshUI()
 }
 
-// Password reset email: resetPasswordForEmail supports redirectTo. [web:55]
+// ------------------------------------------------------------------
+// Password reset (email flow)
+// ------------------------------------------------------------------
 async function onForgot(e){
   e.preventDefault()
   setMsg(forgotMsg, 'Sending…')
@@ -312,10 +332,10 @@ async function onForgot(e){
   const redirectTo = window.location.origin + window.location.pathname
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo }) // [web:55]
-  setMsg(forgotMsg, error ? error.message : 'Sent. Open the email link, then set your new password here.')
+  setMsg(forgotMsg, error ? error.message : 'Sent reset email. Open the link, then set a new password here.')
 }
 
-// Auth events (use PASSWORD_RECOVERY to show reset UI). [web:166]
+// Listen for PASSWORD_RECOVERY event. [web:166]
 supabase.auth.onAuthStateChange((event) => {
   if (event === 'PASSWORD_RECOVERY') {
     document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'))
@@ -323,16 +343,19 @@ supabase.auth.onAuthStateChange((event) => {
     setAuthPane('forgot')
     show(resetBox)
   }
-}) // [web:166]
+})
 
 async function onReset(e){
   e.preventDefault()
   setMsg(resetMsg, 'Updating…')
 
   const password = $('newPassword')?.value ?? ''
-  const { error } = await supabase.auth.updateUser({ password }) // part of reset flow [web:55]
+  const { error } = await supabase.auth.updateUser({ password }) // [web:55]
   setMsg(resetMsg, error ? error.message : 'Password updated. Go to Login.')
 }
 
-// boot
+// ------------------------------------------------------------------
+// Boot
+// ------------------------------------------------------------------
+console.log("The Cut NYC using Supabase URL:", SUPABASE_URL)
 await refreshUI()
