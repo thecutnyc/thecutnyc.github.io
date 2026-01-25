@@ -13,6 +13,7 @@
     <nav class="nav">
       <button class="navbtn active" data-view="feedView" type="button">Feed</button>
       <button class="navbtn" data-view="walletView" type="button">Wallet</button>
+      <button class="navbtn" data-view="charactersView" type="button">Characters</button>
       <button class="navbtn" data-view="settingsView" type="button">Settings</button>
     </nav>
 
@@ -101,11 +102,9 @@
           <label>Post
             <textarea id="postContent" maxlength="280" placeholder="Write an in-character post…"></textarea>
           </label>
-
           <label>Image (optional)
             <input id="postImage" type="file" accept="image/*" />
           </label>
-
           <button class="btn primary" type="submit">Post</button>
         </form>
 
@@ -119,7 +118,7 @@
         <div class="row">
           <div>
             <h2>Wallet</h2>
-            <p class="muted">Transactions + history (use negative amounts to spend).</p>
+            <p class="muted">Transactions + transfers.</p>
           </div>
           <div class="pill" id="walletBalancePill">$—</div>
         </div>
@@ -134,9 +133,61 @@
           <button class="btn primary" type="submit">Add transaction</button>
         </form>
 
+        <div class="divider"></div>
+
+        <h2>Send money</h2>
+        <form id="transferForm" class="grid">
+          <label>To username
+            <input id="transferTo" placeholder="their_username" required />
+          </label>
+          <label>Amount
+            <input id="transferAmount" type="number" step="1" placeholder="50" required />
+          </label>
+          <label>Note
+            <input id="transferNote" placeholder="rent" />
+          </label>
+          <button class="btn primary" type="submit">Send</button>
+        </form>
+
         <p id="walletMsg" class="msg"></p>
         <div class="divider"></div>
         <div id="walletList" class="list"></div>
+      </section>
+
+      <!-- CHARACTERS -->
+      <section id="charactersView" class="card hidden">
+        <div class="row">
+          <div>
+            <h2>Characters</h2>
+            <p class="muted">Public IC directory. Only you can edit yours.</p>
+          </div>
+          <button id="btnRefreshCharacters" class="btn ghost" type="button">Refresh</button>
+        </div>
+
+        <h2>My character</h2>
+        <form id="characterForm" class="grid">
+          <label>Name
+            <input id="charName" required />
+          </label>
+          <label>Age
+            <input id="charAge" />
+          </label>
+          <label>Faction
+            <input id="charFaction" />
+          </label>
+          <label>Faceclaim
+            <input id="charFaceclaim" placeholder="(optional link or name)" />
+          </label>
+          <label>Bio
+            <textarea id="charBio" placeholder="IC info…"></textarea>
+          </label>
+          <button class="btn primary" type="submit">Save character</button>
+        </form>
+        <p id="charactersMsg" class="msg"></p>
+
+        <div class="divider"></div>
+        <h2>All characters</h2>
+        <div id="charactersList" class="list"></div>
       </section>
 
       <!-- SETTINGS -->
