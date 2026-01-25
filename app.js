@@ -1,9 +1,9 @@
 // 1) Put your keys here
-const SUPABASE_URL = "https://eeihtokxisihnyizanuj.supabase.co";
+const SUPABASE_URL = "https://eeihtokxisihnyizanuj.sb.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWh0b2t4aXNpaG55aXphbnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyOTMwMzgsImV4cCI6MjA4NDg2OTAzOH0.BBt7cVENwwUMrVQv5SD5Z8L02lQts5ooXRVTv6LRavY";
 
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const sb = window.sb.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const $ = (id) => document.getElementById(id);
 const setMsg = (el, msg) => { if (el) el.textContent = msg || ""; };
@@ -27,7 +27,7 @@ signupForm.addEventListener("submit", onSignup);
 postForm.addEventListener("submit", onCreatePost);
 logoutBtn.addEventListener("click", onLogout);
 
-supabase.auth.onAuthStateChange(() => refreshUI());
+sb.auth.onAuthStateChange(() => refreshUI());
 refreshUI();
 
 async function onSignup(e){
@@ -37,7 +37,7 @@ async function onSignup(e){
   const email = ($("signupEmail").value || "").trim().toLowerCase();
   const password = $("signupPassword").value || "";
 
-  const { error } = await supabase.auth.signUp({ email, password }); // [web:47]
+  const { error } = await sb.auth.signUp({ email, password }); // [web:47]
   if (error) return setMsg(signupMsg, error.message);
 
   setMsg(signupMsg, "Account created. Now log in (or confirm email if required).");
@@ -50,18 +50,18 @@ async function onLogin(e){
   const email = ($("loginEmail").value || "").trim().toLowerCase();
   const password = $("loginPassword").value || "";
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password }); // [web:69]
+  const { error } = await sb.auth.signInWithPassword({ email, password }); // [web:69]
   if (error) return setMsg(authMsg, error.message);
 
   setMsg(authMsg, "");
 }
 
 async function onLogout(){
-  await supabase.auth.signOut();
+  await sb.auth.signOut();
 }
 
 async function refreshUI(){
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await sb.auth.getUser();
 
   const authed = !!user;
   authSection.classList.toggle("hidden", authed);
@@ -76,7 +76,7 @@ async function onCreatePost(e){
   e.preventDefault();
   setMsg(postMsg, "Posting…");
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) return setMsg(postMsg, "Not logged in.");
 
   const body = ($("postBody").value || "").trim();
@@ -89,14 +89,14 @@ async function onCreatePost(e){
     const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
     const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
 
-    const up = await supabase.storage
+    const up = await sb.storage
       .from("post-images")
       .upload(path, file, { upsert: false });
 
     if (up.error) return setMsg(postMsg, up.error.message);
 
     // Public buckets can use getPublicUrl convenience helper. [web:571]
-    const { data } = supabase.storage.from("post-images").getPublicUrl(path);
+    const { data } = sb.storage.from("post-images").getPublicUrl(path);
     image_url = data.publicUrl;
   }
 
@@ -155,7 +155,7 @@ async function loadFeed(){
 }
 
 async function toggleLike(postId){
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) return;
 
   // Like exists?
@@ -167,9 +167,9 @@ async function toggleLike(postId){
     .maybeSingle();
 
   if (existing.data) {
-    await supabase.from("post_likes").delete().eq("post_id", postId).eq("user_id", user.id);
+    await sb.from("post_likes").delete().eq("post_id", postId).eq("user_id", user.id);
   } else {
-    await supabase.from("post_likes").insert({ post_id: postId, user_id: user.id });
+    await sb.from("post_likes").insert({ post_id: postId, user_id: user.id });
   }
 }
 
@@ -177,10 +177,10 @@ async function addComment(postId){
   const text = prompt("Comment:");
   if (!text) return;
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) return;
 
-  await supabase.from("post_comments").insert({
+  await sb.from("post_comments").insert({
     post_id: postId,
     user_id: user.id,
     body: text.trim(),
