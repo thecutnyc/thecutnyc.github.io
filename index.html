@@ -3,291 +3,655 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>the cut nyc</title>
-
+  <title>Roleplay Social (Single-File)</title>
   <style>
-    :root { --bg:#0b0d12; --card:#121622; --text:#e9ecf5; --muted:#9aa3b2; --line:#232a3b; --accent:#6d6bff; }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
-    .bar{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,13,18,.9);backdrop-filter:blur(8px)}
-    .wrap{max-width:820px;margin:18px auto;padding:0 14px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
-    .grid{display:grid;gap:10px}
-    label{display:grid;gap:6px;color:var(--muted);font-size:14px}
-    input,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0e111a;color:var(--text)}
-    .btn{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#0e111a;color:var(--text);cursor:pointer}
-    .btn.primary{background:var(--accent);border-color:transparent;color:white}
-    .right{display:flex;gap:10px;align-items:center}
-    .muted{color:var(--muted);font-size:14px}
-    .hidden{display:none}
-    hr{border:none;border-top:1px solid var(--line);margin:16px 0}
-    .msg{margin:8px 0 0;color:var(--muted);min-height:18px}
-    .post{border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0;background:#0e111a}
-    .post .meta{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-bottom:8px;gap:12px;flex-wrap:wrap}
-    .post img{max-width:100%;border-radius:12px;border:1px solid var(--line);margin-top:10px}
-    .actions{display:flex;gap:8px;align-items:center;margin-top:10px;color:var(--muted);font-size:14px;flex-wrap:wrap}
-    .actions button{padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:#0b0d12;color:var(--text);cursor:pointer}
+    :root { --bg:#0b0f14; --card:#121923; --muted:#8aa0b7; --text:#e7f0ff; --acc:#7aa7ff; --bad:#ff6b6b; --good:#2ee59d; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:var(--bg); color:var(--text); }
+    a { color: var(--acc); text-decoration: none; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 18px; }
+    .grid { display:grid; gap:14px; grid-template-columns: 1.2fr 0.8fr; }
+    @media (max-width: 860px){ .grid{ grid-template-columns:1fr; } }
+    .card { background: var(--card); border:1px solid rgba(255,255,255,.06); border-radius: 14px; padding: 14px; }
+    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .space { justify-content: space-between; }
+    .muted { color: var(--muted); }
+    .pill { padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.06); font-size: 12px; }
+    input, textarea, select { width:100%; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.10); color: var(--text); border-radius: 12px; padding: 10px 12px; outline: none; }
+    textarea { min-height: 90px; resize: vertical; }
+    button { background: rgba(122,167,255,.18); border:1px solid rgba(122,167,255,.35); color: var(--text); padding: 9px 12px; border-radius: 12px; cursor:pointer; }
+    button:hover { filter: brightness(1.1); }
+    button.ghost { background: transparent; border-color: rgba(255,255,255,.12); }
+    button.bad { background: rgba(255,107,107,.12); border-color: rgba(255,107,107,.35); }
+    button.good { background: rgba(46,229,157,.12); border-color: rgba(46,229,157,.35); }
+    .h { font-weight: 700; font-size: 15px; }
+    .hr { height:1px; background: rgba(255,255,255,.08); margin: 12px 0; }
+    .post { display:grid; gap:10px; }
+    .post img { width:100%; border-radius: 12px; border:1px solid rgba(255,255,255,.08); }
+    .postMeta { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .small { font-size: 12px; }
+    .btns { display:flex; gap:8px; flex-wrap:wrap; }
+    .comment { padding: 8px 10px; border-radius: 12px; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); margin-top:8px; }
+    .two { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    @media (max-width: 520px){ .two{ grid-template-columns:1fr; } }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .hide { display:none !important; }
   </style>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
 <body>
-  <header class="bar">
-    <h1>the cut nyc</h1>
-    <div class="right">
-      <span id="whoami" class="muted"></span>
-      <button id="logoutBtn" class="btn">Logout</button>
+<div class="wrap">
+
+  <div class="row space">
+    <div class="row">
+      <div class="h">Roleplay Social</div>
+      <div class="pill mono" id="buildTag">single-file</div>
     </div>
-  </header>
+    <div class="row">
+      <div id="who" class="muted small">Not logged in</div>
+      <button id="logoutBtn" class="ghost hide">Logout</button>
+    </div>
+  </div>
 
-  <main class="wrap">
-    <section id="authSection" class="card">
-      <h2>Login</h2>
-      <form id="loginForm" class="grid">
-        <label>Email
-          <input id="loginEmail" type="email" autocomplete="email" required />
-        </label>
-        <label>Password
-          <input id="loginPassword" type="password" autocomplete="current-password" required />
-        </label>
-        <button class="btn primary" type="submit">Login</button>
-      </form>
-      <p id="authMsg" class="msg"></p>
+  <div class="grid">
+    <!-- LEFT: FEED -->
+    <div class="card">
+      <div class="row space">
+        <div>
+          <div class="h">Feed</div>
+          <div class="muted small">Posts with text + images, likes, and comments.</div>
+        </div>
+        <button id="seedBtn" class="ghost">Seed demo data</button>
+      </div>
 
-      <hr />
+      <div class="hr"></div>
 
-      <h2>Create account</h2>
-      <form id="signupForm" class="grid">
-        <label>Email
-          <input id="signupEmail" type="email" autocomplete="email" required />
-        </label>
-        <label>Password
-          <input id="signupPassword" type="password" autocomplete="new-password" required />
-        </label>
-        <button class="btn" type="submit">Sign up</button>
-      </form>
-      <p id="signupMsg" class="msg"></p>
-    </section>
+      <div id="composer" class="hide">
+        <div class="h">Create post</div>
+        <div class="muted small">Text is required; image is optional.</div>
+        <div style="height:10px"></div>
+        <textarea id="postText" placeholder="Write your roleplay post..."></textarea>
+        <div style="height:10px"></div>
+        <div class="two">
+          <div>
+            <div class="muted small">Optional image</div>
+            <input id="postImage" type="file" accept="image/*" />
+          </div>
+          <div>
+            <div class="muted small">Visibility</div>
+            <select id="postVis">
+              <option value="public">Public</option>
+              <option value="friends">Friends (not implemented)</option>
+            </select>
+          </div>
+        </div>
+        <div style="height:10px"></div>
+        <div class="row space">
+          <div class="muted small">Tip: images are stored in your browser, so huge images can fill storage.</div>
+          <button id="publishBtn">Publish</button>
+        </div>
 
-    <section id="appSection" class="card hidden">
-      <h2>New post</h2>
-      <form id="postForm" class="grid">
-        <label>Text
-          <textarea id="postBody" rows="3" required></textarea>
-        </label>
-        <label>Image (optional)
-          <input id="postImage" type="file" accept="image/*" />
-        </label>
-        <button class="btn primary" type="submit">Post</button>
-      </form>
-      <p id="postMsg" class="msg"></p>
+        <div class="hr"></div>
+      </div>
 
-      <hr />
-
-      <h2>Feed</h2>
       <div id="feed"></div>
-    </section>
-  </main>
+    </div>
 
-  <script>
-    // Put your keys here (anon key is ok in frontend; protect data with RLS). [web:604]
-    const SUPABASE_URL = "https://eeihtokxisihnyizanuj.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWh0b2t4aXNpaG55aXphbnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyOTMwMzgsImV4cCI6MjA4NDg2OTAzOH0.BBt7cVENwwUMrVQv5SD5Z8L02lQts5ooXRVTv6LRavY";
+    <!-- RIGHT: AUTH + WALLET -->
+    <div>
+      <div class="card" id="authCard">
+        <div class="h">Accounts</div>
+        <div class="muted small">Local-only accounts (stored in this browser).</div>
+        <div class="hr"></div>
 
-    // CDN exposes global `supabase`. Use createClient from it (don’t redeclare `supabase`). [web:582]
-    const { createClient } = supabase;
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    const $ = (id) => document.getElementById(id);
-    const setMsg = (el, msg) => { if (el) el.textContent = msg || ""; };
-
-    const authSection = $("authSection");
-    const appSection = $("appSection");
-    const whoami = $("whoami");
-    const logoutBtn = $("logoutBtn");
-
-    const loginForm = $("loginForm");
-    const signupForm = $("signupForm");
-    const postForm = $("postForm");
-
-    const authMsg = $("authMsg");
-    const signupMsg = $("signupMsg");
-    const postMsg = $("postMsg");
-    const feed = $("feed");
-
-    loginForm.addEventListener("submit", onLogin);
-    signupForm.addEventListener("submit", onSignup);
-    postForm.addEventListener("submit", onCreatePost);
-    logoutBtn.addEventListener("click", onLogout);
-
-    sb.auth.onAuthStateChange(() => refreshUI());
-    refreshUI();
-
-    async function onSignup(e){
-      e.preventDefault();
-      setMsg(signupMsg, "Creating account…");
-
-      const email = ($("signupEmail").value || "").trim().toLowerCase();
-      const password = $("signupPassword").value || "";
-
-      const { error } = await sb.auth.signUp({ email, password });
-      if (error) return setMsg(signupMsg, error.message);
-
-      setMsg(signupMsg, "Account created. Now log in (or confirm email if required).");
-    }
-
-    async function onLogin(e){
-      e.preventDefault();
-      setMsg(authMsg, "Logging in…");
-
-      const email = ($("loginEmail").value || "").trim().toLowerCase();
-      const password = $("loginPassword").value || "";
-
-      // Email+password login call per Supabase docs. [web:69]
-      const { error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) return setMsg(authMsg, error.message);
-
-      setMsg(authMsg, "");
-    }
-
-    async function onLogout(){
-      await sb.auth.signOut();
-    }
-
-    async function refreshUI(){
-      const { data: { user } } = await sb.auth.getUser();
-
-      const authed = !!user;
-      authSection.classList.toggle("hidden", authed);
-      appSection.classList.toggle("hidden", !authed);
-      logoutBtn.style.display = authed ? "inline-block" : "none";
-      whoami.textContent = authed ? user.email : "";
-
-      if (authed) await loadFeed();
-    }
-
-    async function onCreatePost(e){
-      e.preventDefault();
-      setMsg(postMsg, "Posting…");
-
-      const { data: { user } } = await sb.auth.getUser();
-      if (!user) return setMsg(postMsg, "Not logged in.");
-
-      const body = ($("postBody").value || "").trim();
-      if (!body) return setMsg(postMsg, "Write something.");
-
-      let image_url = null;
-
-      const file = $("postImage").files?.[0];
-      if (file) {
-        const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-        const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
-
-        const up = await sb.storage
-          .from("post-images")
-          .upload(path, file, { upsert: false });
-
-        if (up.error) return setMsg(postMsg, up.error.message);
-
-        // For public-readable bucket/object, getPublicUrl returns a URL. [web:571]
-        const { data } = sb.storage.from("post-images").getPublicUrl(path);
-        image_url = data.publicUrl;
-      }
-
-      const ins = await sb
-        .from("posts")
-        .insert({ user_id: user.id, body, image_url });
-
-      if (ins.error) return setMsg(postMsg, ins.error.message);
-
-      $("postBody").value = "";
-      $("postImage").value = "";
-      setMsg(postMsg, "");
-      await loadFeed();
-    }
-
-    async function loadFeed(){
-      feed.innerHTML = "Loading…";
-
-      const { data: posts, error } = await sb
-        .from("posts")
-        .select("id,user_id,body,image_url,created_at")
-        .order("created_at", { ascending: false })
-        .limit(50);
-
-      if (error) {
-        feed.innerHTML = "";
-        return setMsg(postMsg, error.message);
-      }
-
-      feed.innerHTML = "";
-      for (const p of posts) {
-        const el = document.createElement("div");
-        el.className = "post";
-        el.innerHTML = `
-          <div class="meta">
-            <span>${p.user_id}</span>
-            <span>${new Date(p.created_at).toLocaleString()}</span>
+        <div id="authForms">
+          <div class="two">
+            <div>
+              <div class="h">Sign up</div>
+              <div style="height:10px"></div>
+              <input id="suUser" placeholder="Username (unique)" />
+              <div style="height:10px"></div>
+              <input id="suPass" type="password" placeholder="Password" />
+              <div style="height:10px"></div>
+              <button id="signupBtn" class="good">Create account</button>
+            </div>
+            <div>
+              <div class="h">Login</div>
+              <div style="height:10px"></div>
+              <input id="liUser" placeholder="Username" />
+              <div style="height:10px"></div>
+              <input id="liPass" type="password" placeholder="Password" />
+              <div style="height:10px"></div>
+              <button id="loginBtn">Login</button>
+            </div>
           </div>
-          <div>${escapeHtml(p.body)}</div>
-          ${p.image_url ? `<img src="${p.image_url}" alt="post image" />` : ""}
-          <div class="actions">
-            <button data-like="${p.id}">Like</button>
-            <button data-comment="${p.id}">Comment</button>
+
+          <div style="height:10px"></div>
+          <div class="muted small">
+            Warning: passwords are not safely stored (this is a no-backend demo). Use throwaway passwords.
           </div>
-        `;
-        feed.appendChild(el);
-      }
+        </div>
 
-      feed.querySelectorAll("button[data-like]").forEach(btn => {
-        btn.addEventListener("click", () => toggleLike(btn.dataset.like));
-      });
-      feed.querySelectorAll("button[data-comment]").forEach(btn => {
-        btn.addEventListener("click", () => addComment(btn.dataset.comment));
-      });
-    }
+        <div id="profileBox" class="hide">
+          <div class="row space">
+            <div>
+              <div class="h" id="profileName">Profile</div>
+              <div class="muted small" id="profileMeta"></div>
+            </div>
+            <button id="giveBtn" class="ghost">Daily +50</button>
+          </div>
 
-    async function toggleLike(postId){
-      const { data: { user } } = await sb.auth.getUser();
-      if (!user) return;
+          <div class="hr"></div>
 
-      const existing = await sb
-        .from("post_likes")
-        .select("post_id,user_id")
-        .eq("post_id", postId)
-        .eq("user_id", user.id)
-        .maybeSingle();
+          <div class="h">Wallet</div>
+          <div class="row space">
+            <div class="pill">Balance: <span class="mono" id="bal">0</span> coins</div>
+            <button id="resetEcoBtn" class="bad ghost">Reset economy</button>
+          </div>
 
-      if (existing.data) {
-        await sb.from("post_likes").delete().eq("post_id", postId).eq("user_id", user.id);
-      } else {
-        await sb.from("post_likes").insert({ post_id: postId, user_id: user.id });
-      }
-    }
+          <div style="height:12px"></div>
 
-    async function addComment(postId){
-      const text = prompt("Comment:");
-      if (!text) return;
+          <div class="h">Send money</div>
+          <div class="muted small">Transfer coins to another local user.</div>
+          <div style="height:10px"></div>
+          <input id="txTo" placeholder="To username" />
+          <div style="height:10px"></div>
+          <input id="txAmt" type="number" min="1" step="1" placeholder="Amount" />
+          <div style="height:10px"></div>
+          <button id="sendBtn" class="good">Send</button>
 
-      const { data: { user } } = await sb.auth.getUser();
-      if (!user) return;
+          <div class="hr"></div>
 
-      await sb.from("post_comments").insert({
-        post_id: postId,
-        user_id: user.id,
-        body: text.trim(),
-      });
-    }
+          <div class="h">Transactions</div>
+          <div class="muted small">Newest first.</div>
+          <div style="height:10px"></div>
+          <div id="txList"></div>
+        </div>
+      </div>
 
-    function escapeHtml(s){
-      return (s || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-  </script>
+      <div class="card" style="margin-top:14px">
+        <div class="h">Admin (local)</div>
+        <div class="muted small">Tools for development/testing.</div>
+        <div class="hr"></div>
+        <div class="btns">
+          <button id="exportBtn" class="ghost">Export JSON</button>
+          <button id="importBtn" class="ghost">Import JSON</button>
+          <button id="wipeBtn" class="bad">Wipe all data</button>
+        </div>
+        <input id="importBox" class="hide" placeholder="Paste JSON here then press Import JSON again" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   Storage + Data Model
+   =========================
+   Everything is stored in localStorage, which stores strings, so we serialize with JSON.
+*/
+const DB_KEY = "rp_social_db_v1";
+const SESSION_KEY = "rp_social_session_v1";
+
+function now() { return Date.now(); }
+function uid(prefix="id") { return prefix + "_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16); }
+
+function loadDB() {
+  const raw = localStorage.getItem(DB_KEY);
+  if (!raw) {
+    const fresh = { users: {}, posts: [], tx: [] };
+    localStorage.setItem(DB_KEY, JSON.stringify(fresh));
+    return fresh;
+  }
+  try { return JSON.parse(raw); }
+  catch {
+    const fresh = { users: {}, posts: [], tx: [] };
+    localStorage.setItem(DB_KEY, JSON.stringify(fresh));
+    return fresh;
+  }
+}
+function saveDB(db) {
+  localStorage.setItem(DB_KEY, JSON.stringify(db));
+}
+function loadSession() {
+  const raw = localStorage.getItem(SESSION_KEY);
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+function saveSession(s) {
+  localStorage.setItem(SESSION_KEY, JSON.stringify(s));
+}
+function clearSession() { localStorage.removeItem(SESSION_KEY); }
+
+function getMe(db) {
+  const s = loadSession();
+  if (!s || !s.username) return null;
+  return db.users[s.username] ? s.username : null;
+}
+
+/* =========================
+   UI Helpers
+   ========================= */
+const $ = (sel) => document.querySelector(sel);
+
+function esc(s) {
+  return (s ?? "").toString()
+    .replaceAll("&","&amp;").replaceAll("<","&lt;")
+    .replaceAll(">","&gt;").replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+function fmtTime(ts) {
+  const d = new Date(ts);
+  return d.toLocaleString();
+}
+function toast(msg) { alert(msg); } // keep it simple for single-file
+
+/* =========================
+   Image handling
+   ========================= */
+function fileToDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+/* =========================
+   Rendering
+   ========================= */
+function renderAll() {
+  const db = loadDB();
+  const me = getMe(db);
+  renderAuth(db, me);
+  renderFeed(db, me);
+  renderWallet(db, me);
+}
+
+function renderAuth(db, me) {
+  $("#logoutBtn").classList.toggle("hide", !me);
+  $("#composer").classList.toggle("hide", !me);
+  $("#authForms").classList.toggle("hide", !!me);
+  $("#profileBox").classList.toggle("hide", !me);
+
+  if (!me) {
+    $("#who").textContent = "Not logged in";
+    return;
+  }
+  $("#who").textContent = "Logged in as @" + me;
+  $("#profileName").textContent = "@" + me;
+  const u = db.users[me];
+  $("#profileMeta").textContent = `Joined: ${fmtTime(u.createdAt)} • Posts: ${db.posts.filter(p => p.author===me).length}`;
+}
+
+function renderFeed(db, me) {
+  const feed = $("#feed");
+  feed.innerHTML = "";
+
+  if (db.posts.length === 0) {
+    feed.innerHTML = `<div class="muted small">No posts yet. Create one!</div>`;
+    return;
+  }
+
+  // newest first
+  const posts = [...db.posts].sort((a,b)=> b.createdAt - a.createdAt);
+  for (const p of posts) {
+    const liked = me ? (p.likes.includes(me)) : false;
+    const canDelete = me && p.author === me;
+
+    const postEl = document.createElement("div");
+    postEl.className = "card post";
+    postEl.dataset.postId = p.id;
+
+    const likeCount = p.likes.length;
+    const commentCount = p.comments.length;
+
+    postEl.innerHTML = `
+      <div class="postMeta">
+        <div class="pill">@${esc(p.author)}</div>
+        <div class="muted small">${esc(fmtTime(p.createdAt))}</div>
+        ${p.visibility === "public" ? `<div class="pill">Public</div>` : `<div class="pill">Friends</div>`}
+      </div>
+
+      <div style="white-space:pre-wrap">${esc(p.text)}</div>
+
+      ${p.imageDataUrl ? `<img alt="post image" src="${p.imageDataUrl}">` : ""}
+
+      <div class="row space">
+        <div class="row">
+          <div class="pill">Likes: <span class="mono">${likeCount}</span></div>
+          <div class="pill">Comments: <span class="mono">${commentCount}</span></div>
+        </div>
+        <div class="btns">
+          <button class="${liked ? "good" : ""}" data-act="like" ${me ? "" : "disabled"}>${liked ? "Liked" : "Like"}</button>
+          <button class="ghost" data-act="comment" ${me ? "" : "disabled"}>Comment</button>
+          ${canDelete ? `<button class="bad" data-act="delete">Delete</button>` : ""}
+        </div>
+      </div>
+
+      <div data-slot="comments">
+        ${p.comments.slice(-3).map(c => `
+          <div class="comment">
+            <div class="small"><span class="pill">@${esc(c.author)}</span> <span class="muted">${esc(fmtTime(c.createdAt))}</span></div>
+            <div style="margin-top:6px; white-space:pre-wrap">${esc(c.text)}</div>
+          </div>
+        `).join("")}
+        ${p.comments.length > 3 ? `<div class="muted small" style="margin-top:8px">Showing latest 3 comments.</div>` : ""}
+      </div>
+    `;
+
+    postEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      const act = btn.dataset.act;
+      if (!act) return;
+      if (!me && (act === "like" || act === "comment")) return;
+
+      if (act === "like") toggleLike(p.id);
+      if (act === "comment") addComment(p.id);
+      if (act === "delete") deletePost(p.id);
+    });
+
+    feed.appendChild(postEl);
+  }
+}
+
+function renderWallet(db, me) {
+  if (!me) return;
+  const u = db.users[me];
+  $("#bal").textContent = u.wallet.toString();
+
+  const list = $("#txList");
+  const tx = db.tx
+    .filter(t => t.from === me || t.to === me)
+    .sort((a,b) => b.createdAt - a.createdAt)
+    .slice(0, 12);
+
+  if (tx.length === 0) {
+    list.innerHTML = `<div class="muted small">No transactions yet.</div>`;
+    return;
+  }
+
+  list.innerHTML = tx.map(t => {
+    const dir = (t.to === me) ? "IN" : "OUT";
+    const color = (dir === "IN") ? "good" : "bad";
+    const other = (dir === "IN") ? t.from : t.to;
+    return `
+      <div class="comment">
+        <div class="row space">
+          <div class="pill ${color}">${dir}</div>
+          <div class="muted small">${esc(fmtTime(t.createdAt))}</div>
+        </div>
+        <div style="margin-top:8px" class="small">
+          ${dir === "IN" ? "From" : "To"} <span class="pill">@${esc(other)}</span>
+          • Amount: <span class="mono">${t.amount}</span>
+        </div>
+        ${t.note ? `<div class="muted small" style="margin-top:6px">${esc(t.note)}</div>` : ""}
+      </div>
+    `;
+  }).join("");
+}
+
+/* =========================
+   Auth
+   ========================= */
+function signup(username, password) {
+  username = (username||"").trim();
+  if (username.length < 3) return toast("Username must be at least 3 chars.");
+  if (!password || password.length < 3) return toast("Password must be at least 3 chars.");
+
+  const db = loadDB();
+  if (db.users[username]) return toast("Username already exists.");
+
+  db.users[username] = {
+    username,
+    pass: password,           // insecure (demo only)
+    createdAt: now(),
+    wallet: 200,              // starter coins
+  };
+  saveDB(db);
+  saveSession({ username });
+  renderAll();
+}
+
+function login(username, password) {
+  const db = loadDB();
+  username = (username||"").trim();
+  const u = db.users[username];
+  if (!u) return toast("No such user.");
+  if (u.pass !== password) return toast("Wrong password.");
+  saveSession({ username });
+  renderAll();
+}
+
+function logout() {
+  clearSession();
+  renderAll();
+}
+
+/* =========================
+   Posts / Likes / Comments
+   ========================= */
+async function publishPost() {
+  const db = loadDB();
+  const me = getMe(db);
+  if (!me) return toast("Login first.");
+
+  const text = ($("#postText").value || "").trim();
+  if (!text) return toast("Post text is required.");
+
+  const vis = $("#postVis").value || "public";
+  const f = $("#postImage").files && $("#postImage").files[0];
+  let imageDataUrl = null;
+
+  if (f) {
+    // simple size guard
+    if (f.size > 1_200_000) return toast("Image too big (max ~1.2MB). Resize it first.");
+    imageDataUrl = await fileToDataURL(f);
+  }
+
+  db.posts.push({
+    id: uid("post"),
+    author: me,
+    text,
+    imageDataUrl,
+    visibility: vis,
+    createdAt: now(),
+    likes: [],
+    comments: [],
+  });
+
+  saveDB(db);
+  $("#postText").value = "";
+  $("#postImage").value = "";
+  renderAll();
+}
+
+function toggleLike(postId) {
+  const db = loadDB();
+  const me = getMe(db);
+  if (!me) return;
+
+  const p = db.posts.find(x => x.id === postId);
+  if (!p) return;
+
+  const i = p.likes.indexOf(me);
+  if (i >= 0) p.likes.splice(i, 1);
+  else p.likes.push(me);
+
+  saveDB(db);
+  renderAll();
+}
+
+function addComment(postId) {
+  const db = loadDB();
+  const me = getMe(db);
+  if (!me) return;
+
+  const p = db.posts.find(x => x.id === postId);
+  if (!p) return;
+
+  const text = prompt("Write a comment:");
+  if (text === null) return;
+  const t = text.trim();
+  if (!t) return toast("Empty comment.");
+
+  p.comments.push({
+    id: uid("c"),
+    author: me,
+    text: t,
+    createdAt: now()
+  });
+
+  saveDB(db);
+  renderAll();
+}
+
+function deletePost(postId) {
+  const db = loadDB();
+  const me = getMe(db);
+  if (!me) return;
+
+  const p = db.posts.find(x => x.id === postId);
+  if (!p) return;
+
+  if (p.author !== me) return toast("You can only delete your own posts.");
+  if (!confirm("Delete this post?")) return;
+
+  db.posts = db.posts.filter(x => x.id !== postId);
+  saveDB(db);
+  renderAll();
+}
+
+/* =========================
+   Economy / Transfers
+   ========================= */
+function dailyGive() {
+  const db = loadDB();
+  const me = getMe(db);
+  if (!me) return;
+  db.users[me].wallet += 50;
+  db.tx.push({ id: uid("tx"), from: "_system", to: me, amount: 50, note: "Daily reward", createdAt: now() });
+  saveDB(db);
+  renderAll();
+}
+
+function sendMoney(toUser, amount) {
+  const db = loadDB();
+  const me = getMe(db);
+  if (!me) return toast("Login first.");
+
+  toUser = (toUser||"").trim();
+  amount = Math.floor(Number(amount));
+
+  if (!db.users[toUser]) return toast("Receiver does not exist.");
+  if (toUser === me) return toast("You cannot send money to yourself.");
+  if (!Number.isFinite(amount) || amount <= 0) return toast("Amount must be a positive number.");
+
+  const from = db.users[me];
+  const to = db.users[toUser];
+  if (from.wallet < amount) return toast("Not enough balance.");
+
+  from.wallet -= amount;
+  to.wallet += amount;
+
+  db.tx.push({ id: uid("tx"), from: me, to: toUser, amount, note: "", createdAt: now() });
+  saveDB(db);
+  renderAll();
+}
+
+/* =========================
+   Admin utilities
+   ========================= */
+function seedDemo() {
+  const db = loadDB();
+  if (!db.users["alice"]) db.users["alice"] = { username:"alice", pass:"123", createdAt: now()-86400000*4, wallet: 500 };
+  if (!db.users["bob"]) db.users["bob"] = { username:"bob", pass:"123", createdAt: now()-86400000*2, wallet: 350 };
+  if (db.posts.length === 0) {
+    db.posts.push({
+      id: uid("post"),
+      author: "alice",
+      text: "Welcome to the RP feed.\nTry logging in as alice/123 or bob/123.",
+      imageDataUrl: null,
+      visibility: "public",
+      createdAt: now()-3600_000,
+      likes: ["bob"],
+      comments: [{ id: uid("c"), author:"bob", text:"This looks cool.", createdAt: now()-3500_000 }]
+    });
+  }
+  saveDB(db);
+  renderAll();
+}
+
+function exportJSON() {
+  const db = loadDB();
+  const raw = JSON.stringify(db);
+  navigator.clipboard?.writeText(raw);
+  toast("Export copied to clipboard (or open DevTools to copy from storage).");
+}
+
+let importArmed = false;
+function importJSON() {
+  const box = $("#importBox");
+  if (!importArmed) {
+    importArmed = true;
+    box.classList.remove("hide");
+    box.focus();
+    toast("Paste JSON into the input, then click Import JSON again.");
+    return;
+  }
+  try {
+    const obj = JSON.parse(box.value);
+    if (!obj || typeof obj !== "object") throw new Error("bad");
+    if (!obj.users || !obj.posts || !obj.tx) throw new Error("missing keys");
+    localStorage.setItem(DB_KEY, JSON.stringify(obj));
+    importArmed = false;
+    box.value = "";
+    box.classList.add("hide");
+    toast("Imported.");
+    renderAll();
+  } catch {
+    toast("Invalid JSON.");
+  }
+}
+
+function wipeAll() {
+  if (!confirm("Wipe ALL local data for this site?")) return;
+  localStorage.removeItem(DB_KEY);
+  localStorage.removeItem(SESSION_KEY);
+  renderAll();
+}
+
+function resetEconomy() {
+  const db = loadDB();
+  const me = getMe(db);
+  if (!me) return;
+  if (!confirm("Reset your wallet to 200 and clear your transaction history?")) return;
+  db.users[me].wallet = 200;
+  db.tx = db.tx.filter(t => t.from !== me && t.to !== me);
+  saveDB(db);
+  renderAll();
+}
+
+/* =========================
+   Bind events
+   ========================= */
+$("#signupBtn").addEventListener("click", () => signup($("#suUser").value, $("#suPass").value));
+$("#loginBtn").addEventListener("click", () => login($("#liUser").value, $("#liPass").value));
+$("#logoutBtn").addEventListener("click", logout);
+$("#publishBtn").addEventListener("click", publishPost);
+
+$("#giveBtn").addEventListener("click", dailyGive);
+$("#sendBtn").addEventListener("click", () => sendMoney($("#txTo").value, $("#txAmt").value));
+$("#resetEcoBtn").addEventListener("click", resetEconomy);
+
+$("#seedBtn").addEventListener("click", seedDemo);
+$("#exportBtn").addEventListener("click", exportJSON);
+$("#importBtn").addEventListener("click", importJSON);
+$("#wipeBtn").addEventListener("click", wipeAll);
+
+/* Init */
+renderAll();
+</script>
 </body>
 </html>
