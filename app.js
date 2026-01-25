@@ -451,7 +451,11 @@ async function onTransfer(e){
   if (!to_username) return setMsg(walletMsg, 'Enter a username.')
   if (!Number.isFinite(amount) || amount <= 0) return setMsg(walletMsg, 'Amount must be > 0.')
 
-  const { error } = await supabase.rpc('transfer_money', { to_username, amount, note }) // [web:427]
+  const { error } = await supabase.rpc('transfer_money', {
+  to_username,
+  p_amount: amount,
+  note
+}) // [web:427]
   if (error) return setMsg(walletMsg, error.message)
 
   $('transferTo').value = ''
