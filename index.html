@@ -3,48 +3,56 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Roleplay Social (Single-File)</title>
+  <title>RP Insta (Single-File)</title>
   <style>
-    :root { --bg:#0b0f14; --card:#121923; --muted:#8aa0b7; --text:#e7f0ff; --acc:#7aa7ff; --bad:#ff6b6b; --good:#2ee59d; }
-    * { box-sizing: border-box; }
-    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:var(--bg); color:var(--text); }
-    a { color: var(--acc); text-decoration: none; }
-    .wrap { max-width: 980px; margin: 0 auto; padding: 18px; }
-    .grid { display:grid; gap:14px; grid-template-columns: 1.2fr 0.8fr; }
-    @media (max-width: 860px){ .grid{ grid-template-columns:1fr; } }
-    .card { background: var(--card); border:1px solid rgba(255,255,255,.06); border-radius: 14px; padding: 14px; }
-    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .space { justify-content: space-between; }
-    .muted { color: var(--muted); }
-    .pill { padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.06); font-size: 12px; }
-    input, textarea, select { width:100%; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.10); color: var(--text); border-radius: 12px; padding: 10px 12px; outline: none; }
-    textarea { min-height: 90px; resize: vertical; }
-    button { background: rgba(122,167,255,.18); border:1px solid rgba(122,167,255,.35); color: var(--text); padding: 9px 12px; border-radius: 12px; cursor:pointer; }
-    button:hover { filter: brightness(1.1); }
-    button.ghost { background: transparent; border-color: rgba(255,255,255,.12); }
-    button.bad { background: rgba(255,107,107,.12); border-color: rgba(255,107,107,.35); }
-    button.good { background: rgba(46,229,157,.12); border-color: rgba(46,229,157,.35); }
-    .h { font-weight: 700; font-size: 15px; }
-    .hr { height:1px; background: rgba(255,255,255,.08); margin: 12px 0; }
-    .post { display:grid; gap:10px; }
-    .post img { width:100%; border-radius: 12px; border:1px solid rgba(255,255,255,.08); }
-    .postMeta { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .small { font-size: 12px; }
-    .btns { display:flex; gap:8px; flex-wrap:wrap; }
-    .comment { padding: 8px 10px; border-radius: 12px; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); margin-top:8px; }
-    .two { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
-    @media (max-width: 520px){ .two{ grid-template-columns:1fr; } }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    .hide { display:none !important; }
+    :root{--bg:#0b0f14;--card:#121923;--muted:#8aa0b7;--text:#e7f0ff;--acc:#7aa7ff;--bad:#ff6b6b;--good:#2ee59d}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
+    .wrap{max-width:1050px;margin:0 auto;padding:16px}
+    .top{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+    .brand{display:flex;gap:10px;align-items:center}
+    .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg, rgba(122,167,255,.6), rgba(46,229,157,.35));border:1px solid rgba(255,255,255,.12)}
+    .h{font-weight:750}
+    .muted{color:var(--muted)}
+    .small{font-size:12px}
+    .grid{display:grid;gap:14px;grid-template-columns:1.35fr .65fr}
+    @media(max-width:920px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:14px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .space{justify-content:space-between}
+    .pill{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:12px}
+    input,textarea,select{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:var(--text);border-radius:12px;padding:10px 12px;outline:none}
+    textarea{min-height:95px;resize:vertical}
+    button{background:rgba(122,167,255,.18);border:1px solid rgba(122,167,255,.35);color:var(--text);padding:9px 12px;border-radius:12px;cursor:pointer}
+    button:hover{filter:brightness(1.08)}
+    button.ghost{background:transparent;border-color:rgba(255,255,255,.12)}
+    button.bad{background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.35)}
+    button.good{background:rgba(46,229,157,.12);border-color:rgba(46,229,157,.35)}
+    .hr{height:1px;background:rgba(255,255,255,.08);margin:12px 0}
+    .hide{display:none!important}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+    /* Instagram-ish post */
+    .post{padding:0;overflow:hidden}
+    .postHead{padding:12px 12px 8px 12px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .avatar{width:36px;height:36px;border-radius:999px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.12);display:grid;place-items:center;font-weight:800}
+    .postBody{padding:0 12px 12px 12px}
+    .postImg{width:100%;display:block;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08)}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;padding:10px 12px}
+    .comment{padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);margin-top:8px}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media(max-width:560px){.two{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
 <div class="wrap">
-
-  <div class="row space">
-    <div class="row">
-      <div class="h">Roleplay Social</div>
-      <div class="pill mono" id="buildTag">single-file</div>
+  <div class="top">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <div class="h">RP Insta</div>
+        <div class="muted small">Single-file demo (local-only)</div>
+      </div>
     </div>
     <div class="row">
       <div id="who" class="muted small">Not logged in</div>
@@ -53,40 +61,48 @@
   </div>
 
   <div class="grid">
-    <!-- LEFT: FEED -->
+    <!-- FEED -->
     <div class="card">
       <div class="row space">
         <div>
           <div class="h">Feed</div>
-          <div class="muted small">Posts with text + images, likes, and comments.</div>
+          <div class="muted small">Post as a roleplay character; like and comment.</div>
         </div>
-        <button id="seedBtn" class="ghost">Seed demo data</button>
+        <div class="row">
+          <button id="seedBtn" class="ghost">Seed demo</button>
+        </div>
       </div>
 
       <div class="hr"></div>
 
       <div id="composer" class="hide">
-        <div class="h">Create post</div>
-        <div class="muted small">Text is required; image is optional.</div>
+        <div class="row space">
+          <div>
+            <div class="h">Create post</div>
+            <div class="muted small">Choose character → write → publish.</div>
+          </div>
+          <div class="pill">Posting as: <span class="mono" id="activeCharLabel">none</span></div>
+        </div>
+
         <div style="height:10px"></div>
-        <textarea id="postText" placeholder="Write your roleplay post..."></textarea>
-        <div style="height:10px"></div>
+
         <div class="two">
+          <div>
+            <div class="muted small">Character</div>
+            <select id="charSelect"></select>
+          </div>
           <div>
             <div class="muted small">Optional image</div>
             <input id="postImage" type="file" accept="image/*" />
           </div>
-          <div>
-            <div class="muted small">Visibility</div>
-            <select id="postVis">
-              <option value="public">Public</option>
-              <option value="friends">Friends (not implemented)</option>
-            </select>
-          </div>
         </div>
+
+        <div style="height:10px"></div>
+        <textarea id="postText" placeholder="Write your post..."></textarea>
+
         <div style="height:10px"></div>
         <div class="row space">
-          <div class="muted small">Tip: images are stored in your browser, so huge images can fill storage.</div>
+          <div class="muted small">Images are stored as data URLs (can hit storage limits).</div>
           <button id="publishBtn">Publish</button>
         </div>
 
@@ -96,11 +112,11 @@
       <div id="feed"></div>
     </div>
 
-    <!-- RIGHT: AUTH + WALLET -->
+    <!-- SIDEBAR -->
     <div>
-      <div class="card" id="authCard">
+      <div class="card">
         <div class="h">Accounts</div>
-        <div class="muted small">Local-only accounts (stored in this browser).</div>
+        <div class="muted small">Local-only login; don’t use real passwords. [web:22]</div>
         <div class="hr"></div>
 
         <div id="authForms">
@@ -112,7 +128,7 @@
               <div style="height:10px"></div>
               <input id="suPass" type="password" placeholder="Password" />
               <div style="height:10px"></div>
-              <button id="signupBtn" class="good">Create account</button>
+              <button id="signupBtn" class="good">Create</button>
             </div>
             <div>
               <div class="h">Login</div>
@@ -124,34 +140,48 @@
               <button id="loginBtn">Login</button>
             </div>
           </div>
-
-          <div style="height:10px"></div>
-          <div class="muted small">
-            Warning: passwords are not safely stored (this is a no-backend demo). Use throwaway passwords.
-          </div>
         </div>
 
         <div id="profileBox" class="hide">
           <div class="row space">
             <div>
-              <div class="h" id="profileName">Profile</div>
+              <div class="h" id="profileName">@me</div>
               <div class="muted small" id="profileMeta"></div>
             </div>
-            <button id="giveBtn" class="ghost">Daily +50</button>
+            <button id="dailyBtn" class="ghost">Daily +50</button>
           </div>
+
+          <div class="hr"></div>
+
+          <div class="h">Characters</div>
+          <div class="muted small">Separate RP identities you can post as.</div>
+          <div style="height:10px"></div>
+
+          <div class="two">
+            <input id="chName" placeholder="Character name" />
+            <input id="chHandle" placeholder="Handle (optional, e.g. neon_wolf)" />
+          </div>
+          <div style="height:10px"></div>
+          <textarea id="chBio" placeholder="Bio (optional)"></textarea>
+          <div style="height:10px"></div>
+          <div class="row space">
+            <button id="createCharBtn" class="good">Create character</button>
+            <button id="deleteCharBtn" class="bad ghost">Delete selected</button>
+          </div>
+
+          <div style="height:12px"></div>
+          <div id="charList"></div>
 
           <div class="hr"></div>
 
           <div class="h">Wallet</div>
           <div class="row space">
             <div class="pill">Balance: <span class="mono" id="bal">0</span> coins</div>
-            <button id="resetEcoBtn" class="bad ghost">Reset economy</button>
+            <button id="resetEcoBtn" class="bad ghost">Reset</button>
           </div>
 
           <div style="height:12px"></div>
-
           <div class="h">Send money</div>
-          <div class="muted small">Transfer coins to another local user.</div>
           <div style="height:10px"></div>
           <input id="txTo" placeholder="To username" />
           <div style="height:10px"></div>
@@ -160,7 +190,6 @@
           <button id="sendBtn" class="good">Send</button>
 
           <div class="hr"></div>
-
           <div class="h">Transactions</div>
           <div class="muted small">Newest first.</div>
           <div style="height:10px"></div>
@@ -169,296 +198,421 @@
       </div>
 
       <div class="card" style="margin-top:14px">
-        <div class="h">Admin (local)</div>
-        <div class="muted small">Tools for development/testing.</div>
+        <div class="h">Data tools</div>
+        <div class="muted small">Export/import for sharing your local save.</div>
         <div class="hr"></div>
-        <div class="btns">
+        <div class="row">
           <button id="exportBtn" class="ghost">Export JSON</button>
           <button id="importBtn" class="ghost">Import JSON</button>
-          <button id="wipeBtn" class="bad">Wipe all data</button>
+          <button id="wipeBtn" class="bad">Wipe all</button>
         </div>
-        <input id="importBox" class="hide" placeholder="Paste JSON here then press Import JSON again" />
+        <input id="importBox" class="hide" placeholder="Paste JSON here then click Import JSON again" />
       </div>
     </div>
   </div>
 </div>
 
 <script>
-/* =========================
-   Storage + Data Model
-   =========================
-   Everything is stored in localStorage, which stores strings, so we serialize with JSON.
-*/
-const DB_KEY = "rp_social_db_v1";
-const SESSION_KEY = "rp_social_session_v1";
+/* localStorage stores strings; we JSON.stringify/JSON.parse the app DB. */
+const DB_KEY = "rp_insta_db_v2";
+const SESSION_KEY = "rp_insta_session_v2";
 
-function now() { return Date.now(); }
-function uid(prefix="id") { return prefix + "_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16); }
+const $ = (s)=>document.querySelector(s);
+const now = ()=>Date.now();
+const uid = (p="id")=> p+"_"+Math.random().toString(16).slice(2)+"_"+Date.now().toString(16);
 
-function loadDB() {
+function loadDB(){
   const raw = localStorage.getItem(DB_KEY);
-  if (!raw) {
-    const fresh = { users: {}, posts: [], tx: [] };
+  if(!raw){
+    const fresh = { users:{}, posts:[], tx:[] };
     localStorage.setItem(DB_KEY, JSON.stringify(fresh));
     return fresh;
   }
   try { return JSON.parse(raw); }
   catch {
-    const fresh = { users: {}, posts: [], tx: [] };
+    const fresh = { users:{}, posts:[], tx:[] };
     localStorage.setItem(DB_KEY, JSON.stringify(fresh));
     return fresh;
   }
 }
-function saveDB(db) {
-  localStorage.setItem(DB_KEY, JSON.stringify(db));
-}
-function loadSession() {
+function saveDB(db){ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+function loadSession(){
   const raw = localStorage.getItem(SESSION_KEY);
-  if (!raw) return null;
+  if(!raw) return null;
   try { return JSON.parse(raw); } catch { return null; }
 }
-function saveSession(s) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify(s));
-}
-function clearSession() { localStorage.removeItem(SESSION_KEY); }
+function saveSession(s){ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
+function clearSession(){ localStorage.removeItem(SESSION_KEY); }
 
-function getMe(db) {
+function getMe(db){
   const s = loadSession();
-  if (!s || !s.username) return null;
+  if(!s?.username) return null;
   return db.users[s.username] ? s.username : null;
 }
 
-/* =========================
-   UI Helpers
-   ========================= */
-const $ = (sel) => document.querySelector(sel);
-
-function esc(s) {
+function esc(s){
   return (s ?? "").toString()
     .replaceAll("&","&amp;").replaceAll("<","&lt;")
     .replaceAll(">","&gt;").replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
 }
-function fmtTime(ts) {
-  const d = new Date(ts);
-  return d.toLocaleString();
-}
-function toast(msg) { alert(msg); } // keep it simple for single-file
+function fmtTime(ts){ return new Date(ts).toLocaleString(); }
+function toast(m){ alert(m); }
 
-/* =========================
-   Image handling
-   ========================= */
-function fileToDataURL(file) {
-  return new Promise((resolve, reject) => {
+/* Image -> Data URL via FileReader.readAsDataURL (MDN). */
+function fileToDataURL(file){
+  return new Promise((resolve,reject)=>{
     const r = new FileReader();
-    r.onload = () => resolve(r.result);
+    r.onload = ()=>resolve(r.result);
     r.onerror = reject;
     r.readAsDataURL(file);
   });
 }
 
-/* =========================
-   Rendering
-   ========================= */
-function renderAll() {
+/* ===== Characters ===== */
+function myChars(db, me){
+  const u = db.users[me];
+  return Object.values(u.characters || {}).sort((a,b)=>a.createdAt-b.createdAt);
+}
+function getActiveCharId(db, me){
+  const u = db.users[me];
+  const id = u.activeCharId;
+  if(id && u.characters?.[id]) return id;
+  const first = myChars(db, me)[0];
+  return first ? first.id : null;
+}
+function setActiveChar(db, me, charId){
+  const u = db.users[me];
+  if(!u.characters?.[charId]) return;
+  u.activeCharId = charId;
+  saveDB(db);
+}
+
+/* ===== Render ===== */
+function renderAll(){
   const db = loadDB();
   const me = getMe(db);
   renderAuth(db, me);
+  renderCharactersUI(db, me);
+  renderComposer(db, me);
   renderFeed(db, me);
   renderWallet(db, me);
 }
 
-function renderAuth(db, me) {
+function renderAuth(db, me){
   $("#logoutBtn").classList.toggle("hide", !me);
-  $("#composer").classList.toggle("hide", !me);
   $("#authForms").classList.toggle("hide", !!me);
   $("#profileBox").classList.toggle("hide", !me);
+  $("#composer").classList.toggle("hide", !me);
 
-  if (!me) {
+  if(!me){
     $("#who").textContent = "Not logged in";
     return;
   }
   $("#who").textContent = "Logged in as @" + me;
   $("#profileName").textContent = "@" + me;
   const u = db.users[me];
-  $("#profileMeta").textContent = `Joined: ${fmtTime(u.createdAt)} • Posts: ${db.posts.filter(p => p.author===me).length}`;
+  $("#profileMeta").textContent = `Joined: ${fmtTime(u.createdAt)} • Characters: ${Object.keys(u.characters||{}).length}`;
 }
 
-function renderFeed(db, me) {
+function renderCharactersUI(db, me){
+  if(!me) return;
+  const u = db.users[me];
+  u.characters ||= {};
+
+  const chars = myChars(db, me);
+  const activeId = getActiveCharId(db, me);
+  if(activeId && u.activeCharId !== activeId) u.activeCharId = activeId;
+
+  // select
+  const sel = $("#charSelect");
+  sel.innerHTML = "";
+  if(chars.length === 0){
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "Create a character first";
+    sel.appendChild(opt);
+    $("#activeCharLabel").textContent = "none";
+  } else {
+    for(const c of chars){
+      const opt = document.createElement("option");
+      opt.value = c.id;
+      opt.textContent = `${c.name}${c.handle ? " (@" + c.handle + ")" : ""}`;
+      if(c.id === activeId) opt.selected = true;
+      sel.appendChild(opt);
+    }
+    const act = u.characters[activeId];
+    $("#activeCharLabel").textContent = act?.handle ? "@"+act.handle : act?.name || "none";
+  }
+
+  sel.onchange = () => {
+    const db2 = loadDB();
+    const me2 = getMe(db2);
+    if(!me2) return;
+    setActiveChar(db2, me2, sel.value);
+    renderAll();
+  };
+
+  // list
+  const list = $("#charList");
+  if(chars.length === 0){
+    list.innerHTML = `<div class="muted small">No characters yet.</div>`;
+  } else {
+    list.innerHTML = chars.map(c => {
+      const isAct = (c.id === activeId);
+      const label = c.handle ? "@"+c.handle : c.name;
+      return `
+        <div class="comment">
+          <div class="row space">
+            <div class="row">
+              <div class="avatar">${esc((c.name||"?").slice(0,1).toUpperCase())}</div>
+              <div>
+                <div class="h">${esc(c.name)} ${isAct ? `<span class="pill">Active</span>` : ""}</div>
+                <div class="muted small">${c.handle ? "@"+esc(c.handle) : "No handle"} • Created: ${esc(fmtTime(c.createdAt))}</div>
+              </div>
+            </div>
+            <button class="ghost" data-act="set" data-id="${c.id}">Use</button>
+          </div>
+          ${c.bio ? `<div style="margin-top:8px; white-space:pre-wrap" class="small">${esc(c.bio)}</div>` : ""}
+        </div>
+      `;
+    }).join("");
+
+    list.querySelectorAll("button[data-act='set']").forEach(b=>{
+      b.onclick = ()=>{
+        const db2 = loadDB();
+        const me2 = getMe(db2);
+        setActiveChar(db2, me2, b.dataset.id);
+        renderAll();
+      };
+    });
+  }
+  saveDB(db);
+}
+
+function renderComposer(db, me){
+  if(!me) return;
+  const activeId = getActiveCharId(db, me);
+  $("#publishBtn").disabled = !activeId;
+}
+
+function renderFeed(db, me){
   const feed = $("#feed");
   feed.innerHTML = "";
 
-  if (db.posts.length === 0) {
-    feed.innerHTML = `<div class="muted small">No posts yet. Create one!</div>`;
+  if(db.posts.length === 0){
+    feed.innerHTML = `<div class="muted small">No posts yet.</div>`;
     return;
   }
 
-  // newest first
-  const posts = [...db.posts].sort((a,b)=> b.createdAt - a.createdAt);
-  for (const p of posts) {
-    const liked = me ? (p.likes.includes(me)) : false;
-    const canDelete = me && p.author === me;
+  const posts = [...db.posts].sort((a,b)=>b.createdAt - a.createdAt);
 
-    const postEl = document.createElement("div");
-    postEl.className = "card post";
-    postEl.dataset.postId = p.id;
+  for(const p of posts){
+    const liked = me ? p.likes.includes(me) : false;
+    const canDelete = me && p.user === me;
 
-    const likeCount = p.likes.length;
-    const commentCount = p.comments.length;
+    const card = document.createElement("div");
+    card.className = "card post";
+    card.dataset.postId = p.id;
 
-    postEl.innerHTML = `
-      <div class="postMeta">
-        <div class="pill">@${esc(p.author)}</div>
-        <div class="muted small">${esc(fmtTime(p.createdAt))}</div>
-        ${p.visibility === "public" ? `<div class="pill">Public</div>` : `<div class="pill">Friends</div>`}
-      </div>
+    const displayName = p.charName || "Unknown";
+    const displayHandle = p.charHandle ? "@"+p.charHandle : null;
 
-      <div style="white-space:pre-wrap">${esc(p.text)}</div>
-
-      ${p.imageDataUrl ? `<img alt="post image" src="${p.imageDataUrl}">` : ""}
-
-      <div class="row space">
+    card.innerHTML = `
+      <div class="postHead">
         <div class="row">
-          <div class="pill">Likes: <span class="mono">${likeCount}</span></div>
-          <div class="pill">Comments: <span class="mono">${commentCount}</span></div>
+          <div class="avatar">${esc(displayName.slice(0,1).toUpperCase())}</div>
+          <div>
+            <div class="h">${esc(displayName)} ${displayHandle ? `<span class="pill">${esc(displayHandle)}</span>` : ""}</div>
+            <div class="muted small">Owned by @${esc(p.user)} • ${esc(fmtTime(p.createdAt))}</div>
+          </div>
         </div>
-        <div class="btns">
-          <button class="${liked ? "good" : ""}" data-act="like" ${me ? "" : "disabled"}>${liked ? "Liked" : "Like"}</button>
-          <button class="ghost" data-act="comment" ${me ? "" : "disabled"}>Comment</button>
+        <div class="row">
           ${canDelete ? `<button class="bad" data-act="delete">Delete</button>` : ""}
         </div>
       </div>
 
-      <div data-slot="comments">
-        ${p.comments.slice(-3).map(c => `
-          <div class="comment">
-            <div class="small"><span class="pill">@${esc(c.author)}</span> <span class="muted">${esc(fmtTime(c.createdAt))}</span></div>
-            <div style="margin-top:6px; white-space:pre-wrap">${esc(c.text)}</div>
-          </div>
-        `).join("")}
-        ${p.comments.length > 3 ? `<div class="muted small" style="margin-top:8px">Showing latest 3 comments.</div>` : ""}
+      ${p.imageDataUrl ? `<img class="postImg" alt="post image" src="${p.imageDataUrl}">` : ""}
+
+      <div class="actions">
+        <button data-act="like" class="${liked ? "good" : ""}" ${me ? "" : "disabled"}>${liked ? "Liked" : "Like"}</button>
+        <button data-act="comment" class="ghost" ${me ? "" : "disabled"}>Comment</button>
+        <div class="pill">Likes: <span class="mono">${p.likes.length}</span></div>
+        <div class="pill">Comments: <span class="mono">${p.comments.length}</span></div>
+      </div>
+
+      <div class="postBody">
+        <div style="white-space:pre-wrap">${esc(p.text)}</div>
+        <div data-slot="comments">
+          ${p.comments.slice(-3).map(c=>`
+            <div class="comment">
+              <div class="small">
+                <span class="pill">@${esc(c.authorUser)}</span>
+                <span class="muted">${esc(fmtTime(c.createdAt))}</span>
+              </div>
+              <div style="margin-top:6px; white-space:pre-wrap">${esc(c.text)}</div>
+            </div>
+          `).join("")}
+          ${p.comments.length>3 ? `<div class="muted small" style="margin-top:8px">Showing latest 3 comments.</div>` : ""}
+        </div>
       </div>
     `;
 
-    postEl.addEventListener("click", (e) => {
+    card.onclick = (e)=>{
       const btn = e.target.closest("button");
-      if (!btn) return;
+      if(!btn) return;
       const act = btn.dataset.act;
-      if (!act) return;
-      if (!me && (act === "like" || act === "comment")) return;
+      if(!act) return;
+      if((act==="like"||act==="comment") && !me) return;
 
-      if (act === "like") toggleLike(p.id);
-      if (act === "comment") addComment(p.id);
-      if (act === "delete") deletePost(p.id);
-    });
+      if(act==="like") toggleLike(p.id);
+      if(act==="comment") addComment(p.id);
+      if(act==="delete") deletePost(p.id);
+    };
 
-    feed.appendChild(postEl);
+    feed.appendChild(card);
   }
 }
 
-function renderWallet(db, me) {
-  if (!me) return;
-  const u = db.users[me];
-  $("#bal").textContent = u.wallet.toString();
+function renderWallet(db, me){
+  if(!me) return;
+  $("#bal").textContent = db.users[me].wallet.toString();
 
-  const list = $("#txList");
-  const tx = db.tx
-    .filter(t => t.from === me || t.to === me)
-    .sort((a,b) => b.createdAt - a.createdAt)
-    .slice(0, 12);
-
-  if (tx.length === 0) {
-    list.innerHTML = `<div class="muted small">No transactions yet.</div>`;
-    return;
-  }
-
-  list.innerHTML = tx.map(t => {
-    const dir = (t.to === me) ? "IN" : "OUT";
-    const color = (dir === "IN") ? "good" : "bad";
-    const other = (dir === "IN") ? t.from : t.to;
+  const tx = db.tx.filter(t=>t.from===me||t.to===me).sort((a,b)=>b.createdAt-a.createdAt).slice(0,12);
+  $("#txList").innerHTML = tx.length ? tx.map(t=>{
+    const dir = (t.to===me) ? "IN" : "OUT";
+    const cls = (dir==="IN") ? "good" : "bad";
+    const other = (dir==="IN") ? t.from : t.to;
     return `
       <div class="comment">
         <div class="row space">
-          <div class="pill ${color}">${dir}</div>
+          <div class="pill ${cls}">${dir}</div>
           <div class="muted small">${esc(fmtTime(t.createdAt))}</div>
         </div>
-        <div style="margin-top:8px" class="small">
-          ${dir === "IN" ? "From" : "To"} <span class="pill">@${esc(other)}</span>
-          • Amount: <span class="mono">${t.amount}</span>
+        <div class="small" style="margin-top:8px">
+          ${dir==="IN"?"From":"To"} <span class="pill">@${esc(other)}</span> • Amount: <span class="mono">${t.amount}</span>
         </div>
         ${t.note ? `<div class="muted small" style="margin-top:6px">${esc(t.note)}</div>` : ""}
       </div>
     `;
-  }).join("");
+  }).join("") : `<div class="muted small">No transactions.</div>`;
 }
 
-/* =========================
-   Auth
-   ========================= */
-function signup(username, password) {
-  username = (username||"").trim();
-  if (username.length < 3) return toast("Username must be at least 3 chars.");
-  if (!password || password.length < 3) return toast("Password must be at least 3 chars.");
+/* ===== Auth ===== */
+function signup(user, pass){
+  user = (user||"").trim();
+  if(user.length<3) return toast("Username must be at least 3 chars.");
+  if(!pass || pass.length<3) return toast("Password must be at least 3 chars.");
 
   const db = loadDB();
-  if (db.users[username]) return toast("Username already exists.");
+  if(db.users[user]) return toast("Username already exists.");
 
-  db.users[username] = {
-    username,
-    pass: password,           // insecure (demo only)
+  db.users[user] = {
+    username:user,
+    pass:pass,         // demo only; do not use real passwords [web:22]
     createdAt: now(),
-    wallet: 200,              // starter coins
+    wallet: 200,
+    characters: {},
+    activeCharId: null
   };
   saveDB(db);
-  saveSession({ username });
+  saveSession({username:user});
   renderAll();
 }
-
-function login(username, password) {
+function login(user, pass){
   const db = loadDB();
-  username = (username||"").trim();
-  const u = db.users[username];
-  if (!u) return toast("No such user.");
-  if (u.pass !== password) return toast("Wrong password.");
-  saveSession({ username });
+  user = (user||"").trim();
+  const u = db.users[user];
+  if(!u) return toast("No such user.");
+  if(u.pass !== pass) return toast("Wrong password.");
+  saveSession({username:user});
   renderAll();
 }
+function logout(){ clearSession(); renderAll(); }
 
-function logout() {
-  clearSession();
-  renderAll();
-}
-
-/* =========================
-   Posts / Likes / Comments
-   ========================= */
-async function publishPost() {
+/* ===== Characters actions ===== */
+function createCharacter(){
   const db = loadDB();
   const me = getMe(db);
-  if (!me) return toast("Login first.");
+  if(!me) return toast("Login first.");
 
-  const text = ($("#postText").value || "").trim();
-  if (!text) return toast("Post text is required.");
+  const name = ($("#chName").value||"").trim();
+  const handle = ($("#chHandle").value||"").trim();
+  const bio = ($("#chBio").value||"").trim();
 
-  const vis = $("#postVis").value || "public";
+  if(name.length<2) return toast("Character name must be at least 2 chars.");
+  if(handle && !/^[a-zA-Z0-9_\.]{3,20}$/.test(handle)) return toast("Handle must be 3–20 chars (letters, numbers, _ or .).");
+
+  const u = db.users[me];
+  u.characters ||= {};
+
+  // enforce unique handle per user
+  if(handle){
+    const taken = Object.values(u.characters).some(c => (c.handle||"").toLowerCase() === handle.toLowerCase());
+    if(taken) return toast("You already have a character with that handle.");
+  }
+
+  const c = { id: uid("char"), name, handle: handle||"", bio: bio||"", createdAt: now() };
+  u.characters[c.id] = c;
+  u.activeCharId = c.id;
+
+  saveDB(db);
+  $("#chName").value = "";
+  $("#chHandle").value = "";
+  $("#chBio").value = "";
+  renderAll();
+}
+
+function deleteSelectedCharacter(){
+  const db = loadDB();
+  const me = getMe(db);
+  if(!me) return;
+  const u = db.users[me];
+  const id = $("#charSelect").value;
+  if(!id) return toast("No character selected.");
+  if(!confirm("Delete this character? Posts stay, but won’t be editable.")) return;
+
+  delete u.characters[id];
+  u.activeCharId = null;
+
+  saveDB(db);
+  renderAll();
+}
+
+/* ===== Posts ===== */
+async function publishPost(){
+  const db = loadDB();
+  const me = getMe(db);
+  if(!me) return toast("Login first.");
+
+  const u = db.users[me];
+  const activeId = getActiveCharId(db, me);
+  if(!activeId) return toast("Create/select a character first.");
+
+  const ch = u.characters[activeId];
+  const text = ($("#postText").value||"").trim();
+  if(!text) return toast("Post text is required.");
+
   const f = $("#postImage").files && $("#postImage").files[0];
   let imageDataUrl = null;
 
-  if (f) {
-    // simple size guard
-    if (f.size > 1_200_000) return toast("Image too big (max ~1.2MB). Resize it first.");
+  if(f){
+    if(f.size > 1_200_000) return toast("Image too big (max ~1.2MB). Resize it first.");
     imageDataUrl = await fileToDataURL(f);
   }
 
   db.posts.push({
     id: uid("post"),
-    author: me,
+    user: me,              // account owner
+    charId: activeId,      // which character posted
+    charName: ch.name,
+    charHandle: ch.handle,
     text,
     imageDataUrl,
-    visibility: vis,
     createdAt: now(),
     likes: [],
-    comments: [],
+    comments: []
   });
 
   saveDB(db);
@@ -467,188 +621,193 @@ async function publishPost() {
   renderAll();
 }
 
-function toggleLike(postId) {
+function toggleLike(postId){
   const db = loadDB();
   const me = getMe(db);
-  if (!me) return;
+  if(!me) return;
 
-  const p = db.posts.find(x => x.id === postId);
-  if (!p) return;
+  const p = db.posts.find(x=>x.id===postId);
+  if(!p) return;
 
   const i = p.likes.indexOf(me);
-  if (i >= 0) p.likes.splice(i, 1);
+  if(i>=0) p.likes.splice(i,1);
   else p.likes.push(me);
 
   saveDB(db);
   renderAll();
 }
 
-function addComment(postId) {
+function addComment(postId){
   const db = loadDB();
   const me = getMe(db);
-  if (!me) return;
+  if(!me) return;
 
-  const p = db.posts.find(x => x.id === postId);
-  if (!p) return;
+  const p = db.posts.find(x=>x.id===postId);
+  if(!p) return;
 
   const text = prompt("Write a comment:");
-  if (text === null) return;
+  if(text===null) return;
   const t = text.trim();
-  if (!t) return toast("Empty comment.");
+  if(!t) return toast("Empty comment.");
 
-  p.comments.push({
-    id: uid("c"),
-    author: me,
-    text: t,
-    createdAt: now()
-  });
-
+  p.comments.push({ id: uid("c"), authorUser: me, text: t, createdAt: now() });
   saveDB(db);
   renderAll();
 }
 
-function deletePost(postId) {
+function deletePost(postId){
   const db = loadDB();
   const me = getMe(db);
-  if (!me) return;
+  if(!me) return;
+  const p = db.posts.find(x=>x.id===postId);
+  if(!p) return;
+  if(p.user !== me) return toast("You can only delete your own posts.");
+  if(!confirm("Delete this post?")) return;
 
-  const p = db.posts.find(x => x.id === postId);
-  if (!p) return;
-
-  if (p.author !== me) return toast("You can only delete your own posts.");
-  if (!confirm("Delete this post?")) return;
-
-  db.posts = db.posts.filter(x => x.id !== postId);
+  db.posts = db.posts.filter(x=>x.id!==postId);
   saveDB(db);
   renderAll();
 }
 
-/* =========================
-   Economy / Transfers
-   ========================= */
-function dailyGive() {
+/* ===== Economy ===== */
+function daily(){
   const db = loadDB();
   const me = getMe(db);
-  if (!me) return;
+  if(!me) return;
   db.users[me].wallet += 50;
-  db.tx.push({ id: uid("tx"), from: "_system", to: me, amount: 50, note: "Daily reward", createdAt: now() });
+  db.tx.push({ id: uid("tx"), from:"_system", to:me, amount:50, note:"Daily reward", createdAt: now() });
   saveDB(db);
   renderAll();
 }
 
-function sendMoney(toUser, amount) {
+function sendMoney(toUser, amount){
   const db = loadDB();
   const me = getMe(db);
-  if (!me) return toast("Login first.");
+  if(!me) return toast("Login first.");
 
   toUser = (toUser||"").trim();
   amount = Math.floor(Number(amount));
 
-  if (!db.users[toUser]) return toast("Receiver does not exist.");
-  if (toUser === me) return toast("You cannot send money to yourself.");
-  if (!Number.isFinite(amount) || amount <= 0) return toast("Amount must be a positive number.");
+  if(!db.users[toUser]) return toast("Receiver does not exist.");
+  if(toUser === me) return toast("You cannot send money to yourself.");
+  if(!Number.isFinite(amount) || amount<=0) return toast("Amount must be a positive number.");
 
   const from = db.users[me];
-  const to = db.users[toUser];
-  if (from.wallet < amount) return toast("Not enough balance.");
+  if(from.wallet < amount) return toast("Not enough balance.");
 
   from.wallet -= amount;
-  to.wallet += amount;
+  db.users[toUser].wallet += amount;
 
-  db.tx.push({ id: uid("tx"), from: me, to: toUser, amount, note: "", createdAt: now() });
+  db.tx.push({ id: uid("tx"), from:me, to:toUser, amount, note:"", createdAt: now() });
   saveDB(db);
   renderAll();
 }
 
-/* =========================
-   Admin utilities
-   ========================= */
-function seedDemo() {
-  const db = loadDB();
-  if (!db.users["alice"]) db.users["alice"] = { username:"alice", pass:"123", createdAt: now()-86400000*4, wallet: 500 };
-  if (!db.users["bob"]) db.users["bob"] = { username:"bob", pass:"123", createdAt: now()-86400000*2, wallet: 350 };
-  if (db.posts.length === 0) {
-    db.posts.push({
-      id: uid("post"),
-      author: "alice",
-      text: "Welcome to the RP feed.\nTry logging in as alice/123 or bob/123.",
-      imageDataUrl: null,
-      visibility: "public",
-      createdAt: now()-3600_000,
-      likes: ["bob"],
-      comments: [{ id: uid("c"), author:"bob", text:"This looks cool.", createdAt: now()-3500_000 }]
-    });
-  }
-  saveDB(db);
-  renderAll();
-}
-
-function exportJSON() {
-  const db = loadDB();
-  const raw = JSON.stringify(db);
-  navigator.clipboard?.writeText(raw);
-  toast("Export copied to clipboard (or open DevTools to copy from storage).");
-}
-
-let importArmed = false;
-function importJSON() {
-  const box = $("#importBox");
-  if (!importArmed) {
-    importArmed = true;
-    box.classList.remove("hide");
-    box.focus();
-    toast("Paste JSON into the input, then click Import JSON again.");
-    return;
-  }
-  try {
-    const obj = JSON.parse(box.value);
-    if (!obj || typeof obj !== "object") throw new Error("bad");
-    if (!obj.users || !obj.posts || !obj.tx) throw new Error("missing keys");
-    localStorage.setItem(DB_KEY, JSON.stringify(obj));
-    importArmed = false;
-    box.value = "";
-    box.classList.add("hide");
-    toast("Imported.");
-    renderAll();
-  } catch {
-    toast("Invalid JSON.");
-  }
-}
-
-function wipeAll() {
-  if (!confirm("Wipe ALL local data for this site?")) return;
-  localStorage.removeItem(DB_KEY);
-  localStorage.removeItem(SESSION_KEY);
-  renderAll();
-}
-
-function resetEconomy() {
+function resetEconomy(){
   const db = loadDB();
   const me = getMe(db);
-  if (!me) return;
-  if (!confirm("Reset your wallet to 200 and clear your transaction history?")) return;
+  if(!me) return;
+  if(!confirm("Reset your wallet to 200 and clear your transaction history?")) return;
   db.users[me].wallet = 200;
   db.tx = db.tx.filter(t => t.from !== me && t.to !== me);
   saveDB(db);
   renderAll();
 }
 
-/* =========================
-   Bind events
-   ========================= */
-$("#signupBtn").addEventListener("click", () => signup($("#suUser").value, $("#suPass").value));
-$("#loginBtn").addEventListener("click", () => login($("#liUser").value, $("#liPass").value));
-$("#logoutBtn").addEventListener("click", logout);
-$("#publishBtn").addEventListener("click", publishPost);
+/* ===== Tools ===== */
+function seedDemo(){
+  const db = loadDB();
+  if(!db.users["alice"]) db.users["alice"] = { username:"alice", pass:"123", createdAt: now()-86400000*5, wallet: 500, characters:{}, activeCharId:null };
+  if(!db.users["bob"]) db.users["bob"] = { username:"bob", pass:"123", createdAt: now()-86400000*3, wallet: 350, characters:{}, activeCharId:null };
 
-$("#giveBtn").addEventListener("click", dailyGive);
-$("#sendBtn").addEventListener("click", () => sendMoney($("#txTo").value, $("#txAmt").value));
-$("#resetEcoBtn").addEventListener("click", resetEconomy);
+  // Alice chars
+  const a = db.users["alice"];
+  if(Object.keys(a.characters).length===0){
+    const c1 = { id: uid("char"), name:"Ava Neon", handle:"ava_neon", bio:"Modern city RP. Night rides, neon lights.", createdAt: now()-86400000*4 };
+    a.characters[c1.id]=c1; a.activeCharId=c1.id;
+  }
+  // Bob chars
+  const b = db.users["bob"];
+  if(Object.keys(b.characters).length===0){
+    const c1 = { id: uid("char"), name:"Kai Vale", handle:"kai.vale", bio:"Street photographer, coffee addict.", createdAt: now()-86400000*2 };
+    b.characters[c1.id]=c1; b.activeCharId=c1.id;
+  }
 
-$("#seedBtn").addEventListener("click", seedDemo);
-$("#exportBtn").addEventListener("click", exportJSON);
-$("#importBtn").addEventListener("click", importJSON);
-$("#wipeBtn").addEventListener("click", wipeAll);
+  if(db.posts.length===0){
+    const ac = Object.values(a.characters)[0];
+    const bc = Object.values(b.characters)[0];
+    db.posts.push({
+      id: uid("post"),
+      user: "alice",
+      charId: ac.id,
+      charName: ac.name,
+      charHandle: ac.handle,
+      text: "Welcome to RP Insta.\nLogin: alice/123 or bob/123.\nCreate your own characters and post as them.",
+      imageDataUrl: null,
+      createdAt: now()-3600_000,
+      likes: ["bob"],
+      comments: [{ id: uid("c"), authorUser:"bob", text:"This is actually super clean.", createdAt: now()-3500_000 }]
+    });
+  }
+
+  saveDB(db);
+  renderAll();
+}
+
+function exportJSON(){
+  const raw = JSON.stringify(loadDB());
+  navigator.clipboard?.writeText(raw);
+  toast("Export copied to clipboard.");
+}
+
+let importArmed=false;
+function importJSON(){
+  const box = $("#importBox");
+  if(!importArmed){
+    importArmed=true;
+    box.classList.remove("hide");
+    box.focus();
+    toast("Paste JSON, then click Import JSON again.");
+    return;
+  }
+  try{
+    const obj = JSON.parse(box.value);
+    if(!obj?.users || !obj?.posts || !obj?.tx) throw new Error("bad");
+    localStorage.setItem(DB_KEY, JSON.stringify(obj));
+    importArmed=false;
+    box.value="";
+    box.classList.add("hide");
+    toast("Imported.");
+    renderAll();
+  }catch{
+    toast("Invalid JSON.");
+  }
+}
+function wipeAll(){
+  if(!confirm("Wipe ALL local data?")) return;
+  localStorage.removeItem(DB_KEY);
+  localStorage.removeItem(SESSION_KEY);
+  renderAll();
+}
+
+/* ===== Bind ===== */
+$("#signupBtn").onclick = ()=>signup($("#suUser").value, $("#suPass").value);
+$("#loginBtn").onclick  = ()=>login($("#liUser").value, $("#liPass").value);
+$("#logoutBtn").onclick = logout;
+
+$("#createCharBtn").onclick = createCharacter;
+$("#deleteCharBtn").onclick = deleteSelectedCharacter;
+
+$("#publishBtn").onclick = publishPost;
+
+$("#dailyBtn").onclick = daily;
+$("#sendBtn").onclick = ()=>sendMoney($("#txTo").value, $("#txAmt").value);
+$("#resetEcoBtn").onclick = resetEconomy;
+
+$("#seedBtn").onclick = seedDemo;
+$("#exportBtn").onclick = exportJSON;
+$("#importBtn").onclick = importJSON;
+$("#wipeBtn").onclick = wipeAll;
 
 /* Init */
 renderAll();
