@@ -133,3 +133,16 @@ textarea{min-height:92px;resize:vertical}
   background:rgba(255,255,255,.03);
 }
 .foot{padding:10px 2px;font-size:13px;color:var(--muted)}
+
+/* post actions */
+.actions{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.smallbtn{
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);
+  color:var(--text);
+  padding:6px 10px;
+  border-radius:999px;
+  cursor:pointer;
+  font-size:13px;
+}
+.smallbtn:hover{background:rgba(255,255,255,.09)}
