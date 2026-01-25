@@ -89,6 +89,34 @@ $('settingsForm')?.addEventListener('submit', onSaveSettings)
 
 btnLogout?.addEventListener('click', async () => { await supabase.auth.signOut(); await refreshUI() })
 btnRefresh?.addEventListener('click', async () => { await loadFeed() })
+async function toggleLike(post_id){
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+
+  // try insert; if duplicate key, delete instead
+  const { error } = await supabase.from('post_likes').insert({ post_id, user_id: user.id })
+  if (!error) return
+
+  await supabase.from('post_likes').delete().eq('post_id', post_id).eq('user_id', user.id)
+}
+async function addComment(post_id, content){
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  await supabase.from('post_comments').insert({ post_id, user_id: user.id, content })
+}
+
+async function loadComments(post_id){
+  return await supabase
+    .from('post_comments')
+    .select('id, user_id, content, created_at')
+    .eq('post_id', post_id)
+    .order('created_at', { ascending: true })
+}
+const { error } = await supabase.rpc('transfer_money', {
+  to_username: 'someone',
+  amount: 50,
+  note: 'rent'
+})
 
 // UI refresh
 async function refreshUI(){
