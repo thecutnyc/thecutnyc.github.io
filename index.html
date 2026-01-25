@@ -34,31 +34,30 @@
         <h2>Login</h2>
         <p class="muted">Username + password.</p>
         <form id="loginForm" class="grid">
-          <label>Username
-            <input id="loginUsername" autocomplete="username" required />
-          </label>
-          <label>Password
-            <input id="loginPassword" type="password" autocomplete="current-password" required />
-          </label>
-          <button class="btn primary" type="submit">Login</button>
-        </form>
+  <label>Email
+    <input id="loginEmail" type="email" autocomplete="email" required />
+  </label>
+  <label>Password
+    <input id="loginPassword" type="password" autocomplete="current-password" required />
+  </label>
+  <button class="btn primary" type="submit">Login</button>
+</form>
+
         <p id="authMsg" class="msg"></p>
       </div>
 
       <div id="pane-signup" class="tabpane hidden">
         <h2>Create account</h2>
         <form id="signupForm" class="grid">
-          <label>Username (public)
-            <input id="signupUsername" required />
-          </label>
-          <label>Email
-            <input id="signupEmail" type="email" autocomplete="email" required />
-          </label>
-          <label>Password
-            <input id="signupPassword" type="password" autocomplete="new-password" required />
-          </label>
-          <button class="btn primary" type="submit">Create account</button>
-        </form>
+  <label>Email
+    <input id="signupEmail" type="email" autocomplete="email" required />
+  </label>
+  <label>Password
+    <input id="signupPassword" type="password" autocomplete="new-password" required />
+  </label>
+  <button class="btn primary" type="submit">Create account</button>
+</form>
+
         <p id="signupMsg" class="msg"></p>
       </div>
 
