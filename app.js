@@ -2,10 +2,9 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const SUPABASE_URL = "https://eeihtokxisihnyizanuj.supabase.co"
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWh0b2t4aXNpaG55aXphbnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyOTMwMzgsImV4cCI6MjA4NDg2OTAzOH0.BBt7cVENwwUMrVQv5SD5Z8L02lQts5ooXRVTv6LRavY"
+const BUCKET_POST_IMAGES = "post-images"
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-const BUCKET_POST_IMAGES = 'post-images'
 
 // helpers
 const $ = (id) => document.getElementById(id)
@@ -26,6 +25,7 @@ const authView = $('authView')
 const appView = $('appView')
 const btnLogout = $('btnLogout')
 const btnRefresh = $('btnRefresh')
+const btnRefreshCharacters = $('btnRefreshCharacters')
 
 const authMsg = $('authMsg')
 const signupMsg = $('signupMsg')
@@ -46,7 +46,10 @@ const walletList = $('walletList')
 const settingsMsg = $('settingsMsg')
 const bioInput = $('bioInput')
 
-// tabs
+const charactersMsg = $('charactersMsg')
+const charactersList = $('charactersList')
+
+// -------------------- tabs (auth)
 document.querySelectorAll('.tab').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'))
@@ -61,67 +64,64 @@ function setAuthPane(tab){
   $('pane-forgot')?.classList.toggle('hidden', tab !== 'forgot')
 }
 
-// nav
+// -------------------- nav (views)
 document.querySelectorAll('.navbtn').forEach(btn => {
   btn.addEventListener('click', async () => {
     document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'))
     btn.classList.add('active')
     const view = btn.getAttribute('data-view')
     setView(view)
+
     if (view === 'walletView') await loadWallet()
+    if (view === 'charactersView') await loadCharacters()
   })
 })
 function setView(viewId){
   $('feedView')?.classList.toggle('hidden', viewId !== 'feedView')
   $('walletView')?.classList.toggle('hidden', viewId !== 'walletView')
+  $('charactersView')?.classList.toggle('hidden', viewId !== 'charactersView')
   $('settingsView')?.classList.toggle('hidden', viewId !== 'settingsView')
 }
 
-// events
+// -------------------- events
 $('loginForm')?.addEventListener('submit', onLogin)
 $('signupForm')?.addEventListener('submit', onSignup)
 $('forgotForm')?.addEventListener('submit', onForgot)
 $('resetForm')?.addEventListener('submit', onReset)
 
 $('postForm')?.addEventListener('submit', onPost)
+
 $('walletForm')?.addEventListener('submit', onWalletTx)
+$('transferForm')?.addEventListener('submit', onTransfer)
+
 $('settingsForm')?.addEventListener('submit', onSaveSettings)
+
+$('characterForm')?.addEventListener('submit', onSaveCharacter)
+btnRefreshCharacters?.addEventListener('click', async () => loadCharacters())
 
 btnLogout?.addEventListener('click', async () => { await supabase.auth.signOut(); await refreshUI() })
 btnRefresh?.addEventListener('click', async () => { await loadFeed() })
-async function toggleLike(post_id){
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
 
-  // try insert; if duplicate key, delete instead
-  const { error } = await supabase.from('post_likes').insert({ post_id, user_id: user.id })
-  if (!error) return
+// -------------------- shared: profile map
+async function loadProfileMap(userIds){
+  const ids = [...new Set((userIds ?? []).filter(Boolean))]
+  if (!ids.length) return {}
 
-  await supabase.from('post_likes').delete().eq('post_id', post_id).eq('user_id', user.id)
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, username')
+    .in('id', ids)
+
+  if (error || !data) return {}
+  const map = {}
+  for (const p of data) map[p.id] = p.username
+  return map
 }
-async function addComment(post_id, content){
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
-  await supabase.from('post_comments').insert({ post_id, user_id: user.id, content })
-}
 
-async function loadComments(post_id){
-  return await supabase
-    .from('post_comments')
-    .select('id, user_id, content, created_at')
-    .eq('post_id', post_id)
-    .order('created_at', { ascending: true })
-}
-const { error } = await supabase.rpc('transfer_money', {
-  to_username: 'someone',
-  amount: 50,
-  note: 'rent'
-})
-
-// UI refresh
+// -------------------- UI refresh
 async function refreshUI(){
   setMsg(authMsg,''); setMsg(signupMsg,''); setMsg(forgotMsg,''); setMsg(resetMsg,'')
-  setMsg(postMsg,''); setMsg(walletMsg,''); setMsg(settingsMsg,'')
+  setMsg(postMsg,''); setMsg(walletMsg,''); setMsg(settingsMsg,''); setMsg(charactersMsg,'')
 
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -142,13 +142,14 @@ async function refreshUI(){
   if (bioInput) bioInput.value = profile?.bio ?? ''
 
   setView('feedView')
+  document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'))
   document.querySelector('.navbtn[data-view="feedView"]')?.classList.add('active')
 
   await loadFeed()
   await loadWalletBalance()
 }
 
-// FEED (no embed to avoid ambiguous relationships)
+// -------------------- FEED (posts + likes + comments)
 async function loadFeed(){
   if (!feed) return
   feed.innerHTML = `<div class="muted">Loading…</div>`
@@ -164,26 +165,45 @@ async function loadFeed(){
     return
   }
 
-  // get unique user_ids from posts
-  const ids = [...new Set((posts ?? []).map(p => p.user_id).filter(Boolean))]
+  const postIds = (posts ?? []).map(p => p.id)
+  const userIds = (posts ?? []).map(p => p.user_id)
 
-  // fetch usernames for those ids
-  let nameMap = {}
-  if (ids.length){
-    const { data: profs, error: pErr } = await supabase
-      .from('profiles')
-      .select('id, username')
-      .in('id', ids)
+  // like counts + my likes
+  const { data: likes } = await supabase
+    .from('post_likes')
+    .select('post_id, user_id')
+    .in('post_id', postIds)
 
-    if (!pErr && profs){
-      for (const p of profs) nameMap[p.id] = p.username
-    }
+  const likeCount = {}
+  const likedByMe = {}
+  const { data: { user } } = await supabase.auth.getUser()
+  const myId = user?.id ?? null
+
+  for (const l of (likes ?? [])){
+    likeCount[l.post_id] = (likeCount[l.post_id] || 0) + 1
+    if (myId && l.user_id === myId) likedByMe[l.post_id] = true
   }
+
+  // comment counts
+  const { data: comments } = await supabase
+    .from('post_comments')
+    .select('id, post_id')
+    .in('post_id', postIds)
+
+  const commentCount = {}
+  for (const c of (comments ?? [])){
+    commentCount[c.post_id] = (commentCount[c.post_id] || 0) + 1
+  }
+
+  const nameMap = await loadProfileMap(userIds)
 
   feed.innerHTML = ''
   for (const row of posts){
     const u = nameMap[row.user_id] || 'user'
     const t = new Date(row.created_at).toLocaleString()
+    const likesN = likeCount[row.id] || 0
+    const commentsN = commentCount[row.id] || 0
+    const isLiked = !!likedByMe[row.id]
 
     const div = document.createElement('div')
     div.className = 'post'
@@ -191,19 +211,139 @@ async function loadFeed(){
       <div class="meta"><span class="user">@${esc(u)}</span><span>${esc(t)}</span></div>
       ${row.image_url ? `<img src="${esc(row.image_url)}" style="width:100%;border-radius:16px;border:1px solid rgba(255,255,255,.08);margin:8px 0" />` : ''}
       ${row.content ? `<div>${esc(row.content)}</div>` : ''}
+
+      <div class="actions">
+        <button class="smallbtn" data-like="${row.id}">${isLiked ? 'Liked' : 'Like'} · ${likesN}</button>
+        <button class="smallbtn" data-toggle-comments="${row.id}">Comments · ${commentsN}</button>
+      </div>
+
+      <div id="comments-${row.id}" class="hidden" style="margin-top:10px">
+        <div id="comments-list-${row.id}" class="list"></div>
+
+        <form data-comment-form="${row.id}" class="grid" style="margin-top:10px">
+          <label>Add comment
+            <input data-comment-input="${row.id}" maxlength="220" placeholder="Say something…" />
+          </label>
+          <button class="btn primary" type="submit">Comment</button>
+        </form>
+        <p id="comments-msg-${row.id}" class="msg"></p>
+      </div>
     `
     feed.appendChild(div)
   }
+
+  // wire like buttons + comment toggles/forms
+  feed.querySelectorAll('[data-like]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const postId = Number(btn.getAttribute('data-like'))
+      await toggleLike(postId)
+      await loadFeed()
+    })
+  })
+
+  feed.querySelectorAll('[data-toggle-comments]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const postId = Number(btn.getAttribute('data-toggle-comments'))
+      const box = $(`comments-${postId}`)
+      if (!box) return
+      box.classList.toggle('hidden')
+      if (!box.classList.contains('hidden')) await renderComments(postId)
+    })
+  })
+
+  feed.querySelectorAll('form[data-comment-form]').forEach(form => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const postId = Number(form.getAttribute('data-comment-form'))
+      const input = feed.querySelector(`[data-comment-input="${postId}"]`)
+      const msgEl = $(`comments-msg-${postId}`)
+      setMsg(msgEl, '')
+      const content = (input?.value ?? '').trim()
+      if (!content) return setMsg(msgEl, 'Write a comment first.')
+      const err = await addComment(postId, content)
+      if (err) return setMsg(msgEl, err)
+      if (input) input.value = ''
+      await renderComments(postId)
+      await loadFeed()
+    })
+  })
 }
 
-// POST + image upload
+async function toggleLike(post_id){
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+
+  const { error } = await supabase.from('post_likes').insert({ post_id, user_id: user.id })
+  if (!error) return
+
+  await supabase.from('post_likes').delete().eq('post_id', post_id).eq('user_id', user.id)
+}
+
+async function addComment(post_id, content){
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return 'Not logged in.'
+  const { error } = await supabase.from('post_comments').insert({ post_id, user_id: user.id, content })
+  return error ? error.message : null
+}
+
+async function renderComments(post_id){
+  const list = $(`comments-list-${post_id}`)
+  if (!list) return
+  list.innerHTML = `<div class="muted">Loading…</div>`
+
+  const { data: rows, error } = await supabase
+    .from('post_comments')
+    .select('id, user_id, content, created_at')
+    .eq('post_id', post_id)
+    .order('created_at', { ascending: true })
+
+  if (error){
+    list.innerHTML = `<div class="muted">Error: ${esc(error.message)}</div>`
+    return
+  }
+
+  const map = await loadProfileMap((rows ?? []).map(r => r.user_id))
+  const { data: { user } } = await supabase.auth.getUser()
+  const myId = user?.id ?? null
+
+  list.innerHTML = ''
+  for (const r of (rows ?? [])){
+    const u = map[r.user_id] || 'user'
+    const t = new Date(r.created_at).toLocaleString()
+    const canDelete = myId && r.user_id === myId
+
+    const div = document.createElement('div')
+    div.className = 'item'
+    div.innerHTML = `
+      <div>
+        <div class="meta" style="margin:0 0 6px">
+          <span class="user">@${esc(u)}</span><span>${esc(t)}</span>
+        </div>
+        <div>${esc(r.content)}</div>
+      </div>
+      ${canDelete ? `<button class="smallbtn" data-del-comment="${r.id}" data-post="${post_id}">Delete</button>` : `<div class="pill">•</div>`}
+    `
+    list.appendChild(div)
+  }
+
+  list.querySelectorAll('[data-del-comment]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = Number(btn.getAttribute('data-del-comment'))
+      const pid = Number(btn.getAttribute('data-post'))
+      await supabase.from('post_comments').delete().eq('id', id)
+      await renderComments(pid)
+      await loadFeed()
+    })
+  })
+}
+
+// -------------------- POST (image upload)
 async function onPost(e){
   e.preventDefault()
   setMsg(postMsg, '')
 
   const content = $('postContent')?.value?.trim() ?? ''
   const file = $('postImage')?.files?.[0] ?? null
-
   if (!content && !file) return setMsg(postMsg, 'Write something or add an image.')
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -222,14 +362,14 @@ async function onPost(e){
     const { error: upErr } = await supabase
       .storage
       .from(BUCKET_POST_IMAGES)
-      .upload(path, file, { upsert: false, contentType: file.type }) // Upload API [web:368]
+      .upload(path, file, { upsert: false, contentType: file.type }) // [web:368]
 
     if (upErr) return setMsg(postMsg, upErr.message)
 
     const { data: pub } = supabase
       .storage
       .from(BUCKET_POST_IMAGES)
-      .getPublicUrl(path) // Public URL helper [web:377]
+      .getPublicUrl(path) // [web:377]
 
     image_url = pub?.publicUrl ?? null
   }
@@ -245,7 +385,7 @@ async function onPost(e){
   await loadFeed()
 }
 
-// WALLET
+// -------------------- WALLET
 async function loadWalletBalance(){
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
@@ -255,13 +395,8 @@ async function loadWalletBalance(){
     .select('amount')
     .eq('user_id', user.id)
 
-  if (error){
-    if (walletLine) walletLine.textContent = 'Wallet: 0'
-    if (walletBalancePill) walletBalancePill.textContent = '$0'
-    return
-  }
+  const balance = error ? 0 : (data ?? []).reduce((acc, r) => acc + Number(r.amount || 0), 0)
 
-  const balance = (data ?? []).reduce((acc, r) => acc + Number(r.amount || 0), 0)
   if (walletLine) walletLine.textContent = `Wallet: ${balance}`
   if (walletBalancePill) walletBalancePill.textContent = `$${balance}`
 }
@@ -282,7 +417,7 @@ async function loadWallet(){
     .limit(60)
 
   if (error){
-    walletList.innerHTML = `<div class="muted">Wallet table error: ${esc(error.message)}</div>`
+    walletList.innerHTML = `<div class="muted">Wallet error: ${esc(error.message)}</div>`
     return
   }
 
@@ -325,7 +460,120 @@ async function onWalletTx(e){
   await loadWallet()
 }
 
-// SETTINGS
+async function onTransfer(e){
+  e.preventDefault()
+  setMsg(walletMsg, '')
+
+  const to_username = ($('transferTo')?.value ?? '').trim()
+  const amount = Number($('transferAmount')?.value)
+  const note = ($('transferNote')?.value ?? '').trim()
+
+  if (!to_username) return setMsg(walletMsg, 'Enter a username.')
+  if (!Number.isFinite(amount) || amount <= 0) return setMsg(walletMsg, 'Amount must be > 0.')
+
+  const { error } = await supabase.rpc('transfer_money', { to_username, amount, note }) // [web:427]
+  if (error) return setMsg(walletMsg, error.message)
+
+  $('transferTo').value = ''
+  $('transferAmount').value = ''
+  $('transferNote').value = ''
+  await loadWallet()
+}
+
+// -------------------- CHARACTERS
+async function loadCharacters(){
+  if (!charactersList) return
+  setMsg(charactersMsg, '')
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+
+  // load my character (first one)
+  const { data: mine } = await supabase
+    .from('characters')
+    .select('id, character_name, age, faction, faceclaim, bio')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: true })
+    .limit(1)
+
+  const m = (mine && mine[0]) ? mine[0] : null
+  $('charName').value = m?.character_name ?? ''
+  $('charAge').value = m?.age ?? ''
+  $('charFaction').value = m?.faction ?? ''
+  $('charFaceclaim').value = m?.faceclaim ?? ''
+  $('charBio').value = m?.bio ?? ''
+  $('characterForm').setAttribute('data-char-id', m?.id ?? '')
+
+  // load all characters
+  charactersList.innerHTML = `<div class="muted">Loading…</div>`
+  const { data: rows, error } = await supabase
+    .from('characters')
+    .select('id, user_id, character_name, age, faction, faceclaim, bio, created_at')
+    .order('created_at', { ascending: false })
+    .limit(100)
+
+  if (error){
+    charactersList.innerHTML = `<div class="muted">Error: ${esc(error.message)}</div>`
+    return
+  }
+
+  const map = await loadProfileMap((rows ?? []).map(r => r.user_id))
+
+  charactersList.innerHTML = ''
+  for (const r of (rows ?? [])){
+    const owner = map[r.user_id] || 'user'
+    const div = document.createElement('div')
+    div.className = 'item'
+    div.innerHTML = `
+      <div>
+        <div class="meta" style="margin:0 0 6px">
+          <span class="user">${esc(r.character_name)}</span>
+          <span class="muted">by @${esc(owner)}</span>
+        </div>
+        <div class="muted" style="margin-bottom:6px">${esc([r.age ? `Age: ${r.age}` : '', r.faction ? `Faction: ${r.faction}` : '', r.faceclaim ? `Faceclaim: ${r.faceclaim}` : ''].filter(Boolean).join(' · '))}</div>
+        <div>${esc(r.bio || '')}</div>
+      </div>
+      <div class="pill">IC</div>
+    `
+    charactersList.appendChild(div)
+  }
+}
+
+async function onSaveCharacter(e){
+  e.preventDefault()
+  setMsg(charactersMsg, 'Saving…')
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return setMsg(charactersMsg, 'Not logged in.')
+
+  const character_name = ($('charName')?.value ?? '').trim()
+  const age = ($('charAge')?.value ?? '').trim()
+  const faction = ($('charFaction')?.value ?? '').trim()
+  const faceclaim = ($('charFaceclaim')?.value ?? '').trim()
+  const bio = ($('charBio')?.value ?? '').trim()
+
+  if (!character_name) return setMsg(charactersMsg, 'Name is required.')
+
+  const id = $('characterForm')?.getAttribute('data-char-id') || ''
+
+  let error
+  if (id){
+    ;({ error } = await supabase
+      .from('characters')
+      .update({ character_name, age, faction, faceclaim, bio })
+      .eq('id', Number(id))
+      .eq('user_id', user.id))
+  } else {
+    ;({ error } = await supabase
+      .from('characters')
+      .insert({ user_id: user.id, character_name, age, faction, faceclaim, bio }))
+  }
+
+  setMsg(charactersMsg, error ? error.message : 'Saved.')
+  await loadCharacters()
+}
+
+// -------------------- SETTINGS
 async function onSaveSettings(e){
   e.preventDefault()
   setMsg(settingsMsg, 'Saving…')
@@ -338,7 +586,7 @@ async function onSaveSettings(e){
   setMsg(settingsMsg, error ? error.message : 'Saved.')
 }
 
-// AUTH
+// -------------------- AUTH
 async function onSignup(e){
   e.preventDefault()
   setMsg(signupMsg, 'Creating account…')
@@ -374,45 +622,4 @@ async function onLogin(e){
     .eq('username', username)
     .limit(1)
 
-  if (uErr) return setMsg(authMsg, uErr.message)
-  if (!rows || rows.length === 0) return setMsg(authMsg, 'Unknown username.')
-
-  const email = rows[0].email
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) return setMsg(authMsg, error.message)
-
-  await refreshUI()
-}
-
-async function onForgot(e){
-  e.preventDefault()
-  setMsg(forgotMsg, 'Sending…')
-
-  const email = ($('forgotEmail')?.value ?? '').trim().toLowerCase()
-  const redirectTo = window.location.origin + window.location.pathname
-
-  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo })
-  setMsg(forgotMsg, error ? error.message : 'Sent reset email. Open the link, then set a new password here.')
-}
-
-supabase.auth.onAuthStateChange((event) => {
-  if (event === 'PASSWORD_RECOVERY') {
-    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'))
-    document.querySelector('.tab[data-tab="forgot"]')?.classList.add('active')
-    setAuthPane('forgot')
-    show(resetBox)
-  }
-})
-
-async function onReset(e){
-  e.preventDefault()
-  setMsg(resetMsg, 'Updating…')
-
-  const password = $('newPassword')?.value ?? ''
-  const { error } = await supabase.auth.updateUser({ password })
-  setMsg(resetMsg, error ? error.message : 'Password updated. Go to Login.')
-}
-
-// boot
-console.log("The Cut NYC using Supabase URL:", SUPABASE_URL)
-await refreshUI()
+  if (uErr) return setMsg
