@@ -125,7 +125,7 @@ async function loadFeed(){
   if (!feed) return
   feed.innerHTML = `<div class="muted">Loading…</div>`
 
-  const { data, error } = await supabase
+  const { data: posts, error } = await supabase
     .from('posts')
     .select('id, user_id, content, image_url, created_at')
     .order('created_at', { ascending: false })
@@ -136,14 +136,31 @@ async function loadFeed(){
     return
   }
 
+  // get unique user_ids from posts
+  const ids = [...new Set((posts ?? []).map(p => p.user_id).filter(Boolean))]
+
+  // fetch usernames for those ids
+  let nameMap = {}
+  if (ids.length){
+    const { data: profs, error: pErr } = await supabase
+      .from('profiles')
+      .select('id, username')
+      .in('id', ids)
+
+    if (!pErr && profs){
+      for (const p of profs) nameMap[p.id] = p.username
+    }
+  }
+
   feed.innerHTML = ''
-  for (const row of data){
+  for (const row of posts){
+    const u = nameMap[row.user_id] || 'user'
     const t = new Date(row.created_at).toLocaleString()
+
     const div = document.createElement('div')
     div.className = 'post'
-
     div.innerHTML = `
-      <div class="meta"><span class="user">@user</span><span>${esc(t)}</span></div>
+      <div class="meta"><span class="user">@${esc(u)}</span><span>${esc(t)}</span></div>
       ${row.image_url ? `<img src="${esc(row.image_url)}" style="width:100%;border-radius:16px;border:1px solid rgba(255,255,255,.08);margin:8px 0" />` : ''}
       ${row.content ? `<div>${esc(row.content)}</div>` : ''}
     `
