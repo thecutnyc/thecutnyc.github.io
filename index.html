@@ -4,9 +4,34 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>the cut nyc</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    :root { --bg:#0b0d12; --card:#121622; --text:#e9ecf5; --muted:#9aa3b2; --line:#232a3b; --accent:#6d6bff; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
+    .bar{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,13,18,.9);backdrop-filter:blur(8px)}
+    .wrap{max-width:820px;margin:18px auto;padding:0 14px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+    .grid{display:grid;gap:10px}
+    label{display:grid;gap:6px;color:var(--muted);font-size:14px}
+    input,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0e111a;color:var(--text)}
+    .btn{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#0e111a;color:var(--text);cursor:pointer}
+    .btn.primary{background:var(--accent);border-color:transparent;color:white}
+    .right{display:flex;gap:10px;align-items:center}
+    .muted{color:var(--muted);font-size:14px}
+    .hidden{display:none}
+    hr{border:none;border-top:1px solid var(--line);margin:16px 0}
+    .msg{margin:8px 0 0;color:var(--muted);min-height:18px}
+    .post{border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0;background:#0e111a}
+    .post .meta{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-bottom:8px;gap:12px;flex-wrap:wrap}
+    .post img{max-width:100%;border-radius:12px;border:1px solid var(--line);margin-top:10px}
+    .actions{display:flex;gap:8px;align-items:center;margin-top:10px;color:var(--muted);font-size:14px;flex-wrap:wrap}
+    .actions button{padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:#0b0d12;color:var(--text);cursor:pointer}
+  </style>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
+
 <body>
   <header class="bar">
     <h1>the cut nyc</h1>
@@ -65,6 +90,204 @@
     </section>
   </main>
 
-  <script src="app.js"></script>
+  <script>
+    // Put your keys here (anon key is ok in frontend; protect data with RLS). [web:604]
+    const SUPABASE_URL = "https://eeihtokxisihnyizanuj.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWh0b2t4aXNpaG55aXphbnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyOTMwMzgsImV4cCI6MjA4NDg2OTAzOH0.BBt7cVENwwUMrVQv5SD5Z8L02lQts5ooXRVTv6LRavY";
+
+    // CDN exposes global `supabase`. Use createClient from it (don’t redeclare `supabase`). [web:582]
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const $ = (id) => document.getElementById(id);
+    const setMsg = (el, msg) => { if (el) el.textContent = msg || ""; };
+
+    const authSection = $("authSection");
+    const appSection = $("appSection");
+    const whoami = $("whoami");
+    const logoutBtn = $("logoutBtn");
+
+    const loginForm = $("loginForm");
+    const signupForm = $("signupForm");
+    const postForm = $("postForm");
+
+    const authMsg = $("authMsg");
+    const signupMsg = $("signupMsg");
+    const postMsg = $("postMsg");
+    const feed = $("feed");
+
+    loginForm.addEventListener("submit", onLogin);
+    signupForm.addEventListener("submit", onSignup);
+    postForm.addEventListener("submit", onCreatePost);
+    logoutBtn.addEventListener("click", onLogout);
+
+    sb.auth.onAuthStateChange(() => refreshUI());
+    refreshUI();
+
+    async function onSignup(e){
+      e.preventDefault();
+      setMsg(signupMsg, "Creating account…");
+
+      const email = ($("signupEmail").value || "").trim().toLowerCase();
+      const password = $("signupPassword").value || "";
+
+      const { error } = await sb.auth.signUp({ email, password });
+      if (error) return setMsg(signupMsg, error.message);
+
+      setMsg(signupMsg, "Account created. Now log in (or confirm email if required).");
+    }
+
+    async function onLogin(e){
+      e.preventDefault();
+      setMsg(authMsg, "Logging in…");
+
+      const email = ($("loginEmail").value || "").trim().toLowerCase();
+      const password = $("loginPassword").value || "";
+
+      // Email+password login call per Supabase docs. [web:69]
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) return setMsg(authMsg, error.message);
+
+      setMsg(authMsg, "");
+    }
+
+    async function onLogout(){
+      await sb.auth.signOut();
+    }
+
+    async function refreshUI(){
+      const { data: { user } } = await sb.auth.getUser();
+
+      const authed = !!user;
+      authSection.classList.toggle("hidden", authed);
+      appSection.classList.toggle("hidden", !authed);
+      logoutBtn.style.display = authed ? "inline-block" : "none";
+      whoami.textContent = authed ? user.email : "";
+
+      if (authed) await loadFeed();
+    }
+
+    async function onCreatePost(e){
+      e.preventDefault();
+      setMsg(postMsg, "Posting…");
+
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) return setMsg(postMsg, "Not logged in.");
+
+      const body = ($("postBody").value || "").trim();
+      if (!body) return setMsg(postMsg, "Write something.");
+
+      let image_url = null;
+
+      const file = $("postImage").files?.[0];
+      if (file) {
+        const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+        const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+
+        const up = await sb.storage
+          .from("post-images")
+          .upload(path, file, { upsert: false });
+
+        if (up.error) return setMsg(postMsg, up.error.message);
+
+        // For public-readable bucket/object, getPublicUrl returns a URL. [web:571]
+        const { data } = sb.storage.from("post-images").getPublicUrl(path);
+        image_url = data.publicUrl;
+      }
+
+      const ins = await sb
+        .from("posts")
+        .insert({ user_id: user.id, body, image_url });
+
+      if (ins.error) return setMsg(postMsg, ins.error.message);
+
+      $("postBody").value = "";
+      $("postImage").value = "";
+      setMsg(postMsg, "");
+      await loadFeed();
+    }
+
+    async function loadFeed(){
+      feed.innerHTML = "Loading…";
+
+      const { data: posts, error } = await sb
+        .from("posts")
+        .select("id,user_id,body,image_url,created_at")
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (error) {
+        feed.innerHTML = "";
+        return setMsg(postMsg, error.message);
+      }
+
+      feed.innerHTML = "";
+      for (const p of posts) {
+        const el = document.createElement("div");
+        el.className = "post";
+        el.innerHTML = `
+          <div class="meta">
+            <span>${p.user_id}</span>
+            <span>${new Date(p.created_at).toLocaleString()}</span>
+          </div>
+          <div>${escapeHtml(p.body)}</div>
+          ${p.image_url ? `<img src="${p.image_url}" alt="post image" />` : ""}
+          <div class="actions">
+            <button data-like="${p.id}">Like</button>
+            <button data-comment="${p.id}">Comment</button>
+          </div>
+        `;
+        feed.appendChild(el);
+      }
+
+      feed.querySelectorAll("button[data-like]").forEach(btn => {
+        btn.addEventListener("click", () => toggleLike(btn.dataset.like));
+      });
+      feed.querySelectorAll("button[data-comment]").forEach(btn => {
+        btn.addEventListener("click", () => addComment(btn.dataset.comment));
+      });
+    }
+
+    async function toggleLike(postId){
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) return;
+
+      const existing = await sb
+        .from("post_likes")
+        .select("post_id,user_id")
+        .eq("post_id", postId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (existing.data) {
+        await sb.from("post_likes").delete().eq("post_id", postId).eq("user_id", user.id);
+      } else {
+        await sb.from("post_likes").insert({ post_id: postId, user_id: user.id });
+      }
+    }
+
+    async function addComment(postId){
+      const text = prompt("Comment:");
+      if (!text) return;
+
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) return;
+
+      await sb.from("post_comments").insert({
+        post_id: postId,
+        user_id: user.id,
+        body: text.trim(),
+      });
+    }
+
+    function escapeHtml(s){
+      return (s || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
 </body>
 </html>
