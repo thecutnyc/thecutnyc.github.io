@@ -6,7 +6,7 @@ const BUCKET_POST_IMAGES = "post-images"
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-// helpers
+// -------- helpers
 const $ = (id) => document.getElementById(id)
 const setMsg = (el, t) => { if (el) el.textContent = t || '' }
 const show = (el) => { if (el) el.classList.remove('hidden') }
@@ -20,7 +20,22 @@ function extFromType(type){
   return 'jpg'
 }
 
-// refs
+async function getUser(){
+  const { data: { user } } = await supabase.auth.getUser()
+  return user
+}
+
+async function loadProfileMap(userIds){
+  const ids = [...new Set((userIds ?? []).filter(Boolean))]
+  if (!ids.length) return {}
+  const { data, error } = await supabase.from('profiles').select('id, username').in('id', ids)
+  if (error || !data) return {}
+  const map = {}
+  for (const p of data) map[p.id] = p.username
+  return map
+}
+
+// -------- refs
 const authView = $('authView')
 const appView = $('appView')
 const btnLogout = $('btnLogout')
@@ -49,33 +64,30 @@ const bioInput = $('bioInput')
 const charactersMsg = $('charactersMsg')
 const charactersList = $('charactersList')
 
-// -------------------- tabs (auth)
+// -------- auth tabs
 document.querySelectorAll('.tab').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'))
     btn.classList.add('active')
     const tab = btn.getAttribute('data-tab')
-    setAuthPane(tab)
+    $('pane-login')?.classList.toggle('hidden', tab !== 'login')
+    $('pane-signup')?.classList.toggle('hidden', tab !== 'signup')
+    $('pane-forgot')?.classList.toggle('hidden', tab !== 'forgot')
   })
 })
-function setAuthPane(tab){
-  $('pane-login')?.classList.toggle('hidden', tab !== 'login')
-  $('pane-signup')?.classList.toggle('hidden', tab !== 'signup')
-  $('pane-forgot')?.classList.toggle('hidden', tab !== 'forgot')
-}
 
-// -------------------- nav (views)
+// -------- app nav
 document.querySelectorAll('.navbtn').forEach(btn => {
   btn.addEventListener('click', async () => {
     document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'))
     btn.classList.add('active')
     const view = btn.getAttribute('data-view')
     setView(view)
-
     if (view === 'walletView') await loadWallet()
     if (view === 'charactersView') await loadCharacters()
   })
 })
+
 function setView(viewId){
   $('feedView')?.classList.toggle('hidden', viewId !== 'feedView')
   $('walletView')?.classList.toggle('hidden', viewId !== 'walletView')
@@ -83,7 +95,7 @@ function setView(viewId){
   $('settingsView')?.classList.toggle('hidden', viewId !== 'settingsView')
 }
 
-// -------------------- events
+// -------- wire events
 $('loginForm')?.addEventListener('submit', onLogin)
 $('signupForm')?.addEventListener('submit', onSignup)
 $('forgotForm')?.addEventListener('submit', onForgot)
@@ -95,36 +107,18 @@ $('walletForm')?.addEventListener('submit', onWalletTx)
 $('transferForm')?.addEventListener('submit', onTransfer)
 
 $('settingsForm')?.addEventListener('submit', onSaveSettings)
-
 $('characterForm')?.addEventListener('submit', onSaveCharacter)
-btnRefreshCharacters?.addEventListener('click', async () => loadCharacters())
 
 btnLogout?.addEventListener('click', async () => { await supabase.auth.signOut(); await refreshUI() })
 btnRefresh?.addEventListener('click', async () => { await loadFeed() })
+btnRefreshCharacters?.addEventListener('click', async () => { await loadCharacters() })
 
-// -------------------- shared: profile map
-async function loadProfileMap(userIds){
-  const ids = [...new Set((userIds ?? []).filter(Boolean))]
-  if (!ids.length) return {}
-
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('id, username')
-    .in('id', ids)
-
-  if (error || !data) return {}
-  const map = {}
-  for (const p of data) map[p.id] = p.username
-  return map
-}
-
-// -------------------- UI refresh
+// -------- UI refresh
 async function refreshUI(){
   setMsg(authMsg,''); setMsg(signupMsg,''); setMsg(forgotMsg,''); setMsg(resetMsg,'')
   setMsg(postMsg,''); setMsg(walletMsg,''); setMsg(settingsMsg,''); setMsg(charactersMsg,'')
 
-  const { data: { user } } = await supabase.auth.getUser()
-
+  const user = await getUser()
   if (!user){
     show(authView); hide(appView); hide(btnLogout)
     return
@@ -141,15 +135,15 @@ async function refreshUI(){
   if (whoami) whoami.textContent = profile?.username ? `@${profile.username}` : '@signed_in'
   if (bioInput) bioInput.value = profile?.bio ?? ''
 
-  setView('feedView')
   document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'))
   document.querySelector('.navbtn[data-view="feedView"]')?.classList.add('active')
+  setView('feedView')
 
   await loadFeed()
   await loadWalletBalance()
 }
 
-// -------------------- FEED (posts + likes + comments)
+// -------- FEED (posts + likes/comments counts)
 async function loadFeed(){
   if (!feed) return
   feed.innerHTML = `<div class="muted">Loading…</div>`
@@ -166,44 +160,30 @@ async function loadFeed(){
   }
 
   const postIds = (posts ?? []).map(p => p.id)
-  const userIds = (posts ?? []).map(p => p.user_id)
+  const nameMap = await loadProfileMap((posts ?? []).map(p => p.user_id))
 
-  // like counts + my likes
-  const { data: likes } = await supabase
-    .from('post_likes')
-    .select('post_id, user_id')
-    .in('post_id', postIds)
+  const { data: likes } = await supabase.from('post_likes').select('post_id, user_id').in('post_id', postIds)
+  const { data: comments } = await supabase.from('post_comments').select('id, post_id').in('post_id', postIds)
 
   const likeCount = {}
   const likedByMe = {}
-  const { data: { user } } = await supabase.auth.getUser()
+  const commentCount = {}
+
+  const user = await getUser()
   const myId = user?.id ?? null
 
   for (const l of (likes ?? [])){
     likeCount[l.post_id] = (likeCount[l.post_id] || 0) + 1
     if (myId && l.user_id === myId) likedByMe[l.post_id] = true
   }
-
-  // comment counts
-  const { data: comments } = await supabase
-    .from('post_comments')
-    .select('id, post_id')
-    .in('post_id', postIds)
-
-  const commentCount = {}
   for (const c of (comments ?? [])){
     commentCount[c.post_id] = (commentCount[c.post_id] || 0) + 1
   }
 
-  const nameMap = await loadProfileMap(userIds)
-
   feed.innerHTML = ''
-  for (const row of posts){
+  for (const row of (posts ?? [])){
     const u = nameMap[row.user_id] || 'user'
     const t = new Date(row.created_at).toLocaleString()
-    const likesN = likeCount[row.id] || 0
-    const commentsN = commentCount[row.id] || 0
-    const isLiked = !!likedByMe[row.id]
 
     const div = document.createElement('div')
     div.className = 'post'
@@ -213,8 +193,8 @@ async function loadFeed(){
       ${row.content ? `<div>${esc(row.content)}</div>` : ''}
 
       <div class="actions">
-        <button class="smallbtn" data-like="${row.id}">${isLiked ? 'Liked' : 'Like'} · ${likesN}</button>
-        <button class="smallbtn" data-toggle-comments="${row.id}">Comments · ${commentsN}</button>
+        <button class="smallbtn" data-like="${row.id}">${likedByMe[row.id] ? 'Liked' : 'Like'} · ${likeCount[row.id] || 0}</button>
+        <button class="smallbtn" data-toggle-comments="${row.id}">Comments · ${commentCount[row.id] || 0}</button>
       </div>
 
       <div id="comments-${row.id}" class="hidden" style="margin-top:10px">
@@ -232,7 +212,7 @@ async function loadFeed(){
     feed.appendChild(div)
   }
 
-  // wire like buttons + comment toggles/forms
+  // likes
   feed.querySelectorAll('[data-like]').forEach(btn => {
     btn.addEventListener('click', async () => {
       const postId = Number(btn.getAttribute('data-like'))
@@ -241,6 +221,7 @@ async function loadFeed(){
     })
   })
 
+  // comment toggle
   feed.querySelectorAll('[data-toggle-comments]').forEach(btn => {
     btn.addEventListener('click', async () => {
       const postId = Number(btn.getAttribute('data-toggle-comments'))
@@ -251,6 +232,7 @@ async function loadFeed(){
     })
   })
 
+  // comment add
   feed.querySelectorAll('form[data-comment-form]').forEach(form => {
     form.addEventListener('submit', async (e) => {
       e.preventDefault()
@@ -260,8 +242,10 @@ async function loadFeed(){
       setMsg(msgEl, '')
       const content = (input?.value ?? '').trim()
       if (!content) return setMsg(msgEl, 'Write a comment first.')
+
       const err = await addComment(postId, content)
       if (err) return setMsg(msgEl, err)
+
       if (input) input.value = ''
       await renderComments(postId)
       await loadFeed()
@@ -270,17 +254,15 @@ async function loadFeed(){
 }
 
 async function toggleLike(post_id){
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getUser()
   if (!user) return
-
   const { error } = await supabase.from('post_likes').insert({ post_id, user_id: user.id })
   if (!error) return
-
   await supabase.from('post_likes').delete().eq('post_id', post_id).eq('user_id', user.id)
 }
 
 async function addComment(post_id, content){
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getUser()
   if (!user) return 'Not logged in.'
   const { error } = await supabase.from('post_comments').insert({ post_id, user_id: user.id, content })
   return error ? error.message : null
@@ -302,13 +284,13 @@ async function renderComments(post_id){
     return
   }
 
-  const map = await loadProfileMap((rows ?? []).map(r => r.user_id))
-  const { data: { user } } = await supabase.auth.getUser()
+  const nameMap = await loadProfileMap((rows ?? []).map(r => r.user_id))
+  const user = await getUser()
   const myId = user?.id ?? null
 
   list.innerHTML = ''
   for (const r of (rows ?? [])){
-    const u = map[r.user_id] || 'user'
+    const u = nameMap[r.user_id] || 'user'
     const t = new Date(r.created_at).toLocaleString()
     const canDelete = myId && r.user_id === myId
 
@@ -337,7 +319,7 @@ async function renderComments(post_id){
   })
 }
 
-// -------------------- POST (image upload)
+// -------- POST + image upload
 async function onPost(e){
   e.preventDefault()
   setMsg(postMsg, '')
@@ -346,7 +328,7 @@ async function onPost(e){
   const file = $('postImage')?.files?.[0] ?? null
   if (!content && !file) return setMsg(postMsg, 'Write something or add an image.')
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getUser()
   if (!user) return setMsg(postMsg, 'Not logged in.')
 
   let image_url = null
@@ -385,9 +367,9 @@ async function onPost(e){
   await loadFeed()
 }
 
-// -------------------- WALLET
+// -------- WALLET
 async function loadWalletBalance(){
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getUser()
   if (!user) return
 
   const { data, error } = await supabase
@@ -396,7 +378,6 @@ async function loadWalletBalance(){
     .eq('user_id', user.id)
 
   const balance = error ? 0 : (data ?? []).reduce((acc, r) => acc + Number(r.amount || 0), 0)
-
   if (walletLine) walletLine.textContent = `Wallet: ${balance}`
   if (walletBalancePill) walletBalancePill.textContent = `$${balance}`
 }
@@ -406,7 +387,7 @@ async function loadWallet(){
   walletList.innerHTML = `<div class="muted">Loading…</div>`
   await loadWalletBalance()
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getUser()
   if (!user) return
 
   const { data, error } = await supabase
@@ -422,10 +403,11 @@ async function loadWallet(){
   }
 
   walletList.innerHTML = ''
-  for (const row of data){
+  for (const row of (data ?? [])){
     const amt = Number(row.amount || 0)
     const cls = amt >= 0 ? 'pos' : 'neg'
     const t = new Date(row.created_at).toLocaleString()
+
     const div = document.createElement('div')
     div.className = 'item'
     div.innerHTML = `
@@ -443,13 +425,11 @@ async function onWalletTx(e){
   e.preventDefault()
   setMsg(walletMsg, '')
 
-  const amtRaw = $('walletAmount')?.value
-  const note = $('walletNote')?.value?.trim() ?? ''
-  const amount = Number(amtRaw)
-
+  const amount = Number($('walletAmount')?.value)
+  const note = ($('walletNote')?.value ?? '').trim()
   if (!Number.isFinite(amount) || amount === 0) return setMsg(walletMsg, 'Amount must be a non-zero number.')
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getUser()
   if (!user) return setMsg(walletMsg, 'Not logged in.')
 
   const { error } = await supabase.from('wallet_transactions').insert({ user_id: user.id, amount, note })
@@ -480,15 +460,14 @@ async function onTransfer(e){
   await loadWallet()
 }
 
-// -------------------- CHARACTERS
+// -------- CHARACTERS
 async function loadCharacters(){
   if (!charactersList) return
   setMsg(charactersMsg, '')
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getUser()
   if (!user) return
 
-  // load my character (first one)
   const { data: mine } = await supabase
     .from('characters')
     .select('id, character_name, age, faction, faceclaim, bio')
@@ -497,14 +476,13 @@ async function loadCharacters(){
     .limit(1)
 
   const m = (mine && mine[0]) ? mine[0] : null
+  $('characterForm')?.setAttribute('data-char-id', m?.id ? String(m.id) : '')
   $('charName').value = m?.character_name ?? ''
   $('charAge').value = m?.age ?? ''
   $('charFaction').value = m?.faction ?? ''
   $('charFaceclaim').value = m?.faceclaim ?? ''
   $('charBio').value = m?.bio ?? ''
-  $('characterForm').setAttribute('data-char-id', m?.id ?? '')
 
-  // load all characters
   charactersList.innerHTML = `<div class="muted">Loading…</div>`
   const { data: rows, error } = await supabase
     .from('characters')
@@ -543,7 +521,7 @@ async function onSaveCharacter(e){
   e.preventDefault()
   setMsg(charactersMsg, 'Saving…')
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getUser()
   if (!user) return setMsg(charactersMsg, 'Not logged in.')
 
   const character_name = ($('charName')?.value ?? '').trim()
@@ -555,8 +533,8 @@ async function onSaveCharacter(e){
   if (!character_name) return setMsg(charactersMsg, 'Name is required.')
 
   const id = $('characterForm')?.getAttribute('data-char-id') || ''
-
   let error
+
   if (id){
     ;({ error } = await supabase
       .from('characters')
@@ -573,12 +551,12 @@ async function onSaveCharacter(e){
   await loadCharacters()
 }
 
-// -------------------- SETTINGS
+// -------- SETTINGS
 async function onSaveSettings(e){
   e.preventDefault()
   setMsg(settingsMsg, 'Saving…')
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getUser()
   if (!user) return setMsg(settingsMsg, 'Not logged in.')
 
   const bio = bioInput?.value?.trim() ?? ''
@@ -586,18 +564,16 @@ async function onSaveSettings(e){
   setMsg(settingsMsg, error ? error.message : 'Saved.')
 }
 
-// -------------------- AUTH
+// -------- AUTH
 async function onSignup(e){
   e.preventDefault()
   setMsg(signupMsg, 'Creating account…')
 
-  const username = $('signupUsername')?.value?.trim() ?? ''
+  const username = ($('signupUsername')?.value ?? '').trim()
   const email = ($('signupEmail')?.value ?? '').trim().toLowerCase()
   const password = $('signupPassword')?.value ?? ''
 
-  if (!username.match(/^[a-zA-Z0-9_]{3,20}$/)) {
-    return setMsg(signupMsg, 'Username must be 3–20 chars (letters, numbers, underscore).')
-  }
+  if (!username.match(/^[a-zA-Z0-9_]{3,20}$/)) return setMsg(signupMsg, 'Username must be 3–20 chars (letters, numbers, underscore).')
 
   const { data, error } = await supabase.auth.signUp({ email, password })
   if (error) return setMsg(signupMsg, error.message)
@@ -613,7 +589,7 @@ async function onLogin(e){
   e.preventDefault()
   setMsg(authMsg, 'Logging in…')
 
-  const username = $('loginUsername')?.value?.trim() ?? ''
+  const username = ($('loginUsername')?.value ?? '').trim()
   const password = $('loginPassword')?.value ?? ''
 
   const { data: rows, error: uErr } = await supabase
@@ -622,4 +598,44 @@ async function onLogin(e){
     .eq('username', username)
     .limit(1)
 
-  if (uErr) return setMsg
+  if (uErr) return setMsg(authMsg, uErr.message)
+  if (!rows || rows.length === 0) return setMsg(authMsg, 'Unknown username.')
+
+  const email = rows[0].email
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) return setMsg(authMsg, error.message)
+
+  await refreshUI()
+}
+
+async function onForgot(e){
+  e.preventDefault()
+  setMsg(forgotMsg, 'Sending…')
+  const email = ($('forgotEmail')?.value ?? '').trim().toLowerCase()
+  const redirectTo = window.location.origin + window.location.pathname
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo })
+  setMsg(forgotMsg, error ? error.message : 'Sent reset email. Open the link, then set a new password here.')
+}
+
+supabase.auth.onAuthStateChange((event) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'))
+    document.querySelector('.tab[data-tab="forgot"]')?.classList.add('active')
+    $('pane-login')?.classList.add('hidden')
+    $('pane-signup')?.classList.add('hidden')
+    $('pane-forgot')?.classList.remove('hidden')
+    show(resetBox)
+  }
+})
+
+async function onReset(e){
+  e.preventDefault()
+  setMsg(resetMsg, 'Updating…')
+  const password = $('newPassword')?.value ?? ''
+  const { error } = await supabase.auth.updateUser({ password })
+  setMsg(resetMsg, error ? error.message : 'Password updated. Go to Login.')
+}
+
+// boot
+console.log("The Cut NYC using Supabase URL:", SUPABASE_URL)
+await refreshUI()
