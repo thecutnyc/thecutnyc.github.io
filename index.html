@@ -22,8 +22,6 @@
   </header>
 
   <main class="wrap">
- 
-
     <!-- AUTH -->
     <section id="authView" class="card">
       <div class="tabs">
@@ -49,7 +47,6 @@
 
       <div id="pane-signup" class="tabpane hidden">
         <h2>Create account</h2>
-        <p class="muted">Signup needs email too, but your username is what shows publicly.</p>
         <form id="signupForm" class="grid">
           <label>Username (public)
             <input id="signupUsername" required />
@@ -67,7 +64,6 @@
 
       <div id="pane-forgot" class="tabpane hidden">
         <h2>Reset password</h2>
-        <p class="muted">Enter your email. You’ll get a link that brings you back here.</p>
         <form id="forgotForm" class="grid">
           <label>Email
             <input id="forgotEmail" type="email" required />
@@ -102,13 +98,14 @@
         </div>
 
         <form id="postForm" class="grid">
-         
           <label>Post
             <textarea id="postContent" maxlength="280" placeholder="Write an in-character post…"></textarea>
           </label>
+
           <label>Image (optional)
-  <input id="postImage" type="file" accept="image/*" />
-</label>
+            <input id="postImage" type="file" accept="image/*" />
+          </label>
+
           <button class="btn primary" type="submit">Post</button>
         </form>
 
