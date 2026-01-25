@@ -571,44 +571,28 @@ async function onSignup(e){
   e.preventDefault()
   setMsg(signupMsg, 'Creating account…')
 
-  const username = ($('signupUsername')?.value ?? '').trim()
   const email = ($('signupEmail')?.value ?? '').trim().toLowerCase()
   const password = $('signupPassword')?.value ?? ''
 
-  if (!username.match(/^[a-zA-Z0-9_]{3,20}$/)) return setMsg(signupMsg, 'Username must be 3–20 chars (letters, numbers, underscore).')
-
-  const { data, error } = await supabase.auth.signUp({ email, password })
+  const { error } = await supabase.auth.signUp({ email, password }) // email+password signup [web:47]
   if (error) return setMsg(signupMsg, error.message)
 
-  const userId = data.user?.id
-  if (!userId) return setMsg(signupMsg, 'Signup ok, but no user returned (check email confirm settings).')
-
-  const { error: profErr } = await supabase.from('profiles').insert({ id: userId, username, email })
-  setMsg(signupMsg, profErr ? profErr.message : 'Account created. Go to Login.')
+  setMsg(signupMsg, 'Account created. Now log in (or confirm email if your project requires it).')
 }
 
 async function onLogin(e){
   e.preventDefault()
   setMsg(authMsg, 'Logging in…')
 
-  const username = ($('loginUsername')?.value ?? '').trim()
+  const email = ($('loginEmail')?.value ?? '').trim().toLowerCase()
   const password = $('loginPassword')?.value ?? ''
 
-  const { data: rows, error: uErr } = await supabase
-    .from('profiles')
-    .select('email')
-    .eq('username', username)
-    .limit(1)
-
-  if (uErr) return setMsg(authMsg, uErr.message)
-  if (!rows || rows.length === 0) return setMsg(authMsg, 'Unknown username.')
-
-  const email = rows[0].email
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  const { error } = await supabase.auth.signInWithPassword({ email, password }) // email+password login [web:69]
   if (error) return setMsg(authMsg, error.message)
 
   await refreshUI()
 }
+
 
 async function onForgot(e){
   e.preventDefault()
