@@ -1,21 +1,18 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-// 1) PUT YOUR REAL VALUES HERE
 const SUPABASE_URL = "https://eeihtokxisihnyizanuj.supabase.co"
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWh0b2t4aXNpaG55aXphbnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyOTMwMzgsImV4cCI6MjA4NDg2OTAzOH0.BBt7cVENwwUMrVQv5SD5Z8L02lQts5ooXRVTv6LRavY"
 
-// ------------------------------------------------------------------
-// Supabase client
-// ------------------------------------------------------------------
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-// Tiny helpers (safe against nulls)
+const BUCKET_POST_IMAGES = 'post-images'
+
+// helpers
 const $ = (id) => document.getElementById(id)
 const setMsg = (el, t) => { if (el) el.textContent = t || '' }
 const show = (el) => { if (el) el.classList.remove('hidden') }
 const hide = (el) => { if (el) el.classList.add('hidden') }
 const esc = (s) => (s ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
-const BUCKET_POST_IMAGES = 'post-images'
 
 function extFromType(type){
   if (type === 'image/png') return 'png'
@@ -24,10 +21,7 @@ function extFromType(type){
   return 'jpg'
 }
 
-
-// ------------------------------------------------------------------
-// Element refs
-// ------------------------------------------------------------------
+// refs
 const authView = $('authView')
 const appView = $('appView')
 const btnLogout = $('btnLogout')
@@ -52,9 +46,7 @@ const walletList = $('walletList')
 const settingsMsg = $('settingsMsg')
 const bioInput = $('bioInput')
 
-// ------------------------------------------------------------------
-// Auth tabs (Login / Signup / Forgot)
-// ------------------------------------------------------------------
+// tabs
 document.querySelectorAll('.tab').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'))
@@ -63,16 +55,13 @@ document.querySelectorAll('.tab').forEach(btn => {
     setAuthPane(tab)
   })
 })
-
 function setAuthPane(tab){
   $('pane-login')?.classList.toggle('hidden', tab !== 'login')
   $('pane-signup')?.classList.toggle('hidden', tab !== 'signup')
   $('pane-forgot')?.classList.toggle('hidden', tab !== 'forgot')
 }
 
-// ------------------------------------------------------------------
-// Top nav (Feed / Wallet / Settings)
-// ------------------------------------------------------------------
+// nav
 document.querySelectorAll('.navbtn').forEach(btn => {
   btn.addEventListener('click', async () => {
     document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'))
@@ -82,16 +71,13 @@ document.querySelectorAll('.navbtn').forEach(btn => {
     if (view === 'walletView') await loadWallet()
   })
 })
-
 function setView(viewId){
   $('feedView')?.classList.toggle('hidden', viewId !== 'feedView')
   $('walletView')?.classList.toggle('hidden', viewId !== 'walletView')
   $('settingsView')?.classList.toggle('hidden', viewId !== 'settingsView')
 }
 
-// ------------------------------------------------------------------
-// Wire form events
-// ------------------------------------------------------------------
+// events
 $('loginForm')?.addEventListener('submit', onLogin)
 $('signupForm')?.addEventListener('submit', onSignup)
 $('forgotForm')?.addEventListener('submit', onForgot)
@@ -104,9 +90,7 @@ $('settingsForm')?.addEventListener('submit', onSaveSettings)
 btnLogout?.addEventListener('click', async () => { await supabase.auth.signOut(); await refreshUI() })
 btnRefresh?.addEventListener('click', async () => { await loadFeed() })
 
-// ------------------------------------------------------------------
-// Main UI refresh
-// ------------------------------------------------------------------
+// UI refresh
 async function refreshUI(){
   setMsg(authMsg,''); setMsg(signupMsg,''); setMsg(forgotMsg,''); setMsg(resetMsg,'')
   setMsg(postMsg,''); setMsg(walletMsg,''); setMsg(settingsMsg,'')
@@ -136,16 +120,14 @@ async function refreshUI(){
   await loadWalletBalance()
 }
 
-// ------------------------------------------------------------------
-// Feed
-// ------------------------------------------------------------------
+// FEED (no embed to avoid ambiguous relationships)
 async function loadFeed(){
   if (!feed) return
   feed.innerHTML = `<div class="muted">Loading…</div>`
 
   const { data, error } = await supabase
     .from('posts')
-    .select('id, content, created_at, profiles(username)')
+    .select('id, user_id, content, image_url, created_at')
     .order('created_at', { ascending: false })
     .limit(40)
 
@@ -156,20 +138,20 @@ async function loadFeed(){
 
   feed.innerHTML = ''
   for (const row of data){
-    const u = row.profiles?.username ?? 'unknown'
     const t = new Date(row.created_at).toLocaleString()
     const div = document.createElement('div')
     div.className = 'post'
-    div.innerHTML = `
-  <div class="meta"><span class="user">@${esc(u)}</span><span>${esc(t)}</span></div>
-  ${row.image_url ? `<img src="${esc(row.image_url)}" style="width:100%;border-radius:16px;border:1px solid rgba(255,255,255,.08);margin:8px 0" />` : ''}
-  ${row.content ? `<div>${esc(row.content)}</div>` : ''}
-`
 
+    div.innerHTML = `
+      <div class="meta"><span class="user">@user</span><span>${esc(t)}</span></div>
+      ${row.image_url ? `<img src="${esc(row.image_url)}" style="width:100%;border-radius:16px;border:1px solid rgba(255,255,255,.08);margin:8px 0" />` : ''}
+      ${row.content ? `<div>${esc(row.content)}</div>` : ''}
+    `
     feed.appendChild(div)
   }
 }
 
+// POST + image upload
 async function onPost(e){
   e.preventDefault()
   setMsg(postMsg, '')
@@ -184,7 +166,6 @@ async function onPost(e){
 
   let image_url = null
 
-  // 1) upload optional image
   if (file){
     if (!file.type.startsWith('image/')) return setMsg(postMsg, 'That file is not an image.')
     if (file.size > 6 * 1024 * 1024) return setMsg(postMsg, 'Image too big (max ~6MB).')
@@ -196,19 +177,18 @@ async function onPost(e){
     const { error: upErr } = await supabase
       .storage
       .from(BUCKET_POST_IMAGES)
-      .upload(path, file, { upsert: false, contentType: file.type }) // [web:368]
+      .upload(path, file, { upsert: false, contentType: file.type }) // Upload API [web:368]
 
     if (upErr) return setMsg(postMsg, upErr.message)
 
     const { data: pub } = supabase
       .storage
       .from(BUCKET_POST_IMAGES)
-      .getPublicUrl(path) // [web:377]
+      .getPublicUrl(path) // Public URL helper [web:377]
 
     image_url = pub?.publicUrl ?? null
   }
 
-  // 2) insert post with image_url
   const { error } = await supabase
     .from('posts')
     .insert({ user_id: user.id, content: content || '', image_url })
@@ -220,10 +200,7 @@ async function onPost(e){
   await loadFeed()
 }
 
-
-// ------------------------------------------------------------------
-// Wallet (transaction log in wallet_transactions)
-// ------------------------------------------------------------------
+// WALLET
 async function loadWalletBalance(){
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
@@ -303,9 +280,7 @@ async function onWalletTx(e){
   await loadWallet()
 }
 
-// ------------------------------------------------------------------
-// Settings
-// ------------------------------------------------------------------
+// SETTINGS
 async function onSaveSettings(e){
   e.preventDefault()
   setMsg(settingsMsg, 'Saving…')
@@ -318,9 +293,7 @@ async function onSaveSettings(e){
   setMsg(settingsMsg, error ? error.message : 'Saved.')
 }
 
-// ------------------------------------------------------------------
-// Auth: signup + username login
-// ------------------------------------------------------------------
+// AUTH
 async function onSignup(e){
   e.preventDefault()
   setMsg(signupMsg, 'Creating account…')
@@ -337,7 +310,7 @@ async function onSignup(e){
   if (error) return setMsg(signupMsg, error.message)
 
   const userId = data.user?.id
-  if (!userId) return setMsg(signupMsg, 'Signup ok, but no user returned (check email confirm settings in Supabase).')
+  if (!userId) return setMsg(signupMsg, 'Signup ok, but no user returned (check email confirm settings).')
 
   const { error: profErr } = await supabase.from('profiles').insert({ id: userId, username, email })
   setMsg(signupMsg, profErr ? profErr.message : 'Account created. Go to Login.')
@@ -360,15 +333,12 @@ async function onLogin(e){
   if (!rows || rows.length === 0) return setMsg(authMsg, 'Unknown username.')
 
   const email = rows[0].email
-  const { error } = await supabase.auth.signInWithPassword({ email, password }) // [web:69]
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
   if (error) return setMsg(authMsg, error.message)
 
   await refreshUI()
 }
 
-// ------------------------------------------------------------------
-// Password reset (email flow)
-// ------------------------------------------------------------------
 async function onForgot(e){
   e.preventDefault()
   setMsg(forgotMsg, 'Sending…')
@@ -376,11 +346,10 @@ async function onForgot(e){
   const email = ($('forgotEmail')?.value ?? '').trim().toLowerCase()
   const redirectTo = window.location.origin + window.location.pathname
 
-  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo }) // [web:55]
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo })
   setMsg(forgotMsg, error ? error.message : 'Sent reset email. Open the link, then set a new password here.')
 }
 
-// Listen for PASSWORD_RECOVERY event. [web:166]
 supabase.auth.onAuthStateChange((event) => {
   if (event === 'PASSWORD_RECOVERY') {
     document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'))
@@ -395,12 +364,10 @@ async function onReset(e){
   setMsg(resetMsg, 'Updating…')
 
   const password = $('newPassword')?.value ?? ''
-  const { error } = await supabase.auth.updateUser({ password }) // [web:55]
+  const { error } = await supabase.auth.updateUser({ password })
   setMsg(resetMsg, error ? error.message : 'Password updated. Go to Login.')
 }
 
-// ------------------------------------------------------------------
-// Boot
-// ------------------------------------------------------------------
+// boot
 console.log("The Cut NYC using Supabase URL:", SUPABASE_URL)
 await refreshUI()
