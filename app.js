@@ -15,6 +15,15 @@ const setMsg = (el, t) => { if (el) el.textContent = t || '' }
 const show = (el) => { if (el) el.classList.remove('hidden') }
 const hide = (el) => { if (el) el.classList.add('hidden') }
 const esc = (s) => (s ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+const BUCKET_POST_IMAGES = 'post-images'
+
+function extFromType(type){
+  if (type === 'image/png') return 'png'
+  if (type === 'image/webp') return 'webp'
+  if (type === 'image/gif') return 'gif'
+  return 'jpg'
+}
+
 
 // ------------------------------------------------------------------
 // Element refs
@@ -152,9 +161,11 @@ async function loadFeed(){
     const div = document.createElement('div')
     div.className = 'post'
     div.innerHTML = `
-      <div class="meta"><span class="user">@${esc(u)}</span><span>${esc(t)}</span></div>
-      <div>${esc(row.content)}</div>
-    `
+  <div class="meta"><span class="user">@${esc(u)}</span><span>${esc(t)}</span></div>
+  ${row.image_url ? `<img src="${esc(row.image_url)}" style="width:100%;border-radius:16px;border:1px solid rgba(255,255,255,.08);margin:8px 0" />` : ''}
+  ${row.content ? `<div>${esc(row.content)}</div>` : ''}
+`
+
     feed.appendChild(div)
   }
 }
@@ -164,17 +175,51 @@ async function onPost(e){
   setMsg(postMsg, '')
 
   const content = $('postContent')?.value?.trim() ?? ''
-  if (!content) return setMsg(postMsg, 'Write something first.')
+  const file = $('postImage')?.files?.[0] ?? null
+
+  if (!content && !file) return setMsg(postMsg, 'Write something or add an image.')
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return setMsg(postMsg, 'Not logged in.')
 
-  const { error } = await supabase.from('posts').insert({ user_id: user.id, content })
+  let image_url = null
+
+  // 1) upload optional image
+  if (file){
+    if (!file.type.startsWith('image/')) return setMsg(postMsg, 'That file is not an image.')
+    if (file.size > 6 * 1024 * 1024) return setMsg(postMsg, 'Image too big (max ~6MB).')
+
+    const ext = extFromType(file.type)
+    const filename = `${crypto.randomUUID()}.${ext}`
+    const path = `${user.id}/${filename}`
+
+    const { error: upErr } = await supabase
+      .storage
+      .from(BUCKET_POST_IMAGES)
+      .upload(path, file, { upsert: false, contentType: file.type }) // [web:368]
+
+    if (upErr) return setMsg(postMsg, upErr.message)
+
+    const { data: pub } = supabase
+      .storage
+      .from(BUCKET_POST_IMAGES)
+      .getPublicUrl(path) // [web:377]
+
+    image_url = pub?.publicUrl ?? null
+  }
+
+  // 2) insert post with image_url
+  const { error } = await supabase
+    .from('posts')
+    .insert({ user_id: user.id, content: content || '', image_url })
+
   if (error) return setMsg(postMsg, error.message)
 
   $('postContent').value = ''
+  if ($('postImage')) $('postImage').value = ''
   await loadFeed()
 }
+
 
 // ------------------------------------------------------------------
 // Wallet (transaction log in wallet_transactions)
