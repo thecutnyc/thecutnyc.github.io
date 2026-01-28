@@ -167,12 +167,14 @@
 
 <script>
 // ==========================================
-// 1. SETUP: PASTE YOUR SUPABASE KEYS HERE
+// SETUP: PASTE YOUR SUPABASE KEYS BELOW
 // ==========================================
-const SUPABASE_URL = "https://virppeuknikpgmtgthnh.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpcnBwZXVrbmlrcGdtdGd0aG5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2MjA0ODksImV4cCI6MjA4NTE5NjQ4OX0.Klc3IcZEjp1dI1fLwkqSKVw9n5VfPPREsxkQhRcP0a0";
+const SUPABASE_URL = 'https://virppeuknikpgmtgthnh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpcnBwZXVrbmlrcGdtdGd0aG5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2MjA0ODksImV4cCI6MjA4NTE5NjQ4OX0.Klc3IcZEjp1dI1fLwkqSKVw9n5VfPPREsxkQhRcP0a0';
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// FIXED: Using 'client' to avoid variable name conflict
+const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 let me = localStorage.getItem('cut_user') || null;
 let mapObj = null, mapArmed = false;
 
@@ -189,10 +191,10 @@ async function login() {
   const u = document.getElementById('loginUser').value.trim();
   if(!u) return;
   
-  // Check if user exists, if not create
-  let { data } = await supabase.from('profiles').select().eq('username', u);
+  // FIXED: Using 'client' instead of 'supabase'
+  let { data } = await client.from('profiles').select().eq('username', u);
   if(!data || data.length === 0) {
-    await supabase.from('profiles').insert({ username: u });
+    await client.from('profiles').insert({ username: u });
   }
   
   me = u;
@@ -236,14 +238,14 @@ async function addPost() {
   let imgUrl = null;
   if(file) {
     const name = `${Date.now()}_${file.name}`;
-    const { data, error } = await supabase.storage.from('uploads').upload(name, file);
+    const { data, error } = await client.storage.from('uploads').upload(name, file);
     if(data) {
-      const { data: pub } = supabase.storage.from('uploads').getPublicUrl(name);
+      const { data: pub } = client.storage.from('uploads').getPublicUrl(name);
       imgUrl = pub.publicUrl;
     }
   }
 
-  await supabase.from('posts').insert({ author: me, text: txt, img_url: imgUrl });
+  await client.from('posts').insert({ author: me, text: txt, img_url: imgUrl });
   document.getElementById('postText').value = '';
   document.getElementById('postFile').value = '';
   btn.innerText = 'Post';
@@ -251,7 +253,8 @@ async function addPost() {
 }
 
 async function loadFeed() {
-  const { data } = await supabase.from('posts').select().order('created_at', {ascending:false}).limit(20);
+  const { data } = await client.from('posts').select().order('created_at', {ascending:false}).limit(20);
+  if(!data) return;
   document.getElementById('feedList').innerHTML = data.map(p => `
     <div class="card">
       <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted)">
@@ -266,7 +269,8 @@ async function loadFeed() {
 
 // --- PROFILES ---
 async function loadProfiles() {
-  const { data } = await supabase.from('profiles').select();
+  const { data } = await client.from('profiles').select();
+  if(!data) return;
   document.getElementById('profileGrid').innerHTML = data.map(u => `
     <div class="card" style="text-align:center; cursor:pointer;" onclick="openProfile('${u.username}')">
       <img src="${u.avatar||'https://ui-avatars.com/api/?name='+u.username}" style="width:60px; height:60px; border-radius:50%; object-fit:cover;">
@@ -277,8 +281,9 @@ async function loadProfiles() {
 }
 
 async function openProfile(uName) {
-  nav('profileView'); // switch tab
-  const { data } = await supabase.from('profiles').select().eq('username', uName).single();
+  nav('profileView'); 
+  const { data } = await client.from('profiles').select().eq('username', uName).single();
+  if(!data) return;
   document.getElementById('pvName').innerText = '@'+data.username;
   document.getElementById('pvAvatar').src = data.avatar || 'https://ui-avatars.com/api/?name='+data.username;
   document.getElementById('pvOcc').innerText = data.occupation || 'Unknown';
@@ -289,7 +294,7 @@ async function openProfile(uName) {
 }
 
 async function loadMyProfile() {
-  const { data } = await supabase.from('profiles').select().eq('username', me).single();
+  const { data } = await client.from('profiles').select().eq('username', me).single();
   if(!data) return;
   document.getElementById('myAvi').value = data.avatar || '';
   document.getElementById('myReal').value = data.real_name || '';
@@ -299,7 +304,7 @@ async function loadMyProfile() {
 }
 
 async function saveProfile() {
-  await supabase.from('profiles').update({
+  await client.from('profiles').update({
     avatar: document.getElementById('myAvi').value,
     real_name: document.getElementById('myReal').value,
     occupation: document.getElementById('myOcc').value,
@@ -310,7 +315,7 @@ async function saveProfile() {
 
 // --- JOBS & EVENTS ---
 async function addJob() {
-  await supabase.from('jobs').insert({
+  await client.from('jobs').insert({
     author: me,
     title: document.getElementById('jobTitle').value,
     pay: document.getElementById('jobPay').value
@@ -318,14 +323,15 @@ async function addJob() {
   loadJobs();
 }
 async function loadJobs() {
-  const { data } = await supabase.from('jobs').select().order('created_at', {ascending:false});
+  const { data } = await client.from('jobs').select().order('created_at', {ascending:false});
+  if(!data) return;
   document.getElementById('jobList').innerHTML = data.map(j => 
     `<div class="card"><b>${j.title}</b> (${j.pay})<br><small>by @${j.author}</small></div>`
   ).join('');
 }
 
 async function addEvent() {
-  await supabase.from('events').insert({
+  await client.from('events').insert({
     author: me,
     title: document.getElementById('evtTitle').value,
     location: document.getElementById('evtLoc').value,
@@ -334,7 +340,8 @@ async function addEvent() {
   loadEvents();
 }
 async function loadEvents() {
-  const { data } = await supabase.from('events').select().order('created_at', {ascending:false});
+  const { data } = await client.from('events').select().order('created_at', {ascending:false});
+  if(!data) return;
   document.getElementById('evtList').innerHTML = data.map(e => 
     `<div class="card"><b>${e.title}</b><br>📍 ${e.location}<br><small>${new Date(e.event_date).toLocaleString()}</small></div>`
   ).join('');
@@ -346,16 +353,16 @@ async function transfer() {
   const amt = parseInt(document.getElementById('payAmt').value);
   
   // 1. Get my balance
-  const { data: myData } = await supabase.from('profiles').select('balance').eq('username', me).single();
+  const { data: myData } = await client.from('profiles').select('balance').eq('username', me).single();
   if(myData.balance < amt) return alert('Too poor!');
 
   // 2. Get their balance
-  const { data: theirData } = await supabase.from('profiles').select('balance').eq('username', to).single();
+  const { data: theirData } = await client.from('profiles').select('balance').eq('username', to).single();
   if(!theirData) return alert('User not found');
 
-  // 3. Update both (simple version, not transactional)
-  await supabase.from('profiles').update({ balance: myData.balance - amt }).eq('username', me);
-  await supabase.from('profiles').update({ balance: theirData.balance + amt }).eq('username', to);
+  // 3. Update both
+  await client.from('profiles').update({ balance: myData.balance - amt }).eq('username', me);
+  await client.from('profiles').update({ balance: theirData.balance + amt }).eq('username', to);
   
   alert('Sent!');
   loadMyProfile();
@@ -372,7 +379,7 @@ function initMap() {
   mapObj.on('click', async (e) => {
     if(mapArmed) {
       const title = document.getElementById('pinTitle').value || 'Pin';
-      await supabase.from('pins').insert({ owner: me, lat: e.latlng.lat, lng: e.latlng.lng, title: title });
+      await client.from('pins').insert({ owner: me, lat: e.latlng.lat, lng: e.latlng.lng, title: title });
       mapArmed = false; 
       document.getElementById('armMapBtn').style.background = '';
       loadPins();
@@ -381,10 +388,9 @@ function initMap() {
 }
 
 async function loadPins() {
-  // Clear existing (simple way)
   mapObj.eachLayer(l => { if(l instanceof L.Marker) mapObj.removeLayer(l); });
-  
-  const { data } = await supabase.from('pins').select();
+  const { data } = await client.from('pins').select();
+  if(!data) return;
   data.forEach(p => {
     L.marker([p.lat, p.lng]).addTo(mapObj).bindPopup(`<b>${p.title}</b><br>@${p.owner}`);
   });
