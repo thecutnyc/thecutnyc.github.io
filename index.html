@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Cut NYC (Mobile Fixed v4.0)</title>
+  <title>The Cut NYC</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -113,7 +113,7 @@
       
       /* Main Content Fixes */
       .main { 
-        padding: 30px; /* Reduced from 15px to ensure content touches edges if needed, but keeping 30px for consistency */
+        padding: 30px; 
         padding-bottom: 100px; 
         width: 100%; 
       }
@@ -121,14 +121,12 @@
       /* Top Header */
       #mobileHeader {
         display: flex; justify-content: space-between; align-items: center;
-        padding: 15px 20px; /* Increased side padding */
+        padding: 15px 20px; 
         background: var(--bg-card); 
         border-bottom: 1px solid var(--border);
-        /* FIX: Relative positioning so it scrolls away */
         position: relative; 
-        /* FIX: Negative margins to pull it tight to the edges */
         margin: -30px -30px 20px -30px; 
-        width: calc(100% + 60px); /* Compensate for negative margins */
+        width: calc(100% + 60px); 
       }
       
       .profile-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -277,7 +275,14 @@
       <div id="account" class="page">
         <h1>My Character</h1>
         <div class="card">
-          <label>Avatar URL</label><input id="editAvatar">
+          <label>Profile Picture</label>
+          <div style="display:flex; gap:10px; margin-bottom:10px;">
+             <!-- NEW: File Upload Button -->
+             <input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="uploadAvatar()">
+             <button class="btn small" onclick="document.getElementById('avatarUpload').click()" style="background:var(--border); color:var(--text); width:auto;">📂 Upload Photo</button>
+             <input id="editAvatar" placeholder="Or paste URL..." style="margin:0; flex:1;">
+          </div>
+          
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <div><label>Real Name</label><input id="editReal"></div>
             <div><label>Age</label><input id="editAge" type="number"></div>
@@ -432,6 +437,32 @@ async function loadMyProfile() {
   document.getElementById('editBio').value = data.bio||'';
   document.getElementById('myBal').innerText = data.balance;
 }
+
+// NEW: Upload Avatar Function
+async function uploadAvatar() {
+    const file = document.getElementById('avatarUpload').files[0];
+    if(!file) return;
+    
+    // Change button text to show loading
+    const inputField = document.getElementById('editAvatar');
+    inputField.value = "Uploading...";
+    
+    // Upload to Supabase
+    const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+    const name = `avatar_${Date.now()}_${cleanName}`;
+    const { error } = await client.storage.from('uploads').upload(name, file);
+    
+    if(error) {
+        alert("Upload failed: " + error.message);
+        inputField.value = "";
+        return;
+    }
+    
+    // Get URL
+    const { data } = client.storage.from('uploads').getPublicUrl(name);
+    inputField.value = data.publicUrl;
+}
+
 async function saveProfile() {
   await client.from('profiles').update({
     avatar: document.getElementById('editAvatar').value,
