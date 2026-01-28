@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Cut NYC (Online v3.4)</title>
+  <title>The Cut NYC (Online v3.5)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -194,8 +194,8 @@
         <h1>City Map</h1>
         <div class="card">
           <div style="display:flex; gap:10px;">
-            <input id="mapSearch" placeholder="Search address (e.g. Times Square)">
-            <button class="btn" onclick="searchAddress()">Search</button>
+            <input id="mapSearch" placeholder="Exact address (e.g. 1370 E 70th St, Brooklyn)">
+            <button class="btn" onclick="searchAddress()">Search & Find</button>
           </div>
           <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px;">
             <input id="pinTitle" placeholder="Pin Title" style="margin:0; width:60%;">
@@ -246,7 +246,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let me = localStorage.getItem('cut_user_online') || null;
-let mapObj = null, mapArmed = false;
+let mapObj = null, mapArmed = false, searchMarker = null;
 
 // INIT
 document.documentElement.setAttribute('data-theme', localStorage.getItem('theme')||'light');
@@ -490,6 +490,7 @@ function initMap() {
     if(mapArmed) {
       await client.from('pins').insert({ owner: me, lat: e.latlng.lat, lng: e.latlng.lng, title: document.getElementById('pinTitle').value||'Pin' });
       mapArmed = false; document.getElementById('armMapBtn').style.background = '';
+      if(searchMarker) mapObj.removeLayer(searchMarker); // Clear search marker
       loadPins();
     }
   });
@@ -498,11 +499,23 @@ function initMap() {
 async function searchAddress() {
     const q = document.getElementById('mapSearch').value;
     if(!q) return;
-    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}+NYC`);
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`);
     const data = await res.json();
     if(data && data.length > 0) {
-        const { lat, lon } = data[0];
-        mapObj.flyTo([lat, lon], 16);
+        const { lat, lon, display_name } = data[0];
+        // 1. Zoom to Exact Spot
+        mapObj.setView([lat, lon], 18);
+        
+        // 2. Place Red Marker
+        if(searchMarker) mapObj.removeLayer(searchMarker);
+        searchMarker = L.marker([lat, lon], {icon: L.divIcon({className: 'search-icon', html: '🔴', iconSize: [20, 20]})}).addTo(mapObj);
+        
+        // 3. Auto-fill Title
+        document.getElementById('pinTitle').value = display_name.split(',')[0];
+        
+        // 4. Arm the Pin Button
+        mapArmed = true;
+        document.getElementById('armMapBtn').style.background = '#22c55e';
     } else {
         alert('Address not found');
     }
@@ -510,14 +523,14 @@ async function searchAddress() {
 
 function zoomTo(lat, lng) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    mapObj.flyTo([lat, lng], 17);
+    mapObj.setView([lat, lng], 18);
     mapObj.openPopup();
 }
 
 async function loadPins() {
   const { data } = await client.from('pins').select();
   if(!data) return;
-  mapObj.eachLayer(l => { if(l instanceof L.Marker) mapObj.removeLayer(l); });
+  mapObj.eachLayer(l => { if(l instanceof L.Marker && l !== searchMarker) mapObj.removeLayer(l); });
   data.forEach(p => L.marker([p.lat, p.lng]).addTo(mapObj).bindPopup(`<b>${p.title}</b><br>@${p.owner}`));
   
   document.getElementById('pinList').innerHTML = data.map(p => `
