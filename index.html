@@ -60,7 +60,6 @@
     .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
     .btn { background: var(--text); color: var(--bg-card); border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
     .btn.danger { background: var(--red); color: white; }
-    .btn.ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
     .btn.small { padding: 6px 10px; font-size: 12px; }
     
     input, textarea, select {
@@ -70,8 +69,20 @@
       font-family: inherit; font-size: 16px;
     }
 
-    /* SPECIFIC */
-    .profile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+    /* PROFILE GRID FIX */
+    .profile-grid { 
+        display: grid; 
+        grid-template-columns: repeat(2, 1fr); /* Force 2 columns */
+        gap: 15px; 
+    }
+    .profile-card {
+        background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; 
+        cursor: pointer; text-align: center;
+        /* THE FIX: Fixed height instead of aspect ratio */
+        height: 180px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+
     #map { height: 400px; width: 100%; border-radius: 8px; z-index: 1; margin-top: 10px; }
     .list-item, .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border); }
     .tx-in { color: var(--green); } .tx-out { color: var(--red); }
@@ -103,7 +114,6 @@
         padding: 15px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border);
         position: relative; margin: -30px -30px 20px -30px; width: calc(100% + 60px); 
       }
-      .profile-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     }
   </style>
 </head>
@@ -131,10 +141,10 @@
         <div class="nav-item" onclick="nav('events')">Events</div>
         <div class="nav-item" onclick="nav('wallet')">Wallet</div>
         <div class="nav-item" onclick="nav('map')">Map</div>
-        <div class="nav-item" onclick="nav('account')">My Account</div>
+        <div class="nav-item" onclick="nav('account')">Me</div>
       </nav>
       <div class="sidebar-footer" style="margin-top:auto;">
-        <button class="btn" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--text);" onclick="toggleTheme()">Dark/Light Mode</button>
+        <button class="btn" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--text);" onclick="toggleTheme()">Theme</button>
         <button class="btn danger" style="width:100%; margin-top:10px;" onclick="logout()">Logout</button>
       </div>
     </aside>
@@ -278,7 +288,7 @@
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:20px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:15px 0; text-align:center;">
             <div><strong>Age</strong><br><span id="pvAge">-</span></div>
-            <div><strong>Occupation</strong><br><span id="pvOcc">-</span></div>
+            <div><strong>Occ</strong><br><span id="pvOcc">-</span></div>
             <div><strong>Status</strong><br><span id="pvStat">-</span></div>
           </div>
           <p id="pvBio" style="white-space:pre-wrap; color:var(--muted); font-size:14px;"></p>
@@ -336,7 +346,7 @@ async function loadAll() {
   loadFeed(); loadProfiles(); loadJobs(); loadEvents(); loadMyProfile(); loadTx();
 }
 
-// --- FEED (UPDATED) ---
+// FEED
 async function addPost() {
   const txt = document.getElementById('postText').value;
   const file = document.getElementById('postFile').files[0];
@@ -357,7 +367,6 @@ async function addPost() {
 }
 
 async function loadFeed() {
-  // Get posts + likes count + comments count
   const { data: posts } = await client.from('posts').select(`*, likes(user_id), comments(id)`).order('created_at', {ascending:false}).limit(20);
   
   document.getElementById('feedList').innerHTML = (posts||[]).map(p => {
@@ -407,7 +416,7 @@ async function toggleLike(pid) {
     const { data } = await client.from('likes').select().eq('post_id', pid).eq('user_id', me).single();
     if(data) { await client.from('likes').delete().eq('id', data.id); }
     else { await client.from('likes').insert({ post_id: pid, user_id: me }); }
-    loadFeed(); // Refresh to show update
+    loadFeed();
 }
 
 async function toggleComments(pid) {
@@ -415,7 +424,6 @@ async function toggleComments(pid) {
     if(div.style.display === 'block') { div.style.display = 'none'; return; }
     div.style.display = 'block';
     
-    // Load comments
     const { data } = await client.from('comments').select().eq('post_id', pid).order('created_at');
     document.getElementById(`clist-${pid}`).innerHTML = (data||[]).map(c => `
         <div class="comment-item"><b>${c.author}</b>: ${c.text}</div>
@@ -427,35 +435,25 @@ async function addComment(pid) {
     if(!txt) return;
     await client.from('comments').insert({ post_id: pid, author: me, text: txt });
     document.getElementById(`cinput-${pid}`).value = '';
-    toggleComments(pid); // Reload list
+    toggleComments(pid);
 }
 
-// --- WALLET (UPDATED) ---
+// WALLET
 async function transfer() {
   const to = s('payTo'), amt = parseInt(s('payAmt')), note = s('payNote');
   const { data: my } = await client.from('profiles').select('balance').eq('username', me).single();
   if(my.balance < amt) return alert('Poor');
   const { data: dest } = await client.from('profiles').select('balance').eq('username', to).single();
   if(!dest) return alert('No user');
-  
   await client.from('profiles').update({balance: my.balance-amt}).eq('username',me);
   await client.from('profiles').update({balance: dest.balance+amt}).eq('username',to);
-  
-  // Now includes note
   await client.from('transactions').insert({from_user:me, to_user:to, amount:amt, note: note});
-  
   alert('Sent'); loadMyProfile(); loadTx();
 }
 async function loadTx() {
   const { data } = await client.from('transactions').select().or(`from_user.eq.${me},to_user.eq.${me}`).order('created_at',{ascending:false});
   document.getElementById('txList').innerHTML = (data||[]).map(t => 
-    `<div class="tx-item">
-       <div>
-         ${t.to_user===me?'From '+t.from_user:'To '+t.to_user}
-         ${t.note ? `<br><small style="color:var(--muted)">"${t.note}"</small>` : ''}
-       </div>
-       <div class="${t.to_user===me?'tx-in':'tx-out'}">${t.to_user===me?'+':'-'}${t.amount}</div>
-     </div>`
+    `<div class="tx-item"><div>${t.to_user===me?'From '+t.from_user:'To '+t.to_user}${t.note ? `<br><small style="color:var(--muted)">"${t.note}"</small>` : ''}</div><div class="${t.to_user===me?'tx-in':'tx-out'}">${t.to_user===me?'+':'-'}${t.amount}</div></div>`
   ).join('');
 }
 async function modBalance(m) {
@@ -463,16 +461,17 @@ async function modBalance(m) {
   await client.from('profiles').update({balance: data.balance+(amt*m)}).eq('username',me); loadMyProfile();
 }
 
-// PROFILES
+// PROFILES (FIXED)
 async function loadProfiles() {
   const { data } = await client.from('profiles').select();
   document.getElementById('profileGrid').innerHTML = (data||[]).map(u => `
-    <div class="card" style="text-align:center; padding:15px; cursor:pointer;" onclick="openProfile('${u.username}')">
+    <div class="profile-card" onclick="openProfile('${u.username}')">
       <img src="${u.avatar||'https://ui-avatars.com/api/?name='+u.username}" style="width:60px; height:60px; border-radius:50%; object-fit:cover;">
-      <div style="font-weight:bold; font-size:14px; margin-top:10px; overflow:hidden; text-overflow:ellipsis;">@${u.username}</div>
+      <div style="font-weight:bold; font-size:14px; margin-top:10px; overflow:hidden; text-overflow:ellipsis; width:100%;">@${u.username}</div>
       <div style="font-size:11px; color:var(--muted)">${u.occupation||'Citizen'}</div>
     </div>`).join('');
 }
+
 async function openProfile(u) {
   nav('profileView');
   const { data } = await client.from('profiles').select().eq('username', u).single();
