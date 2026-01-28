@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Cut NYC (Mobile Smooth v3.9)</title>
+  <title>The Cut NYC (Mobile Fixed v4.0)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -28,8 +28,8 @@
       margin: 0; padding: 0; width: 100%; height: 100%;
       font-family: 'Inter', sans-serif;
       background: var(--bg-body); color: var(--text);
-      overflow: hidden; /* Lock the page */
-      overscroll-behavior: none; /* Stop the bounce */
+      overflow: hidden; 
+      overscroll-behavior: none; 
     }
 
     /* APP LAYOUT */
@@ -53,7 +53,7 @@
     .main { 
       flex: 1; 
       overflow-y: auto; 
-      -webkit-overflow-scrolling: touch; /* SMOOTH SCROLLING FIX */
+      -webkit-overflow-scrolling: touch; 
       padding: 30px; 
       position: relative; 
     }
@@ -96,7 +96,7 @@
         padding: 0; flex-direction: row;
         overflow-x: auto; background: var(--bg-sidebar);
         align-items: center;
-        -webkit-overflow-scrolling: touch; /* Smooth scroll horizontal */
+        -webkit-overflow-scrolling: touch; 
       }
       .sidebar-brand, .sidebar-footer { display: none; }
       
@@ -113,16 +113,22 @@
       
       /* Main Content Fixes */
       .main { 
-        padding: 15px; 
-        padding-bottom: 100px; /* Extra padding for bottom nav */
+        padding: 30px; /* Reduced from 15px to ensure content touches edges if needed, but keeping 30px for consistency */
+        padding-bottom: 100px; 
         width: 100%; 
       }
       
       /* Top Header */
       #mobileHeader {
         display: flex; justify-content: space-between; align-items: center;
-        padding: 15px; background: var(--bg-card); border-bottom: 1px solid var(--border);
-        position: sticky; top: 0; z-index: 900; margin: -15px -15px 15px -15px;
+        padding: 15px 20px; /* Increased side padding */
+        background: var(--bg-card); 
+        border-bottom: 1px solid var(--border);
+        /* FIX: Relative positioning so it scrolls away */
+        position: relative; 
+        /* FIX: Negative margins to pull it tight to the edges */
+        margin: -30px -30px 20px -30px; 
+        width: calc(100% + 60px); /* Compensate for negative margins */
       }
       
       .profile-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
