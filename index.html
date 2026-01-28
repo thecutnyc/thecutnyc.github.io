@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Cut NYC (Online v3.3)</title>
+  <title>The Cut NYC (Online v3.4)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -47,7 +47,6 @@
     .btn.danger { background: var(--red); color: white; }
     .btn.small { padding: 5px 10px; font-size: 12px; }
     
-    /* FIX FOR INPUTS */
     input, textarea, select {
       width: 100%; padding: 10px;
       background: var(--bg-body); border: 1px solid var(--border);
@@ -57,7 +56,7 @@
 
     /* SPECIFIC LISTS */
     .profile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-    #map { height: 400px; width: 100%; border-radius: 8px; z-index: 1; }
+    #map { height: 400px; width: 100%; border-radius: 8px; z-index: 1; margin-top: 10px; }
     .list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border); }
     .tx-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
     .tx-in { color: var(--green); } .tx-out { color: var(--red); }
@@ -178,11 +177,8 @@
           </div>
           <button class="btn" onclick="transfer()">Send</button>
         </div>
-        
-        <!-- TRANSACTION LIST -->
         <h2 style="margin-top:30px">History</h2>
         <div id="txList" class="card" style="padding:0"></div>
-
         <div class="card" style="margin-top:20px">
           <h2>Manual Adjustment (Admin)</h2>
           <div style="display:flex; gap:10px;">
@@ -196,9 +192,15 @@
       <!-- MAP -->
       <div id="mapPage" class="page">
         <h1>City Map</h1>
-        <div class="card" style="display:flex; align-items:center; justify-content:space-between;">
-          <input id="pinTitle" placeholder="Pin Title" style="margin:0; width:60%;">
-          <button id="armMapBtn" class="btn" onclick="toggleMapArm()">Add Pin</button>
+        <div class="card">
+          <div style="display:flex; gap:10px;">
+            <input id="mapSearch" placeholder="Search address (e.g. Times Square)">
+            <button class="btn" onclick="searchAddress()">Search</button>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px;">
+            <input id="pinTitle" placeholder="Pin Title" style="margin:0; width:60%;">
+            <button id="armMapBtn" class="btn" onclick="toggleMapArm()">Add Pin</button>
+          </div>
         </div>
         <div id="map"></div>
         <h2 style="margin-top:20px;">Locations List</h2>
@@ -301,7 +303,6 @@ async function addPost() {
   btn.innerText = '...';
   let url = null;
   if(file) {
-    // Sanitize filename to prevent upload errors
     const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
     const name = `${Date.now()}_${cleanName}`;
     await client.storage.from('uploads').upload(name, file);
@@ -450,21 +451,16 @@ async function transfer() {
   const { data: dest } = await client.from('profiles').select('balance').eq('username', to).single();
   if(!dest) return alert('User not found');
   
-  // Update Balances
   await client.from('profiles').update({ balance: my.balance - amt }).eq('username', me);
   await client.from('profiles').update({ balance: dest.balance + amt }).eq('username', to);
   
-  // Record Transaction
   await client.from('transactions').insert({ from_user: me, to_user: to, amount: amt });
   
-  alert('Sent!'); 
-  loadMyProfile();
-  loadTx();
+  alert('Sent!'); loadMyProfile(); loadTx();
 }
 
 async function loadTx() {
     const { data } = await client.from('transactions').select().or(`from_user.eq.${me},to_user.eq.${me}`).order('created_at', {ascending:false});
-    
     document.getElementById('txList').innerHTML = (data||[]).map(t => {
         const isIn = t.to_user === me;
         return `
@@ -482,7 +478,7 @@ async function modBalance(m) {
   loadMyProfile();
 }
 
-// --- MAP ---
+// --- MAP & SEARCH ---
 function initMap() {
   if(mapObj) { mapObj.invalidateSize(); return; }
   mapObj = L.map('map').setView([40.7128, -74.0060], 13);
@@ -499,17 +495,36 @@ function initMap() {
   });
 }
 
+async function searchAddress() {
+    const q = document.getElementById('mapSearch').value;
+    if(!q) return;
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}+NYC`);
+    const data = await res.json();
+    if(data && data.length > 0) {
+        const { lat, lon } = data[0];
+        mapObj.flyTo([lat, lon], 16);
+    } else {
+        alert('Address not found');
+    }
+}
+
+function zoomTo(lat, lng) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    mapObj.flyTo([lat, lng], 17);
+    mapObj.openPopup();
+}
+
 async function loadPins() {
   const { data } = await client.from('pins').select();
   if(!data) return;
-  // Map
   mapObj.eachLayer(l => { if(l instanceof L.Marker) mapObj.removeLayer(l); });
   data.forEach(p => L.marker([p.lat, p.lng]).addTo(mapObj).bindPopup(`<b>${p.title}</b><br>@${p.owner}`));
   
-  // List
   document.getElementById('pinList').innerHTML = data.map(p => `
     <div class="list-item">
-      <div><b>${p.title}</b> <small>@${p.owner}</small></div>
+      <div onclick="zoomTo(${p.lat}, ${p.lng})" style="cursor:pointer; flex:1;">
+        <b>${p.title}</b> <br> <small>@${p.owner}</small>
+      </div>
       ${p.owner===me ? `<button class="btn danger small" onclick="delPin(${p.id})">Del</button>` : ''}
     </div>
   `).join('');
