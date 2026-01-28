@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Cut NYC (Social v4.2)</title>
+  <title>The Cut NYC</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -131,10 +131,10 @@
         <div class="nav-item" onclick="nav('events')">Events</div>
         <div class="nav-item" onclick="nav('wallet')">Wallet</div>
         <div class="nav-item" onclick="nav('map')">Map</div>
-        <div class="nav-item" onclick="nav('account')">Me</div>
+        <div class="nav-item" onclick="nav('account')">My Account</div>
       </nav>
       <div class="sidebar-footer" style="margin-top:auto;">
-        <button class="btn" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--text);" onclick="toggleTheme()">Theme</button>
+        <button class="btn" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--text);" onclick="toggleTheme()">Dark/Light Mode</button>
         <button class="btn danger" style="width:100%; margin-top:10px;" onclick="logout()">Logout</button>
       </div>
     </aside>
@@ -278,7 +278,7 @@
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:20px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:15px 0; text-align:center;">
             <div><strong>Age</strong><br><span id="pvAge">-</span></div>
-            <div><strong>Occ</strong><br><span id="pvOcc">-</span></div>
+            <div><strong>Occupation</strong><br><span id="pvOcc">-</span></div>
             <div><strong>Status</strong><br><span id="pvStat">-</span></div>
           </div>
           <p id="pvBio" style="white-space:pre-wrap; color:var(--muted); font-size:14px;"></p>
