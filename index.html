@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Cut NYC</title>
+  <title>The Cut NYC (Social v4.2)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -28,14 +28,11 @@
       margin: 0; padding: 0; width: 100%; height: 100%;
       font-family: 'Inter', sans-serif;
       background: var(--bg-body); color: var(--text);
-      overflow: hidden; 
-      overscroll-behavior: none; 
+      overflow: hidden; overscroll-behavior: none;
     }
 
     /* APP LAYOUT */
-    #app {
-      display: flex; width: 100%; height: 100%; overflow: hidden;
-    }
+    #app { display: flex; width: 100%; height: 100%; overflow: hidden; }
     
     /* SIDEBAR (Desktop) */
     .sidebar { 
@@ -51,14 +48,11 @@
     
     /* MAIN SCROLLABLE AREA */
     .main { 
-      flex: 1; 
-      overflow-y: auto; 
-      -webkit-overflow-scrolling: touch; 
-      padding: 30px; 
-      position: relative; 
+      flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; 
+      padding: 30px; position: relative; 
     }
     
-    .page { display: none; max-width: 800px; margin: 0 auto; animation: fadeIn 0.2s; }
+    .page { display: none; max-width: 600px; margin: 0 auto; animation: fadeIn 0.2s; }
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -66,6 +60,7 @@
     .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
     .btn { background: var(--text); color: var(--bg-card); border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
     .btn.danger { background: var(--red); color: white; }
+    .btn.ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
     .btn.small { padding: 6px 10px; font-size: 12px; }
     
     input, textarea, select {
@@ -75,63 +70,40 @@
       font-family: inherit; font-size: 16px;
     }
 
-    /* GRID & MAP */
+    /* SPECIFIC */
     .profile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
     #map { height: 400px; width: 100%; border-radius: 8px; z-index: 1; margin-top: 10px; }
     .list-item, .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border); }
     .tx-in { color: var(--green); } .tx-out { color: var(--red); }
     .hidden { display: none !important; }
     
+    /* SOCIAL ACTIONS */
+    .actions { display: flex; gap: 15px; margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .act-btn { cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 5px; color: var(--muted); }
+    .act-btn.liked { color: var(--red); }
+    .comments-sec { margin-top: 15px; background: var(--hover); padding: 10px; border-radius: 8px; display: none; }
+    .comment-item { font-size: 13px; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+
     #mobileHeader { display: none; }
 
     /* --- MOBILE OPTIMIZATIONS --- */
     @media (max-width: 768px) {
       #app { flex-direction: column; }
-      
-      /* Sidebar -> Bottom Nav */
       .sidebar {
-        width: 100%; height: 70px;
-        border-right: none; border-top: 1px solid var(--border);
+        width: 100%; height: 70px; border-right: none; border-top: 1px solid var(--border);
         position: fixed; bottom: 0; left: 0; z-index: 1000;
-        padding: 0; flex-direction: row;
-        overflow-x: auto; background: var(--bg-sidebar);
-        align-items: center;
-        -webkit-overflow-scrolling: touch; 
+        padding: 0; flex-direction: row; overflow-x: auto; background: var(--bg-sidebar); align-items: center;
       }
       .sidebar-brand, .sidebar-footer { display: none; }
-      
-      nav { 
-        display: flex; width: 100%; height: 100%; 
-        padding: 0 10px; gap: 5px; align-items: center; 
-      }
-      .nav-item { 
-        margin: 0; padding: 8px 12px; font-size: 12px; 
-        white-space: nowrap; border-radius: 20px;
-        background: var(--bg-body); flex-shrink: 0;
-        height: 36px; display: flex; align-items: center;
-      }
-      
-      /* Main Content Fixes */
-      .main { 
-        padding: 30px; 
-        padding-bottom: 100px; 
-        width: 100%; 
-      }
-      
-      /* Top Header */
+      nav { display: flex; width: 100%; padding: 0 10px; gap: 5px; align-items: center; }
+      .nav-item { margin: 0; padding: 8px 12px; font-size: 12px; white-space: nowrap; border-radius: 20px; background: var(--bg-body); flex-shrink: 0; height: 36px; display: flex; align-items: center; }
+      .main { padding: 30px; padding-bottom: 100px; width: 100%; }
       #mobileHeader {
         display: flex; justify-content: space-between; align-items: center;
-        padding: 15px 20px; 
-        background: var(--bg-card); 
-        border-bottom: 1px solid var(--border);
-        position: relative; 
-        margin: -30px -30px 20px -30px; 
-        width: calc(100% + 60px); 
+        padding: 15px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border);
+        position: relative; margin: -30px -30px 20px -30px; width: calc(100% + 60px); 
       }
-      
       .profile-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .card { padding: 15px; }
-      h1 { font-size: 20px; margin-bottom: 15px; }
     }
   </style>
 </head>
@@ -149,7 +121,7 @@
 
   <div id="app" class="hidden">
     
-    <!-- SIDEBAR / BOTTOM NAV -->
+    <!-- SIDEBAR -->
     <aside class="sidebar">
       <div class="sidebar-brand" style="font-weight:800; font-size:20px; margin-bottom:30px;">The Cut NYC</div>
       <nav>
@@ -168,8 +140,6 @@
     </aside>
 
     <main class="main">
-      
-      <!-- MOBILE HEADER -->
       <div id="mobileHeader">
         <div style="font-weight:800; font-size:18px;">The Cut NYC</div>
         <div style="display:flex; gap:8px;">
@@ -235,10 +205,9 @@
         <div class="card">
           <h2>Send Money</h2>
           <input id="payTo" placeholder="Username">
-          <div style="display:flex; gap:10px;">
-            <input id="payAmt" type="number" placeholder="Amount" style="flex:1">
-            <button class="btn" onclick="transfer()">Send</button>
-          </div>
+          <input id="payAmt" type="number" placeholder="Amount">
+          <input id="payNote" placeholder="Note (Optional)">
+          <button class="btn" style="width:100%" onclick="transfer()">Send</button>
         </div>
         <h3 style="margin-top:20px">History</h3>
         <div id="txList" class="card" style="padding:0"></div>
@@ -258,7 +227,7 @@
         <h1>City Map</h1>
         <div class="card">
           <div style="display:flex; gap:8px;">
-            <input id="mapSearch" placeholder="Exact address (e.g. 1370 E 70th St, Brooklyn)" style="flex:1">
+            <input id="mapSearch" placeholder="Exact address..." style="flex:1">
             <button class="btn small" onclick="searchAddress()">Search</button>
           </div>
           <div style="display:flex; align-items:center; gap:8px; margin-top:10px;">
@@ -277,12 +246,10 @@
         <div class="card">
           <label>Profile Picture</label>
           <div style="display:flex; gap:10px; margin-bottom:10px;">
-             <!-- NEW: File Upload Button -->
              <input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="uploadAvatar()">
-             <button class="btn small" onclick="document.getElementById('avatarUpload').click()" style="background:var(--border); color:var(--text); width:auto;">📂 Upload Photo</button>
+             <button class="btn small" onclick="document.getElementById('avatarUpload').click()" style="background:var(--border); color:var(--text); width:auto;">📂 Upload</button>
              <input id="editAvatar" placeholder="Or paste URL..." style="margin:0; flex:1;">
           </div>
-          
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <div><label>Real Name</label><input id="editReal"></div>
             <div><label>Age</label><input id="editAge" type="number"></div>
@@ -349,9 +316,7 @@ function nav(id) {
   document.getElementById(id==='map'?'mapPage':id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
   event.target.classList.add('active');
-  if(window.innerWidth < 768) {
-      event.target.scrollIntoView({ behavior: 'smooth', inline: 'center' });
-  }
+  if(window.innerWidth < 768) event.target.scrollIntoView({ behavior: 'smooth', inline: 'center' });
   if(id==='map') setTimeout(initMap,200);
 }
 
@@ -371,7 +336,7 @@ async function loadAll() {
   loadFeed(); loadProfiles(); loadJobs(); loadEvents(); loadMyProfile(); loadTx();
 }
 
-// FEED
+// --- FEED (UPDATED) ---
 async function addPost() {
   const txt = document.getElementById('postText').value;
   const file = document.getElementById('postFile').files[0];
@@ -390,17 +355,112 @@ async function addPost() {
   document.getElementById('postText').value = ''; document.getElementById('postFile').value = '';
   btn.innerText = 'Post'; loadFeed();
 }
+
 async function loadFeed() {
-  const { data } = await client.from('posts').select().order('created_at', {ascending:false}).limit(20);
-  document.getElementById('feedList').innerHTML = (data||[]).map(p => `
-    <div class="card">
+  // Get posts + likes count + comments count
+  const { data: posts } = await client.from('posts').select(`*, likes(user_id), comments(id)`).order('created_at', {ascending:false}).limit(20);
+  
+  document.getElementById('feedList').innerHTML = (posts||[]).map(p => {
+    const isLiked = p.likes && p.likes.some(l => l.user_id === me);
+    const likeCount = p.likes ? p.likes.length : 0;
+    const commentCount = p.comments ? p.comments.length : 0;
+    
+    return `
+    <div class="card" id="post-${p.id}">
       <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted)">
         <strong onclick="openProfile('${p.author}')">@${p.author}</strong>
-        <span>${new Date(p.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <span>${new Date(p.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+          ${p.author === me ? `<span onclick="deletePost(${p.id})" style="cursor:pointer; color:var(--red);">🗑</span>` : ''}
+        </div>
       </div>
       <div style="margin-top:5px;">${p.text||''}</div>
       ${p.img_url ? `<img src="${p.img_url}" style="max-width:100%; margin-top:10px; border-radius:8px;">` : ''}
-    </div>`).join('');
+      
+      <div class="actions">
+        <div class="act-btn ${isLiked?'liked':''}" onclick="toggleLike(${p.id})">
+          ${isLiked ? '❤️' : '♡'} ${likeCount}
+        </div>
+        <div class="act-btn" onclick="toggleComments(${p.id})">
+          💬 ${commentCount}
+        </div>
+      </div>
+      
+      <div id="comments-${p.id}" class="comments-sec">
+        <div id="clist-${p.id}"></div>
+        <div style="display:flex; gap:5px; margin-top:10px;">
+          <input id="cinput-${p.id}" placeholder="Write comment..." style="margin:0; font-size:12px; padding:8px;">
+          <button class="btn small" onclick="addComment(${p.id})">Send</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function deletePost(id) {
+    if(!confirm('Delete post?')) return;
+    await client.from('posts').delete().eq('id', id);
+    loadFeed();
+}
+
+async function toggleLike(pid) {
+    const { data } = await client.from('likes').select().eq('post_id', pid).eq('user_id', me).single();
+    if(data) { await client.from('likes').delete().eq('id', data.id); }
+    else { await client.from('likes').insert({ post_id: pid, user_id: me }); }
+    loadFeed(); // Refresh to show update
+}
+
+async function toggleComments(pid) {
+    const div = document.getElementById(`comments-${pid}`);
+    if(div.style.display === 'block') { div.style.display = 'none'; return; }
+    div.style.display = 'block';
+    
+    // Load comments
+    const { data } = await client.from('comments').select().eq('post_id', pid).order('created_at');
+    document.getElementById(`clist-${pid}`).innerHTML = (data||[]).map(c => `
+        <div class="comment-item"><b>${c.author}</b>: ${c.text}</div>
+    `).join('');
+}
+
+async function addComment(pid) {
+    const txt = document.getElementById(`cinput-${pid}`).value;
+    if(!txt) return;
+    await client.from('comments').insert({ post_id: pid, author: me, text: txt });
+    document.getElementById(`cinput-${pid}`).value = '';
+    toggleComments(pid); // Reload list
+}
+
+// --- WALLET (UPDATED) ---
+async function transfer() {
+  const to = s('payTo'), amt = parseInt(s('payAmt')), note = s('payNote');
+  const { data: my } = await client.from('profiles').select('balance').eq('username', me).single();
+  if(my.balance < amt) return alert('Poor');
+  const { data: dest } = await client.from('profiles').select('balance').eq('username', to).single();
+  if(!dest) return alert('No user');
+  
+  await client.from('profiles').update({balance: my.balance-amt}).eq('username',me);
+  await client.from('profiles').update({balance: dest.balance+amt}).eq('username',to);
+  
+  // Now includes note
+  await client.from('transactions').insert({from_user:me, to_user:to, amount:amt, note: note});
+  
+  alert('Sent'); loadMyProfile(); loadTx();
+}
+async function loadTx() {
+  const { data } = await client.from('transactions').select().or(`from_user.eq.${me},to_user.eq.${me}`).order('created_at',{ascending:false});
+  document.getElementById('txList').innerHTML = (data||[]).map(t => 
+    `<div class="tx-item">
+       <div>
+         ${t.to_user===me?'From '+t.from_user:'To '+t.to_user}
+         ${t.note ? `<br><small style="color:var(--muted)">"${t.note}"</small>` : ''}
+       </div>
+       <div class="${t.to_user===me?'tx-in':'tx-out'}">${t.to_user===me?'+':'-'}${t.amount}</div>
+     </div>`
+  ).join('');
+}
+async function modBalance(m) {
+  const amt = parseInt(s('adminAmt')), { data } = await client.from('profiles').select('balance').eq('username', me).single();
+  await client.from('profiles').update({balance: data.balance+(amt*m)}).eq('username',me); loadMyProfile();
 }
 
 // PROFILES
@@ -437,32 +497,17 @@ async function loadMyProfile() {
   document.getElementById('editBio').value = data.bio||'';
   document.getElementById('myBal').innerText = data.balance;
 }
-
-// NEW: Upload Avatar Function
 async function uploadAvatar() {
     const file = document.getElementById('avatarUpload').files[0];
     if(!file) return;
-    
-    // Change button text to show loading
-    const inputField = document.getElementById('editAvatar');
-    inputField.value = "Uploading...";
-    
-    // Upload to Supabase
+    document.getElementById('editAvatar').value = "Uploading...";
     const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
     const name = `avatar_${Date.now()}_${cleanName}`;
     const { error } = await client.storage.from('uploads').upload(name, file);
-    
-    if(error) {
-        alert("Upload failed: " + error.message);
-        inputField.value = "";
-        return;
-    }
-    
-    // Get URL
+    if(error) { alert("Upload failed"); return; }
     const { data } = client.storage.from('uploads').getPublicUrl(name);
-    inputField.value = data.publicUrl;
+    document.getElementById('editAvatar').value = data.publicUrl;
 }
-
 async function saveProfile() {
   await client.from('profiles').update({
     avatar: document.getElementById('editAvatar').value,
@@ -477,9 +522,7 @@ async function saveProfile() {
 }
 
 // JOBS/EVENTS
-async function addJob() {
-  await client.from('jobs').insert({ author: me, title: s('jobTitle'), description: s('jobDesc'), pay: s('jobPay') }); loadJobs();
-}
+async function addJob() { await client.from('jobs').insert({ author: me, title: s('jobTitle'), description: s('jobDesc'), pay: s('jobPay') }); loadJobs(); }
 async function loadJobs() {
   const { data } = await client.from('jobs').select().order('created_at', {ascending:false});
   document.getElementById('jobList').innerHTML = (data||[]).map(j => `
@@ -488,9 +531,7 @@ async function loadJobs() {
       <span style="color:green">(${j.pay})</span><p>${j.description}</p><small>@${j.author}</small>
     </div>`).join('');
 }
-async function addEvent() {
-  await client.from('events').insert({ author: me, title: s('evtTitle'), location: s('evtLoc'), event_date: s('evtTime') }); loadEvents();
-}
+async function addEvent() { await client.from('events').insert({ author: me, title: s('evtTitle'), location: s('evtLoc'), event_date: s('evtTime') }); loadEvents(); }
 async function loadEvents() {
   const { data } = await client.from('events').select().order('created_at', {ascending:false});
   document.getElementById('eventList').innerHTML = (data||[]).map(e => `
@@ -501,29 +542,6 @@ async function loadEvents() {
 }
 async function del(table, id) { if(confirm('Delete?')){ await client.from(table).delete().eq('id', id); table==='jobs'?loadJobs():loadEvents(); } }
 function s(id){ return document.getElementById(id).value; }
-
-// WALLET
-async function transfer() {
-  const to = s('payTo'), amt = parseInt(s('payAmt'));
-  const { data: my } = await client.from('profiles').select('balance').eq('username', me).single();
-  if(my.balance < amt) return alert('Poor');
-  const { data: dest } = await client.from('profiles').select('balance').eq('username', to).single();
-  if(!dest) return alert('No user');
-  await client.from('profiles').update({balance: my.balance-amt}).eq('username',me);
-  await client.from('profiles').update({balance: dest.balance+amt}).eq('username',to);
-  await client.from('transactions').insert({from_user:me, to_user:to, amount:amt});
-  alert('Sent'); loadMyProfile(); loadTx();
-}
-async function loadTx() {
-  const { data } = await client.from('transactions').select().or(`from_user.eq.${me},to_user.eq.${me}`).order('created_at',{ascending:false});
-  document.getElementById('txList').innerHTML = (data||[]).map(t => 
-    `<div class="tx-item"><div>${t.to_user===me?'From '+t.from_user:'To '+t.to_user}</div><div class="${t.to_user===me?'tx-in':'tx-out'}">${t.to_user===me?'+':'-'}${t.amount}</div></div>`
-  ).join('');
-}
-async function modBalance(m) {
-  const amt = parseInt(s('adminAmt')), { data } = await client.from('profiles').select('balance').eq('username', me).single();
-  await client.from('profiles').update({balance: data.balance+(amt*m)}).eq('username',me); loadMyProfile();
-}
 
 // MAP
 function initMap() {
