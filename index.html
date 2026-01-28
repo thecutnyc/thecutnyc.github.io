@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Cut NYC (Online v3.2)</title>
+  <title>The Cut NYC (Online v3.3)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,6 +16,7 @@
       --bg-body: #f3f4f6; --bg-sidebar: #ffffff; --bg-card: #ffffff;
       --text: #111827; --muted: #6b7280; --border: #e5e7eb; --primary: #2563eb;
       --hover: #f9fafb; --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --green: #22c55e; --red: #ef4444;
     }
     [data-theme="dark"] {
       --bg-body: #000000; --bg-sidebar: #121212; --bg-card: #18181b;
@@ -43,10 +44,10 @@
     /* COMPONENTS */
     .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
     .btn { background: var(--text); color: var(--bg-card); border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
-    .btn.danger { background: #ef4444; color: white; }
+    .btn.danger { background: var(--red); color: white; }
     .btn.small { padding: 5px 10px; font-size: 12px; }
     
-    /* FIX FOR INPUTS OVERFLOWING */
+    /* FIX FOR INPUTS */
     input, textarea, select {
       width: 100%; padding: 10px;
       background: var(--bg-body); border: 1px solid var(--border);
@@ -54,16 +55,19 @@
       font-family: inherit; box-sizing: border-box;
     }
 
-    /* GRID & MAP */
+    /* SPECIFIC LISTS */
     .profile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
     #map { height: 400px; width: 100%; border-radius: 8px; z-index: 1; }
-    .pin-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border); }
+    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border); }
+    .tx-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .tx-in { color: var(--green); } .tx-out { color: var(--red); }
+    
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- AUTH SCREEN -->
+  <!-- AUTH -->
   <div id="loginScreen" style="position:fixed; inset:0; background:var(--bg-body); z-index:999; display:flex; align-items:center; justify-content:center;">
     <div class="card" style="width:300px; text-align:center;">
       <h1>The Cut NYC</h1>
@@ -73,7 +77,7 @@
     </div>
   </div>
 
-  <!-- APP LAYOUT -->
+  <!-- APP -->
   <div id="app" class="hidden" style="display:flex; width:100%; height:100%;">
     <aside class="sidebar">
       <div style="font-weight:800; font-size:20px; margin-bottom:30px;">The Cut NYC</div>
@@ -174,7 +178,12 @@
           </div>
           <button class="btn" onclick="transfer()">Send</button>
         </div>
-        <div class="card">
+        
+        <!-- TRANSACTION LIST -->
+        <h2 style="margin-top:30px">History</h2>
+        <div id="txList" class="card" style="padding:0"></div>
+
+        <div class="card" style="margin-top:20px">
           <h2>Manual Adjustment (Admin)</h2>
           <div style="display:flex; gap:10px;">
             <input id="adminAmt" type="number" placeholder="Amount">
@@ -279,6 +288,7 @@ async function loadAll() {
   loadJobs();
   loadEvents();
   loadMyProfile();
+  loadTx();
 }
 
 // --- FEED ---
@@ -291,7 +301,9 @@ async function addPost() {
   btn.innerText = '...';
   let url = null;
   if(file) {
-    const name = `${Date.now()}_${file.name}`;
+    // Sanitize filename to prevent upload errors
+    const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+    const name = `${Date.now()}_${cleanName}`;
     await client.storage.from('uploads').upload(name, file);
     const { data } = client.storage.from('uploads').getPublicUrl(name);
     url = data.publicUrl;
@@ -382,9 +394,23 @@ async function addJob() {
 }
 async function loadJobs() {
   const { data } = await client.from('jobs').select().order('created_at', {ascending:false});
-  document.getElementById('jobList').innerHTML = (data||[]).map(j => 
-    `<div class="card"><b>${j.title}</b> <span style="color:green">(${j.pay})</span><p>${j.description}</p><small>@${j.author}</small></div>`
-  ).join('');
+  document.getElementById('jobList').innerHTML = (data||[]).map(j => `
+    <div class="card">
+      <div style="display:flex; justify-content:space-between;">
+        <b>${j.title}</b>
+        ${j.author === me ? `<button class="btn danger small" onclick="delJob(${j.id})">Delete</button>` : ''}
+      </div>
+      <span style="color:green">(${j.pay})</span>
+      <p>${j.description}</p>
+      <small>@${j.author}</small>
+    </div>
+  `).join('');
+}
+async function delJob(id) {
+    if(confirm('Delete job?')) {
+        await client.from('jobs').delete().eq('id', id);
+        loadJobs();
+    }
 }
 
 async function addEvent() {
@@ -397,12 +423,25 @@ async function addEvent() {
 }
 async function loadEvents() {
   const { data } = await client.from('events').select().order('created_at', {ascending:false});
-  document.getElementById('eventList').innerHTML = (data||[]).map(e => 
-    `<div class="card"><b>${e.title}</b><br>📍 ${e.location}<br><small>${new Date(e.event_date).toLocaleString()}</small></div>`
-  ).join('');
+  document.getElementById('eventList').innerHTML = (data||[]).map(e => `
+    <div class="card">
+      <div style="display:flex; justify-content:space-between;">
+        <b>${e.title}</b>
+        ${e.author === me ? `<button class="btn danger small" onclick="delEvt(${e.id})">Delete</button>` : ''}
+      </div>
+      <br>📍 ${e.location}<br>
+      <small>${new Date(e.event_date).toLocaleString()}</small>
+    </div>
+  `).join('');
+}
+async function delEvt(id) {
+    if(confirm('Delete event?')) {
+        await client.from('events').delete().eq('id', id);
+        loadEvents();
+    }
 }
 
-// --- WALLET ---
+// --- WALLET & TRANSACTIONS ---
 async function transfer() {
   const to = document.getElementById('payTo').value;
   const amt = parseInt(document.getElementById('payAmt').value);
@@ -411,9 +450,29 @@ async function transfer() {
   const { data: dest } = await client.from('profiles').select('balance').eq('username', to).single();
   if(!dest) return alert('User not found');
   
+  // Update Balances
   await client.from('profiles').update({ balance: my.balance - amt }).eq('username', me);
   await client.from('profiles').update({ balance: dest.balance + amt }).eq('username', to);
-  alert('Sent!'); loadMyProfile();
+  
+  // Record Transaction
+  await client.from('transactions').insert({ from_user: me, to_user: to, amount: amt });
+  
+  alert('Sent!'); 
+  loadMyProfile();
+  loadTx();
+}
+
+async function loadTx() {
+    const { data } = await client.from('transactions').select().or(`from_user.eq.${me},to_user.eq.${me}`).order('created_at', {ascending:false});
+    
+    document.getElementById('txList').innerHTML = (data||[]).map(t => {
+        const isIn = t.to_user === me;
+        return `
+        <div class="tx-item">
+            <div>${isIn ? 'Received from' : 'Sent to'} <strong>${isIn ? t.from_user : t.to_user}</strong></div>
+            <div class="${isIn ? 'tx-in' : 'tx-out'}">${isIn ? '+' : '-'}${t.amount}</div>
+        </div>`;
+    }).join('');
 }
 
 async function modBalance(m) {
@@ -449,7 +508,7 @@ async function loadPins() {
   
   // List
   document.getElementById('pinList').innerHTML = data.map(p => `
-    <div class="pin-item">
+    <div class="list-item">
       <div><b>${p.title}</b> <small>@${p.owner}</small></div>
       ${p.owner===me ? `<button class="btn danger small" onclick="delPin(${p.id})">Del</button>` : ''}
     </div>
