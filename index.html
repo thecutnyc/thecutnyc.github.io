@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Cut NYC (Mobile v3.6)</title>
+  <title>The Cut NYC (Mobile Fixed v3.8)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -54,14 +54,14 @@
     .btn.small { padding: 6px 10px; font-size: 12px; }
     
     input, textarea, select {
-      width: 100%; padding: 12px; /* Larger tap area */
+      width: 100%; padding: 12px;
       background: var(--bg-body); border: 1px solid var(--border);
       color: var(--text); border-radius: 8px; margin-bottom: 10px;
-      font-family: inherit; font-size: 16px; /* Prevents iOS zoom */
+      font-family: inherit; font-size: 16px;
     }
 
     /* GRID & MAP */
-    .profile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+    .profile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
     #map { height: 400px; width: 100%; border-radius: 8px; z-index: 1; margin-top: 10px; }
     .list-item, .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border); }
     .tx-in { color: var(--green); } .tx-out { color: var(--red); }
@@ -70,48 +70,48 @@
     /* MOBILE HEADER (Hidden on Desktop) */
     #mobileHeader { display: none; }
 
-    /* --- MOBILE RESPONSIVENESS --- */
+    /* --- MOBILE RESPONSIVENESS FIX --- */
     @media (max-width: 768px) {
       body { flex-direction: column; }
       
-      /* Sidebar becomes Bottom Nav */
+      /* Sidebar -> Bottom Nav */
       .sidebar {
-        width: 100%; height: auto;
+        width: 100%; height: 70px; /* Fixed height */
         border-right: none; border-top: 1px solid var(--border);
         position: fixed; bottom: 0; left: 0; z-index: 1000;
-        padding: 8px;
-        flex-direction: row;
-        overflow-x: auto; /* Scrollable horizontal */
-        background: var(--bg-sidebar);
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        padding: 0; flex-direction: row;
+        overflow-x: auto; background: var(--bg-sidebar);
+        align-items: center;
       }
-      
-      /* Hide unnecessary sidebar elements on mobile */
       .sidebar-brand, .sidebar-footer { display: none; }
       
-      /* Nav Items pills */
-      nav { display: flex; gap: 8px; width: 100%; padding-right: 20px; }
+      nav { 
+        display: flex; width: 100%; height: 100%; 
+        padding: 0 10px; gap: 5px; align-items: center; 
+      }
       .nav-item { 
-        margin: 0; padding: 8px 14px; font-size: 13px; 
+        margin: 0; padding: 8px 12px; font-size: 12px; 
         white-space: nowrap; border-radius: 20px;
         background: var(--bg-body); flex-shrink: 0;
+        height: 36px; display: flex; align-items: center;
       }
       
-      /* Main Content shift */
-      .main { padding: 15px; padding-bottom: 80px; width: 100%; }
+      /* Main Content Padding Fix */
+      .main { 
+        padding: 15px; padding-bottom: 90px; /* Space for bottom nav */
+        width: 100%; height: 100%; overflow-y: auto;
+      }
       
-      /* Show Top Header */
+      /* Top Header */
       #mobileHeader {
         display: flex; justify-content: space-between; align-items: center;
         padding: 15px; background: var(--bg-card); border-bottom: 1px solid var(--border);
         position: sticky; top: 0; z-index: 900; margin: -15px -15px 15px -15px;
       }
       
-      /* Component Adjustments */
-      .card { padding: 15px; border-radius: 10px; }
-      h1 { font-size: 22px; }
-      #map { height: 300px; }
-      .profile-grid { grid-template-columns: repeat(2, 1fr); }
+      .profile-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .card { padding: 15px; }
+      h1 { font-size: 20px; margin-bottom: 15px; }
     }
   </style>
 </head>
@@ -134,12 +134,12 @@
       <div class="sidebar-brand" style="font-weight:800; font-size:20px; margin-bottom:30px;">The Cut NYC</div>
       <nav>
         <div class="nav-item active" onclick="nav('feed')">Feed</div>
-        <div class="nav-item" onclick="nav('profiles')">Profiles</div>
+        <div class="nav-item" onclick="nav('profiles')">Citizens</div>
         <div class="nav-item" onclick="nav('jobs')">Jobs</div>
         <div class="nav-item" onclick="nav('events')">Events</div>
         <div class="nav-item" onclick="nav('wallet')">Wallet</div>
         <div class="nav-item" onclick="nav('map')">Map</div>
-        <div class="nav-item" onclick="nav('account')">Account</div>
+        <div class="nav-item" onclick="nav('account')">Me</div>
       </nav>
       <div class="sidebar-footer" style="margin-top:auto;">
         <button class="btn" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--text);" onclick="toggleTheme()">Theme</button>
@@ -238,8 +238,8 @@
         <h1>City Map</h1>
         <div class="card">
           <div style="display:flex; gap:8px;">
-            <input id="mapSearch" placeholder="Search address..." style="flex:1">
-            <button class="btn small" onclick="searchAddress()">Go</button>
+            <input id="mapSearch" placeholder="Exact address (e.g. 1370 E 70th St, Brooklyn)" style="flex:1">
+            <button class="btn small" onclick="searchAddress()">Search</button>
           </div>
           <div style="display:flex; align-items:center; gap:8px; margin-top:10px;">
             <input id="pinTitle" placeholder="Pin Title" style="margin:0; flex:1;">
@@ -323,7 +323,6 @@ function nav(id) {
   document.getElementById(id==='map'?'mapPage':id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
   event.target.classList.add('active');
-  // Scroll sidebar to item on mobile
   if(window.innerWidth < 768) {
       event.target.scrollIntoView({ behavior: 'smooth', inline: 'center' });
   }
@@ -356,8 +355,9 @@ async function addPost() {
   let url = null;
   if(file) {
     const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
-    await client.storage.from('uploads').upload(`${Date.now()}_${cleanName}`, file);
-    const { data } = client.storage.from('uploads').getPublicUrl(`${Date.now()}_${cleanName}`);
+    const name = `${Date.now()}_${cleanName}`;
+    await client.storage.from('uploads').upload(name, file);
+    const { data } = client.storage.from('uploads').getPublicUrl(name);
     url = data.publicUrl;
   }
   await client.from('posts').insert({ author: me, text: txt, img_url: url });
@@ -381,9 +381,10 @@ async function loadFeed() {
 async function loadProfiles() {
   const { data } = await client.from('profiles').select();
   document.getElementById('profileGrid').innerHTML = (data||[]).map(u => `
-    <div class="card" style="text-align:center; padding:10px;" onclick="openProfile('${u.username}')">
-      <img src="${u.avatar||'https://ui-avatars.com/api/?name='+u.username}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">
-      <div style="font-weight:bold; font-size:14px; margin-top:5px; overflow:hidden; text-overflow:ellipsis;">@${u.username}</div>
+    <div class="card" style="text-align:center; padding:15px; cursor:pointer;" onclick="openProfile('${u.username}')">
+      <img src="${u.avatar||'https://ui-avatars.com/api/?name='+u.username}" style="width:60px; height:60px; border-radius:50%; object-fit:cover;">
+      <div style="font-weight:bold; font-size:14px; margin-top:10px; overflow:hidden; text-overflow:ellipsis;">@${u.username}</div>
+      <div style="font-size:11px; color:var(--muted)">${u.occupation||'Citizen'}</div>
     </div>`).join('');
 }
 async function openProfile(u) {
@@ -493,7 +494,7 @@ async function searchAddress() {
     const { lat, lon, display_name } = data[0];
     mapObj.setView([lat, lon], 18);
     if(searchMarker) mapObj.removeLayer(searchMarker);
-    searchMarker = L.marker([lat, lon]).addTo(mapObj);
+    searchMarker = L.marker([lat, lon], {icon: L.divIcon({className: 'search-icon', html: '🔴', iconSize: [20, 20]})}).addTo(mapObj);
     document.getElementById('pinTitle').value = display_name.split(',')[0];
     mapArmed=true; document.getElementById('armMapBtn').style.background='#22c55e';
   } else alert('Not found');
