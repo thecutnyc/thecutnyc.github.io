@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Cut NYC</title>
+  <title>The Cut NYC (Fixed Grid v4.5)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -69,18 +69,23 @@
       font-family: inherit; font-size: 16px;
     }
 
-    /* PROFILE GRID FIX */
+    /* --- FIXED PROFILE GRID --- */
     .profile-grid { 
         display: grid; 
-        grid-template-columns: repeat(2, 1fr); /* Force 2 columns */
+        grid-template-columns: repeat(2, 1fr); 
         gap: 15px; 
+        grid-auto-rows: 160px; /* Force every row to be exactly 160px tall */
     }
     .profile-card {
-        background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; 
+        background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; 
         cursor: pointer; text-align: center;
-        /* THE FIX: Fixed height instead of aspect ratio */
-        height: 180px;
+        height: 100%; /* Fill the fixed row height */
         display: flex; flex-direction: column; align-items: center; justify-content: center;
+        overflow: hidden;
+    }
+    .profile-card img {
+        width: 60px; height: 60px; border-radius: 50%; 
+        object-fit: cover; flex-shrink: 0; margin-bottom: 10px;
     }
 
     #map { height: 400px; width: 100%; border-radius: 8px; z-index: 1; margin-top: 10px; }
