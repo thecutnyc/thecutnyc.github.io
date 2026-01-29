@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Cut NYC (Justice v5.0)</title>
+  <title>The Cut NYC (Justice v5.1)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -190,7 +190,8 @@
         <h1>Law Book</h1>
         <div class="card">
             <h2>Add New Rule</h2>
-            <input id="ruleTitle" placeholder="Title (e.g. Speeding, Cleaning)">
+            <input id="ruleTitle" placeholder="Title (e.g. Speeding)">
+            <input id="ruleDesc" placeholder="Description (Optional)">
             <select id="ruleType">
                 <option value="crime">Crime (Fine)</option>
                 <option value="reward">Reward (Payment)</option>
@@ -376,11 +377,13 @@ async function loadAll() {
 async function addRule() {
     await client.from('rules').insert({
         title: s('ruleTitle'),
+        description: s('ruleDesc'),
         type: s('ruleType'),
         amount: parseInt(s('ruleAmt')),
         created_by: me
     });
     document.getElementById('ruleTitle').value = '';
+    document.getElementById('ruleDesc').value = '';
     loadRules();
 }
 
@@ -389,19 +392,19 @@ async function loadRules() {
     const crimes = data.filter(r => r.type === 'crime');
     const rewards = data.filter(r => r.type === 'reward');
 
-    document.getElementById('crimeList').innerHTML = crimes.map(r => `
+    const renderRow = (r) => `
         <div class="law-row">
-            <div><b>${r.title}</b><br><small>$${r.amount} Fine</small></div>
-            <button class="btn danger small" onclick="issueRequest('${r.title}', ${r.amount}, 'fine')">Issue</button>
+            <div>
+                <b>${r.title}</b>
+                ${r.description ? `<br><small style="color:var(--muted); font-style:italic;">"${r.description}"</small>` : ''}
+                <br><small style="color:${r.type==='crime'?'var(--red)':'var(--green)'}">$${r.amount} ${r.type==='crime'?'Fine':'Reward'}</small>
+            </div>
+            <button class="btn ${r.type==='crime'?'danger':'success'} small" onclick="issueRequest('${r.title}', ${r.amount}, '${r.type}')">Issue</button>
         </div>
-    `).join('');
+    `;
 
-    document.getElementById('rewardList').innerHTML = rewards.map(r => `
-        <div class="law-row">
-            <div><b>${r.title}</b><br><small>$${r.amount} Reward</small></div>
-            <button class="btn success small" onclick="issueRequest('${r.title}', ${r.amount}, 'reward')">Issue</button>
-        </div>
-    `).join('');
+    document.getElementById('crimeList').innerHTML = crimes.map(renderRow).join('');
+    document.getElementById('rewardList').innerHTML = rewards.map(renderRow).join('');
 }
 
 async function issueRequest(reason, amount, type) {
@@ -533,6 +536,10 @@ async function loadTx() {
   document.getElementById('txList').innerHTML = (data||[]).map(t => 
     `<div class="tx-item"><div>${t.to_user===me?'From '+t.from_user:'To '+t.to_user}${t.note ? `<br><small style="color:var(--muted)">"${t.note}"</small>` : ''}</div><div class="${t.to_user===me?'tx-in':'tx-out'}">${t.to_user===me?'+':'-'}${t.amount}</div></div>`
   ).join('');
+}
+async function modBalance(m) {
+  const amt = parseInt(s('adminAmt')), { data } = await client.from('profiles').select('balance').eq('username', me).single();
+  await client.from('profiles').update({balance: data.balance+(amt*m)}).eq('username',me); loadMyProfile();
 }
 
 // PROFILES
