@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Cut NYC (Banner Fixed v5.7)</title>
+  <title>The Cut NYC (Percent Fines v5.9)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,14 +16,12 @@
       --text: #111827; --muted: #6b7280; --border: #e5e7eb; --primary: #2563eb;
       --hover: #f9fafb; --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
       --green: #22c55e; --red: #ef4444; 
-      /* LIGHT MODE BANNER: Yellow Background, Dark Text */
       --banner-bg: #fefce8; --banner-border: #eab308; --banner-text: #854d0e;
     }
     [data-theme="dark"] {
       --bg-body: #000000; --bg-sidebar: #121212; --bg-card: #18181b;
       --text: #f4f4f5; --muted: #a1a1aa; --border: #27272a; --primary: #3b82f6;
       --hover: #27272a; --shadow: none;
-      /* DARK MODE BANNER: Dark Brown Background, Yellow Text */
       --banner-bg: #422006; --banner-border: #a16207; --banner-text: #fef08a;
     }
     * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -37,25 +35,12 @@
 
     /* APP LAYOUT */
     #app { display: flex; width: 100%; height: 100%; overflow: hidden; }
-    
-    /* SIDEBAR (Desktop) */
-    .sidebar { 
-      width: 250px; background: var(--bg-sidebar); border-right: 1px solid var(--border); 
-      display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; 
-    }
-    .nav-item { 
-      padding: 12px; border-radius: 8px; cursor: pointer; 
-      color: var(--muted); font-weight: 500; margin-bottom: 4px; transition: 0.2s;
-    }
+    .sidebar { width: 250px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
+    .nav-item { padding: 12px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500; margin-bottom: 4px; transition: 0.2s; }
     .nav-item:hover { background: var(--hover); color: var(--text); }
     .nav-item.active { background: var(--primary); color: white; }
     
-    /* MAIN SCROLLABLE AREA */
-    .main { 
-      flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; 
-      padding: 30px; position: relative; 
-    }
-    
+    .main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 30px; position: relative; }
     .page { display: none; max-width: 600px; margin: 0 auto; animation: fadeIn 0.2s; }
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -73,81 +58,43 @@
       color: var(--text); border-radius: 8px; margin-bottom: 10px;
       font-family: inherit; font-size: 16px;
     }
+    
+    .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer; }
+    .checkbox-wrapper input { width: auto; margin: 0; }
 
-    /* ALERT BANNER (FIXED VISIBILITY) */
-    #alertBanner {
-        background: var(--banner-bg); 
-        border: 1px solid var(--banner-border); 
-        color: var(--banner-text);
-        padding: 15px; 
-        border-radius: 8px; 
-        margin-bottom: 30px; /* More space below */
-        display: none; /* JS will turn this to Flex */
-        font-size: 15px; 
-        font-weight: 600;
-        align-items: center; 
-        gap: 12px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
+    #alertBanner { background: var(--banner-bg); border: 1px solid var(--banner-border); color: var(--banner-text); padding: 15px; border-radius: 8px; margin-bottom: 30px; display: none; font-size: 15px; font-weight: 600; align-items: center; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-    /* NEWS ARTICLE STYLE */
     .news-item { margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
     .news-headline { font-size: 24px; font-weight: 800; line-height: 1.2; margin-bottom: 8px; font-family: 'Georgia', serif; }
     .news-meta { font-size: 13px; color: var(--muted); margin-bottom: 15px; }
     .news-body { font-size: 16px; line-height: 1.6; white-space: pre-wrap; }
 
-    /* GRID & MAP */
-    .profile-grid { 
-        display: grid; 
-        grid-template-columns: repeat(2, 1fr); 
-        gap: 15px; 
-        grid-auto-rows: 160px;
-    }
-    .profile-card {
-        background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; 
-        cursor: pointer; text-align: center; height: 100%;
-        display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
-    }
-    .profile-card img {
-        width: 60px; height: 60px; border-radius: 50%; 
-        object-fit: cover; flex-shrink: 0; margin-bottom: 10px;
-    }
+    .profile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; grid-auto-rows: 160px; }
+    .profile-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; cursor: pointer; text-align: center; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+    .profile-card img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; flex-shrink: 0; margin-bottom: 10px; }
 
     #map { height: 400px; width: 100%; border-radius: 8px; z-index: 1; margin-top: 10px; }
     .list-item, .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border); }
     .tx-in { color: var(--green); } .tx-out { color: var(--red); }
-    .hidden { display: none !important; }
-    .admin-only { display: none !important; }
+    .hidden { display: none !important; } .admin-only { display: none !important; }
     
-    /* SOCIAL & LAW */
     .actions { display: flex; gap: 15px; margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border); }
     .act-btn { cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 5px; color: var(--muted); }
     .act-btn.liked { color: var(--red); }
     .comments-sec { margin-top: 15px; background: var(--hover); padding: 10px; border-radius: 8px; display: none; }
     .comment-item { font-size: 13px; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
-    
     .law-row { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--border); align-items: center; }
     .req-item { background: var(--hover); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 10px; }
-
     #mobileHeader { display: none; }
 
-    /* --- MOBILE OPTIMIZATIONS --- */
     @media (max-width: 768px) {
       #app { flex-direction: column; }
-      .sidebar {
-        width: 100%; height: 70px; border-right: none; border-top: 1px solid var(--border);
-        position: fixed; bottom: 0; left: 0; z-index: 1000;
-        padding: 0; flex-direction: row; overflow-x: auto; background: var(--bg-sidebar); align-items: center;
-      }
+      .sidebar { width: 100%; height: 70px; border-right: none; border-top: 1px solid var(--border); position: fixed; bottom: 0; left: 0; z-index: 1000; padding: 0; flex-direction: row; overflow-x: auto; background: var(--bg-sidebar); align-items: center; }
       .sidebar-brand, .sidebar-footer { display: none; }
       nav { display: flex; width: 100%; padding: 0 10px; gap: 5px; align-items: center; }
       .nav-item { margin: 0; padding: 8px 12px; font-size: 12px; white-space: nowrap; border-radius: 20px; background: var(--bg-body); flex-shrink: 0; height: 36px; display: flex; align-items: center; }
       .main { padding: 30px; padding-bottom: 100px; width: 100%; }
-      #mobileHeader {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 15px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border);
-        position: relative; margin: -30px -30px 20px -30px; width: calc(100% + 60px); 
-      }
+      #mobileHeader { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border); position: relative; margin: -30px -30px 20px -30px; width: calc(100% + 60px); }
     }
   </style>
 </head>
@@ -165,7 +112,6 @@
 
   <div id="app" class="hidden">
     
-    <!-- SIDEBAR -->
     <aside class="sidebar">
       <div class="sidebar-brand" style="font-weight:800; font-size:20px; margin-bottom:30px;">The Cut NYC</div>
       <nav>
@@ -194,7 +140,6 @@
         </div>
       </div>
 
-      <!-- ADMIN ALERT BANNER (High Visibility) -->
       <div id="alertBanner">
         <span style="font-size:20px;">📢</span> <span id="bannerText">System Online. Welcome to The Cut NYC.</span>
       </div>
@@ -212,7 +157,7 @@
         <div id="feedList"></div>
       </div>
 
-      <!-- NEWS (JOURNALISM) -->
+      <!-- NEWS -->
       <div id="news" class="page">
         <h1>City News</h1>
         <div class="card">
@@ -242,15 +187,18 @@
                 <option value="crime">Crime (Fine)</option>
                 <option value="reward">Reward (Payment)</option>
             </select>
-            <div style="display:flex; gap:10px;">
-                <input id="ruleAmt" type="number" placeholder="Amount ($)" style="flex:1">
+            <div style="display:flex; gap:10px; align-items:center;">
+                <input id="ruleAmt" type="number" placeholder="Amount ($ or %)" style="flex:1">
+                <label class="checkbox-wrapper" style="margin:0;">
+                    <input type="checkbox" id="ruleIsPercent"> <span>Is %?</span>
+                </label>
                 <button class="btn" onclick="addRule()">Add Rule</button>
             </div>
+            <small style="color:var(--muted); display:block; margin-top:5px;">Check "Is %?" to fine percentage of wealth (e.g. 10 = 10%)</small>
         </div>
         
         <h2>Crimes & Fines</h2>
         <div id="crimeList" class="card" style="padding:0"></div>
-        
         <h2>Rewards & Bounties</h2>
         <div id="rewardList" class="card" style="padding:0"></div>
       </div>
@@ -276,7 +224,6 @@
         <h3 style="margin-top:20px">History</h3>
         <div id="txList" class="card" style="padding:0"></div>
 
-        <!-- PUBLIC MANUAL ADJUSTMENT (Everyone can use) -->
         <div class="card" style="margin-top:20px; border:1px solid var(--border);">
           <h3>Money Printer</h3>
           <div style="display:flex; gap:10px;">
@@ -301,7 +248,6 @@
         </div>
         <div id="jobList"></div>
       </div>
-
       <div id="events" class="page">
         <h1>Events</h1>
         <div class="card">
@@ -359,7 +305,6 @@
           <button class="btn" style="width:100%" onclick="saveProfile()">Save Character</button>
         </div>
         
-        <!-- PROTECTED ADMIN BANNER EDIT -->
         <div class="card admin-only" style="margin-top:20px; border:1px solid var(--banner-border);">
             <h3 style="color:var(--banner-border)">📢 Broadcast Alert</h3>
             <input id="editBannerText" placeholder="System Message...">
@@ -416,6 +361,7 @@ function nav(id) {
   document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
   event.target.classList.add('active');
   if(window.innerWidth < 768) event.target.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+  if(id) loadBanner();
   if(id==='map') setTimeout(initMap,200);
 }
 
@@ -424,13 +370,8 @@ function logout() { localStorage.removeItem('cut_user_online'); location.reload(
 async function login() {
   const u = document.getElementById('loginUser').value.trim();
   if(!u) return;
-  
-  // LOGIN CHECK
   const { data } = await client.from('profiles').select().eq('username', u).single();
-  
-  // IF NEW USER:
   if(!data) await client.from('profiles').insert({ username: u, balance: 100 });
-  
   me = u;
   localStorage.setItem('cut_user_online', me);
   location.reload();
@@ -441,7 +382,6 @@ async function loadAll() {
   loadBanner(); loadFeed(); loadNews(); loadProfiles(); loadJobs(); loadEvents(); loadMyProfile(); loadTx(); loadRules(); loadRequests();
 }
 
-// --- ADMIN SYSTEM ---
 async function checkAdmin() {
     const { data } = await client.from('profiles').select('is_admin').eq('username', me).single();
     if(data && data.is_admin) {
@@ -449,30 +389,96 @@ async function checkAdmin() {
     }
 }
 
-// --- NEWS & ALERTS ---
 async function loadBanner() {
-    const { data } = await client.from('app_config').select().eq('key', 'banner_msg').single();
+    const { data } = await client.from('app_config').select().eq('key', 'banner_msg').maybeSingle();
     const banner = document.getElementById('alertBanner');
-    
-    // Always show banner container so it doesn't look broken
     banner.style.display = 'flex';
-    
     if(data && data.value) {
         document.getElementById('bannerText').innerText = data.value;
         document.getElementById('editBannerText').value = data.value;
     } else {
-        // Fallback text so you see something
         document.getElementById('bannerText').innerText = "System Online. Welcome to The Cut NYC.";
     }
 }
-
 async function saveBanner() {
     const txt = document.getElementById('editBannerText').value;
-    const { data } = await client.from('app_config').select().eq('key', 'banner_msg').single();
+    const { data } = await client.from('app_config').select().eq('key', 'banner_msg').maybeSingle();
     if(data) await client.from('app_config').update({ value: txt }).eq('key', 'banner_msg');
     else await client.from('app_config').insert({ key: 'banner_msg', value: txt });
-    loadBanner();
-    alert('Banner Updated!');
+    await loadBanner(); alert('Banner Updated!');
+}
+
+// LAW - FIXED FOR PERCENTAGE
+async function addRule() {
+    const isP = document.getElementById('ruleIsPercent').checked;
+    await client.from('rules').insert({
+        title: s('ruleTitle'),
+        description: s('ruleDesc'),
+        type: s('ruleType'),
+        amount: parseInt(s('ruleAmt')),
+        is_percent: isP,
+        created_by: me
+    });
+    document.getElementById('ruleTitle').value = ''; document.getElementById('ruleDesc').value = ''; 
+    document.getElementById('ruleIsPercent').checked = false;
+    loadRules();
+}
+
+async function loadRules() {
+    const { data } = await client.from('rules').select();
+    const crimes = data.filter(r => r.type === 'crime'); const rewards = data.filter(r => r.type === 'reward');
+    const renderRow = (r) => `
+        <div class="law-row">
+            <div>
+                <b>${r.title}</b>
+                ${r.description ? `<br><small style="color:var(--muted); font-style:italic;">"${r.description}"</small>` : ''}
+                <br><small style="color:${r.type==='crime'?'var(--red)':'var(--green)'}">
+                   ${r.type==='crime'?'Fine':'Reward'}: ${r.is_percent ? r.amount+'%' : '$'+r.amount}
+                </small>
+            </div>
+            <button class="btn ${r.type==='crime'?'danger':'success'} small" onclick="issueRequest('${r.title}', ${r.amount}, '${r.type}', ${r.is_percent})">Issue</button>
+        </div>`;
+    document.getElementById('crimeList').innerHTML = crimes.map(renderRow).join(''); document.getElementById('rewardList').innerHTML = rewards.map(renderRow).join('');
+}
+
+async function issueRequest(reason, amount, type, isPercent) {
+    const target = prompt(`Who is this ${type} for? (Enter username)`); if(!target) return;
+    await client.from('requests').insert({ to_user: target, amount: amount, type: type, reason: reason, status: 'pending', is_percent: isPercent });
+    alert(`${type} sent to ${target}`);
+}
+
+async function loadRequests() {
+    const { data } = await client.from('requests').select().eq('to_user', me).eq('status', 'pending');
+    document.getElementById('requestList').innerHTML = (data||[]).length ? (data||[]).map(r => `
+        <div class="req-item" style="border-left: 5px solid ${r.type==='crime'?'var(--red)':'var(--green)'}">
+            <div style="font-weight:bold; margin-bottom:5px;">${r.type.toUpperCase()}: ${r.reason}</div>
+            <div style="font-size:20px; font-weight:800; margin-bottom:10px;">${r.is_percent ? r.amount+'%' : '$'+r.amount}</div>
+            <button class="btn ${r.type==='crime'?'danger':'success'}" style="width:100%" onclick="processRequest(${r.id}, ${r.amount}, '${r.type}', ${r.is_percent})">
+                ${r.type==='crime' ? 'Pay Fine' : 'Claim Reward'}
+            </button>
+        </div>`).join('') : '<div style="color:var(--muted); padding:10px;">No pending requests.</div>';
+}
+
+async function processRequest(id, amount, type, isPercent) {
+    const { data: user } = await client.from('profiles').select('balance').eq('username', me).single();
+    let finalAmt = amount;
+    
+    // PERCENTAGE CALCULATION
+    if(isPercent) {
+        finalAmt = Math.floor(user.balance * (amount / 100));
+        if(finalAmt < 1) finalAmt = 0; // Don't take money if they have 0
+    }
+
+    if(type === 'crime') {
+        if(user.balance < finalAmt) return alert("Not enough money!");
+        await client.from('profiles').update({ balance: user.balance - finalAmt }).eq('username', me);
+    } else {
+        await client.from('profiles').update({ balance: user.balance + finalAmt }).eq('username', me);
+    }
+    
+    await client.from('requests').update({ status: 'completed' }).eq('id', id);
+    alert(type === 'crime' ? `Fine Paid ($${finalAmt})` : `Reward Claimed ($${finalAmt})`);
+    loadMyProfile(); loadRequests();
 }
 
 async function addNews() {
@@ -488,7 +494,6 @@ async function addNews() {
     loadNews();
     nav('news');
 }
-
 async function loadNews() {
     const { data } = await client.from('news').select().order('created_at', {ascending:false});
     document.getElementById('newsList').innerHTML = (data||[]).map(n => `
@@ -501,282 +506,40 @@ async function loadNews() {
     `).join('');
 }
 
-
-// --- LAW & REQUESTS ---
-async function addRule() {
-    await client.from('rules').insert({
-        title: s('ruleTitle'),
-        description: s('ruleDesc'),
-        type: s('ruleType'),
-        amount: parseInt(s('ruleAmt')),
-        created_by: me
-    });
-    document.getElementById('ruleTitle').value = '';
-    document.getElementById('ruleDesc').value = '';
-    loadRules();
-}
-
-async function loadRules() {
-    const { data } = await client.from('rules').select();
-    const crimes = data.filter(r => r.type === 'crime');
-    const rewards = data.filter(r => r.type === 'reward');
-
-    const renderRow = (r) => `
-        <div class="law-row">
-            <div>
-                <b>${r.title}</b>
-                ${r.description ? `<br><small style="color:var(--muted); font-style:italic;">"${r.description}"</small>` : ''}
-                <br><small style="color:${r.type==='crime'?'var(--red)':'var(--green)'}">$${r.amount} ${r.type==='crime'?'Fine':'Reward'}</small>
-            </div>
-            <button class="btn ${r.type==='crime'?'danger':'success'} small" onclick="issueRequest('${r.title}', ${r.amount}, '${r.type}')">Issue</button>
-        </div>
-    `;
-
-    document.getElementById('crimeList').innerHTML = crimes.map(renderRow).join('');
-    document.getElementById('rewardList').innerHTML = rewards.map(renderRow).join('');
-}
-
-async function issueRequest(reason, amount, type) {
-    const target = prompt(`Who is this ${type} for? (Enter username)`);
-    if(!target) return;
-    await client.from('requests').insert({
-        to_user: target,
-        amount: amount,
-        type: type, // Stores 'crime' or 'reward'
-        reason: reason,
-        status: 'pending'
-    });
-    alert(`${type} sent to ${target}`);
-}
-
-async function loadRequests() {
-    const { data } = await client.from('requests').select().eq('to_user', me).eq('status', 'pending');
-    document.getElementById('requestList').innerHTML = (data||[]).length ? (data||[]).map(r => `
-        <div class="req-item" style="border-left: 5px solid ${r.type==='crime'?'var(--red)':'var(--green)'}">
-            <div style="font-weight:bold; margin-bottom:5px;">${r.type.toUpperCase()}: ${r.reason}</div>
-            <div style="font-size:20px; font-weight:800; margin-bottom:10px;">$${r.amount}</div>
-            <button class="btn ${r.type==='crime'?'danger':'success'}" style="width:100%" onclick="processRequest(${r.id}, ${r.amount}, '${r.type}')">
-                ${r.type==='crime' ? 'Pay Fine' : 'Claim Reward'}
-            </button>
-        </div>
-    `).join('') : '<div style="color:var(--muted); padding:10px;">No pending requests.</div>';
-}
-
-async function processRequest(id, amount, type) {
-    const { data: user } = await client.from('profiles').select('balance').eq('username', me).single();
-    if(type === 'crime') {
-        if(user.balance < amount) return alert("Not enough money to pay fine!");
-        await client.from('profiles').update({ balance: user.balance - amount }).eq('username', me);
-    } else {
-        await client.from('profiles').update({ balance: user.balance + amount }).eq('username', me);
-    }
-    
-    await client.from('requests').update({ status: 'completed' }).eq('id', id);
-    alert(type === 'crime' ? 'Fine Paid.' : 'Reward Claimed!');
-    loadMyProfile(); loadRequests();
-}
-
-// FEED
 async function addPost() {
-  const txt = document.getElementById('postText').value;
-  const file = document.getElementById('postFile').files[0];
-  const btn = document.getElementById('postBtn');
-  if(!txt && !file) return;
-  btn.innerText = '...';
-  let url = null;
-  if(file) {
-    const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
-    const name = `${Date.now()}_${cleanName}`;
-    await client.storage.from('uploads').upload(name, file);
-    const { data } = client.storage.from('uploads').getPublicUrl(name);
-    url = data.publicUrl;
-  }
-  await client.from('posts').insert({ author: me, text: txt, img_url: url });
-  document.getElementById('postText').value = ''; document.getElementById('postFile').value = '';
-  btn.innerText = 'Post'; loadFeed();
+  const txt = document.getElementById('postText').value; const file = document.getElementById('postFile').files[0]; const btn = document.getElementById('postBtn');
+  if(!txt && !file) return; btn.innerText = '...'; let url = null;
+  if(file) { const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '_'); const name = `${Date.now()}_${cleanName}`; await client.storage.from('uploads').upload(name, file); const { data } = client.storage.from('uploads').getPublicUrl(name); url = data.publicUrl; }
+  await client.from('posts').insert({ author: me, text: txt, img_url: url }); document.getElementById('postText').value = ''; document.getElementById('postFile').value = ''; btn.innerText = 'Post'; loadFeed();
 }
-
 async function loadFeed() {
   const { data: posts } = await client.from('posts').select(`*, likes(user_id), comments(id)`).order('created_at', {ascending:false}).limit(20);
   document.getElementById('feedList').innerHTML = (posts||[]).map(p => {
-    const isLiked = p.likes && p.likes.some(l => l.user_id === me);
-    const likeCount = p.likes ? p.likes.length : 0;
-    const commentCount = p.comments ? p.comments.length : 0;
-    return `
-    <div class="card" id="post-${p.id}">
-      <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted)">
-        <strong onclick="openProfile('${p.author}')">@${p.author}</strong>
-        <div style="display:flex; gap:10px; align-items:center;">
-          <span>${new Date(p.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
-          ${p.author === me ? `<span onclick="deletePost(${p.id})" style="cursor:pointer; color:var(--red);">🗑</span>` : ''}
-        </div>
-      </div>
-      <div style="margin-top:5px;">${p.text||''}</div>
-      ${p.img_url ? `<img src="${p.img_url}" style="max-width:100%; margin-top:10px; border-radius:8px;">` : ''}
-      <div class="actions">
-        <div class="act-btn ${isLiked?'liked':''}" onclick="toggleLike(${p.id})">${isLiked ? '❤️' : '♡'} ${likeCount}</div>
-        <div class="act-btn" onclick="toggleComments(${p.id})">💬 ${commentCount}</div>
-      </div>
-      <div id="comments-${p.id}" class="comments-sec">
-        <div id="clist-${p.id}"></div>
-        <div style="display:flex; gap:5px; margin-top:10px;">
-          <input id="cinput-${p.id}" placeholder="Write comment..." style="margin:0; font-size:12px; padding:8px;">
-          <button class="btn small" onclick="addComment(${p.id})">Send</button>
-        </div>
-      </div>
-    </div>`;
+    const isLiked = p.likes && p.likes.some(l => l.user_id === me); const likeCount = p.likes ? p.likes.length : 0; const commentCount = p.comments ? p.comments.length : 0;
+    return `<div class="card" id="post-${p.id}"><div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted)"><strong onclick="openProfile('${p.author}')">@${p.author}</strong><div style="display:flex; gap:10px; align-items:center;"><span>${new Date(p.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>${p.author === me ? `<span onclick="deletePost(${p.id})" style="cursor:pointer; color:var(--red);">🗑</span>` : ''}</div></div><div style="margin-top:5px;">${p.text||''}</div>${p.img_url ? `<img src="${p.img_url}" style="max-width:100%; margin-top:10px; border-radius:8px;">` : ''}<div class="actions"><div class="act-btn ${isLiked?'liked':''}" onclick="toggleLike(${p.id})">${isLiked ? '❤️' : '♡'} ${likeCount}</div><div class="act-btn" onclick="toggleComments(${p.id})">💬 ${commentCount}</div></div><div id="comments-${p.id}" class="comments-sec"><div id="clist-${p.id}"></div><div style="display:flex; gap:5px; margin-top:10px;"><input id="cinput-${p.id}" placeholder="Write comment..." style="margin:0; font-size:12px; padding:8px;"><button class="btn small" onclick="addComment(${p.id})">Send</button></div></div></div>`;
   }).join('');
 }
 async function deletePost(id) { if(confirm('Delete post?')) await client.from('posts').delete().eq('id', id); loadFeed(); }
-async function toggleLike(pid) {
-    const { data } = await client.from('likes').select().eq('post_id', pid).eq('user_id', me).single();
-    if(data) await client.from('likes').delete().eq('id', data.id);
-    else await client.from('likes').insert({ post_id: pid, user_id: me });
-    loadFeed();
-}
-async function toggleComments(pid) {
-    const div = document.getElementById(`comments-${pid}`);
-    if(div.style.display === 'block') { div.style.display = 'none'; return; }
-    div.style.display = 'block';
-    const { data } = await client.from('comments').select().eq('post_id', pid).order('created_at');
-    document.getElementById(`clist-${pid}`).innerHTML = (data||[]).map(c => `<div class="comment-item"><b>${c.author}</b>: ${c.text}</div>`).join('');
-}
-async function addComment(pid) {
-    const txt = document.getElementById(`cinput-${pid}`).value;
-    if(!txt) return;
-    await client.from('comments').insert({ post_id: pid, author: me, text: txt });
-    document.getElementById(`cinput-${pid}`).value = ''; toggleComments(pid);
-}
-
-// WALLET
-async function transfer() {
-  const to = s('payTo'), amt = parseInt(s('payAmt')), note = s('payNote');
-  const { data: my } = await client.from('profiles').select('balance').eq('username', me).single();
-  if(my.balance < amt) return alert('Poor');
-  const { data: dest } = await client.from('profiles').select('balance').eq('username', to).single();
-  if(!dest) return alert('No user');
-  await client.from('profiles').update({balance: my.balance-amt}).eq('username',me);
-  await client.from('profiles').update({balance: dest.balance+amt}).eq('username',to);
-  await client.from('transactions').insert({from_user:me, to_user:to, amount:amt, note: note});
-  alert('Sent'); loadMyProfile(); loadTx();
-}
-async function loadTx() {
-  const { data } = await client.from('transactions').select().or(`from_user.eq.${me},to_user.eq.${me}`).order('created_at',{ascending:false});
-  document.getElementById('txList').innerHTML = (data||[]).map(t => 
-    `<div class="tx-item"><div>${t.to_user===me?'From '+t.from_user:'To '+t.to_user}${t.note ? `<br><small style="color:var(--muted)">"${t.note}"</small>` : ''}</div><div class="${t.to_user===me?'tx-in':'tx-out'}">${t.to_user===me?'+':'-'}${t.amount}</div></div>`
-  ).join('');
-}
-async function modBalance(m) {
-  const amt = parseInt(s('adminAmt')), { data } = await client.from('profiles').select('balance').eq('username', me).single();
-  await client.from('profiles').update({balance: data.balance+(amt*m)}).eq('username',me); loadMyProfile();
-}
-
-// PROFILES
-async function loadProfiles() {
-  const { data } = await client.from('profiles').select();
-  document.getElementById('profileGrid').innerHTML = (data||[]).map(u => `
-    <div class="profile-card" onclick="openProfile('${u.username}')">
-      <img src="${u.avatar||'https://ui-avatars.com/api/?name='+u.username}">
-      <div style="font-weight:bold; font-size:14px; margin-top:10px; overflow:hidden; text-overflow:ellipsis; width:100%;">@${u.username}</div>
-      <div style="font-size:11px; color:var(--muted)">${u.occupation||'Citizen'}</div>
-    </div>`).join('');
-}
-async function openProfile(u) {
-  nav('profileView');
-  const { data } = await client.from('profiles').select().eq('username', u).single();
-  document.getElementById('pvName').innerText = '@'+data.username;
-  document.getElementById('pvAvatar').src = data.avatar||'';
-  document.getElementById('pvReal').innerText = data.real_name||'';
-  document.getElementById('pvAge').innerText = data.age||'-';
-  document.getElementById('pvOcc').innerText = data.occupation||'-';
-  document.getElementById('pvStat').innerText = data.status||'-';
-  document.getElementById('pvLoc').innerText = data.location||'-';
-  document.getElementById('pvBio').innerText = data.bio||'';
-}
-async function loadMyProfile() {
-  const { data } = await client.from('profiles').select().eq('username', me).single();
-  if(!data) return;
-  document.getElementById('editAvatar').value = data.avatar||'';
-  document.getElementById('editReal').value = data.real_name||'';
-  document.getElementById('editAge').value = data.age||'';
-  document.getElementById('editOcc').value = data.occupation||'';
-  document.getElementById('editStatus').value = data.status||'Single';
-  document.getElementById('editLoc').value = data.location||'';
-  document.getElementById('editBio').value = data.bio||'';
-  document.getElementById('myBal').innerText = data.balance;
-}
-async function uploadAvatar() {
-    const file = document.getElementById('avatarUpload').files[0];
-    if(!file) return;
-    document.getElementById('editAvatar').value = "Uploading...";
-    const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
-    const name = `avatar_${Date.now()}_${cleanName}`;
-    const { error } = await client.storage.from('uploads').upload(name, file);
-    if(error) { alert("Upload failed"); return; }
-    const { data } = client.storage.from('uploads').getPublicUrl(name);
-    document.getElementById('editAvatar').value = data.publicUrl;
-}
-async function saveProfile() {
-  await client.from('profiles').update({
-    avatar: document.getElementById('editAvatar').value,
-    real_name: document.getElementById('editReal').value,
-    age: document.getElementById('editAge').value,
-    occupation: document.getElementById('editOcc').value,
-    status: document.getElementById('editStatus').value,
-    location: document.getElementById('editLoc').value,
-    bio: document.getElementById('editBio').value
-  }).eq('username', me);
-  alert('Saved!');
-}
-
-// JOBS/EVENTS
+async function toggleLike(pid) { const { data } = await client.from('likes').select().eq('post_id', pid).eq('user_id', me).single(); if(data) await client.from('likes').delete().eq('id', data.id); else await client.from('likes').insert({ post_id: pid, user_id: me }); loadFeed(); }
+async function toggleComments(pid) { const div = document.getElementById(`comments-${pid}`); if(div.style.display === 'block') { div.style.display = 'none'; return; } div.style.display = 'block'; const { data } = await client.from('comments').select().eq('post_id', pid).order('created_at'); document.getElementById(`clist-${pid}`).innerHTML = (data||[]).map(c => `<div class="comment-item"><b>${c.author}</b>: ${c.text}</div>`).join(''); }
+async function addComment(pid) { const txt = document.getElementById(`cinput-${pid}`).value; if(!txt) return; await client.from('comments').insert({ post_id: pid, author: me, text: txt }); document.getElementById(`cinput-${pid}`).value = ''; toggleComments(pid); }
+async function transfer() { const to = s('payTo'), amt = parseInt(s('payAmt')), note = s('payNote'); const { data: my } = await client.from('profiles').select('balance').eq('username', me).single(); if(my.balance < amt) return alert('Poor'); const { data: dest } = await client.from('profiles').select('balance').eq('username', to).single(); if(!dest) return alert('No user'); await client.from('profiles').update({balance: my.balance-amt}).eq('username',me); await client.from('profiles').update({balance: dest.balance+amt}).eq('username',to); await client.from('transactions').insert({from_user:me, to_user:to, amount:amt, note: note}); alert('Sent'); loadMyProfile(); loadTx(); }
+async function loadTx() { const { data } = await client.from('transactions').select().or(`from_user.eq.${me},to_user.eq.${me}`).order('created_at',{ascending:false}); document.getElementById('txList').innerHTML = (data||[]).map(t => `<div class="tx-item"><div>${t.to_user===me?'From '+t.from_user:'To '+t.to_user}${t.note ? `<br><small style="color:var(--muted)">"${t.note}"</small>` : ''}</div><div class="${t.to_user===me?'tx-in':'tx-out'}">${t.to_user===me?'+':'-'}${t.amount}</div></div>`).join(''); }
+async function modBalance(m) { const amt = parseInt(s('adminAmt')), { data } = await client.from('profiles').select('balance').eq('username', me).single(); await client.from('profiles').update({balance: data.balance+(amt*m)}).eq('username',me); loadMyProfile(); }
+async function loadProfiles() { const { data } = await client.from('profiles').select(); document.getElementById('profileGrid').innerHTML = (data||[]).map(u => `<div class="profile-card" onclick="openProfile('${u.username}')"><img src="${u.avatar||'https://ui-avatars.com/api/?name='+u.username}"><div style="font-weight:bold; font-size:14px; margin-top:10px; overflow:hidden; text-overflow:ellipsis; width:100%;">@${u.username}</div><div style="font-size:11px; color:var(--muted)">${u.occupation||'Citizen'}</div></div>`).join(''); }
+async function openProfile(u) { nav('profileView'); const { data } = await client.from('profiles').select().eq('username', u).single(); document.getElementById('pvName').innerText = '@'+data.username; document.getElementById('pvAvatar').src = data.avatar||''; document.getElementById('pvReal').innerText = data.real_name||''; document.getElementById('pvAge').innerText = data.age||'-'; document.getElementById('pvOcc').innerText = data.occupation||'-'; document.getElementById('pvStat').innerText = data.status||'-'; document.getElementById('pvLoc').innerText = data.location||'-'; document.getElementById('pvBio').innerText = data.bio||''; }
+async function loadMyProfile() { const { data } = await client.from('profiles').select().eq('username', me).single(); if(!data) return; document.getElementById('editAvatar').value = data.avatar||''; document.getElementById('editReal').value = data.real_name||''; document.getElementById('editAge').value = data.age||''; document.getElementById('editOcc').value = data.occupation||''; document.getElementById('editStatus').value = data.status||'Single'; document.getElementById('editLoc').value = data.location||''; document.getElementById('editBio').value = data.bio||''; document.getElementById('myBal').innerText = data.balance; }
+async function uploadAvatar() { const file = document.getElementById('avatarUpload').files[0]; if(!file) return; document.getElementById('editAvatar').value = "Uploading..."; const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '_'); const name = `avatar_${Date.now()}_${cleanName}`; const { error } = await client.storage.from('uploads').upload(name, file); if(error) { alert("Upload failed"); return; } const { data } = client.storage.from('uploads').getPublicUrl(name); document.getElementById('editAvatar').value = data.publicUrl; }
+async function saveProfile() { await client.from('profiles').update({ avatar: document.getElementById('editAvatar').value, real_name: document.getElementById('editReal').value, age: document.getElementById('editAge').value, occupation: document.getElementById('editOcc').value, status: document.getElementById('editStatus').value, location: document.getElementById('editLoc').value, bio: document.getElementById('editBio').value }).eq('username', me); alert('Saved!'); }
 async function addJob() { await client.from('jobs').insert({ author: me, title: s('jobTitle'), description: s('jobDesc'), pay: s('jobPay') }); loadJobs(); }
-async function loadJobs() {
-  const { data } = await client.from('jobs').select().order('created_at', {ascending:false});
-  document.getElementById('jobList').innerHTML = (data||[]).map(j => `<div class="card"><div style="display:flex; justify-content:space-between;"><b>${j.title}</b>${j.author===me?`<button class="btn danger small" onclick="del('jobs',${j.id})">x</button>`:''}</div><span style="color:green">(${j.pay})</span><p>${j.description}</p><small>@${j.author}</small></div>`).join('');
-}
+async function loadJobs() { const { data } = await client.from('jobs').select().order('created_at', {ascending:false}); document.getElementById('jobList').innerHTML = (data||[]).map(j => `<div class="card"><div style="display:flex; justify-content:space-between;"><b>${j.title}</b>${j.author===me?`<button class="btn danger small" onclick="del('jobs',${j.id})">x</button>`:''}</div><span style="color:green">(${j.pay})</span><p>${j.description}</p><small>@${j.author}</small></div>`).join(''); }
 async function addEvent() { await client.from('events').insert({ author: me, title: s('evtTitle'), location: s('evtLoc'), event_date: s('evtTime') }); loadEvents(); }
-async function loadEvents() {
-  const { data } = await client.from('events').select().order('created_at', {ascending:false});
-  document.getElementById('eventList').innerHTML = (data||[]).map(e => `<div class="card"><div style="display:flex; justify-content:space-between;"><b>${e.title}</b>${e.author===me?`<button class="btn danger small" onclick="del('events',${e.id})">x</button>`:''}</div><br>📍 ${e.location}<br><small>${new Date(e.event_date).toLocaleString()}</small></div>`).join('');
-}
+async function loadEvents() { const { data } = await client.from('events').select().order('created_at', {ascending:false}); document.getElementById('eventList').innerHTML = (data||[]).map(e => `<div class="card"><div style="display:flex; justify-content:space-between;"><b>${e.title}</b>${e.author===me?`<button class="btn danger small" onclick="del('events',${e.id})">x</button>`:''}</div><br>📍 ${e.location}<br><small>${new Date(e.event_date).toLocaleString()}</small></div>`).join(''); }
 async function del(table, id) { if(confirm('Delete?')){ await client.from(table).delete().eq('id', id); table==='jobs'?loadJobs():loadEvents(); } }
 function s(id){ return document.getElementById(id).value; }
-
-// MAP
-function initMap() {
-  if(mapObj) { mapObj.invalidateSize(); return; }
-  mapObj = L.map('map').setView([40.7128, -74.0060], 13);
-  L.tileLayer(document.documentElement.getAttribute('data-theme')==='dark' ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(mapObj);
-  loadPins();
-  mapObj.on('click', async (e) => {
-    if(mapArmed) {
-      await client.from('pins').insert({owner:me, lat:e.latlng.lat, lng:e.latlng.lng, title:s('pinTitle')||'Pin'});
-      mapArmed=false; document.getElementById('armMapBtn').style.background=''; if(searchMarker) mapObj.removeLayer(searchMarker); loadPins();
-    }
-  });
-}
-async function searchAddress() {
-  const q = s('mapSearch'); if(!q) return;
-  const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`);
-  const data = await res.json();
-  if(data[0]) {
-    const { lat, lon, display_name } = data[0];
-    mapObj.setView([lat, lon], 18);
-    if(searchMarker) mapObj.removeLayer(searchMarker);
-    searchMarker = L.marker([lat, lon], {icon: L.divIcon({className: 'search-icon', html: '🔴', iconSize: [20, 20]})}).addTo(mapObj);
-    document.getElementById('pinTitle').value = display_name.split(',')[0];
-    mapArmed=true; document.getElementById('armMapBtn').style.background='#22c55e';
-  } else alert('Not found');
-}
-async function loadPins() {
-  const { data } = await client.from('pins').select();
-  mapObj.eachLayer(l => { if(l instanceof L.Marker && l !== searchMarker) mapObj.removeLayer(l); });
-  (data||[]).forEach(p => L.marker([p.lat, p.lng]).addTo(mapObj).bindPopup(`<b>${p.title}</b><br>@${p.owner}`));
-  document.getElementById('pinList').innerHTML = (data||[]).map(p => 
-    `<div class="list-item"><div onclick="zoomTo(${p.lat},${p.lng})" style="flex:1"><b>${p.title}</b><br><small>@${p.owner}</small></div>${p.owner===me?`<button class="btn danger small" onclick="del('pins',${p.id})">x</button>`:''}</div>`
-  ).join('');
-}
+function initMap() { if(mapObj) { mapObj.invalidateSize(); return; } mapObj = L.map('map').setView([40.7128, -74.0060], 13); L.tileLayer(document.documentElement.getAttribute('data-theme')==='dark' ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(mapObj); loadPins(); mapObj.on('click', async (e) => { if(mapArmed) { await client.from('pins').insert({owner:me, lat:e.latlng.lat, lng:e.latlng.lng, title:s('pinTitle')||'Pin'}); mapArmed=false; document.getElementById('armMapBtn').style.background=''; if(searchMarker) mapObj.removeLayer(searchMarker); loadPins(); } }); }
+async function searchAddress() { const q = s('mapSearch'); if(!q) return; const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`); const data = await res.json(); if(data[0]) { const { lat, lon, display_name } = data[0]; mapObj.setView([lat, lon], 18); if(searchMarker) mapObj.removeLayer(searchMarker); searchMarker = L.marker([lat, lon], {icon: L.divIcon({className: 'search-icon', html: '🔴', iconSize: [20, 20]})}).addTo(mapObj); document.getElementById('pinTitle').value = display_name.split(',')[0]; mapArmed=true; document.getElementById('armMapBtn').style.background='#22c55e'; } else alert('Not found'); }
+async function loadPins() { const { data } = await client.from('pins').select(); mapObj.eachLayer(l => { if(l instanceof L.Marker && l !== searchMarker) mapObj.removeLayer(l); }); (data||[]).forEach(p => L.marker([p.lat, p.lng]).addTo(mapObj).bindPopup(`<b>${p.title}</b><br>@${p.owner}`)); document.getElementById('pinList').innerHTML = (data||[]).map(p => `<div class="list-item"><div onclick="zoomTo(${p.lat},${p.lng})" style="flex:1"><b>${p.title}</b><br><small>@${p.owner}</small></div>${p.owner===me?`<button class="btn danger small" onclick="del('pins',${p.id})">x</button>`:''}</div>`).join(''); }
 function zoomTo(lat, lng){ mapObj.setView([lat,lng], 18); window.scrollTo({top:0,behavior:'smooth'}); }
 function toggleMapArm(){ mapArmed=!mapArmed; document.getElementById('armMapBtn').style.background=mapArmed?'#22c55e':''; }
 </script>
