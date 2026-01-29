@@ -545,14 +545,41 @@ async function toggleLike(pid) {
         await client.from('likes').insert({ post_id: pid, user_id: me });
         const { data: post } = await client.from('posts').select('author').eq('id', pid).single();
         if (post && post.author !== me) {
-            await client.from('notifications').insert({ user_id: post.author, from_user: me, type: 'like', message: 'liked your post', is_read: false });
+            await client.from('notifications').insert({ user_id: post.author, from_user: me, type: 'like', message: 'liked your post', is_read: false, link_id: pid  });
         }
     }
     loadFeed();
 }
 
 async function toggleComments(pid) { const div = document.getElementById(`comments-${pid}`); if(div.style.display === 'block') { div.style.display = 'none'; return; } div.style.display = 'block'; const { data } = await client.from('comments').select().eq('post_id', pid).order('created_at'); document.getElementById(`clist-${pid}`).innerHTML = (data||[]).map(c => `<div class="comment-item"><b>${c.author}</b>: ${c.text}</div>`).join(''); }
-async function addComment(pid) { const txt = document.getElementById(`cinput-${pid}`).value; if(!txt) return; await client.from('comments').insert({ post_id: pid, author: me, text: txt }); document.getElementById(`cinput-${pid}`).value = ''; toggleComments(pid); }
+async function addComment(pid) {
+    const txt = document.getElementById(`cinput-${pid}`).value;
+    if (!txt) return;
+
+    // 1. Add the comment
+    await client.from('comments').insert({ post_id: pid, author: me, text: txt });
+    
+    // 2. Clear input & refresh comments
+    document.getElementById(`cinput-${pid}`).value = '';
+    toggleComments(pid);
+
+    // --- NOTIFICATION LOGIC START ---
+    // A. Find who owns the post
+    const { data: post } = await client.from('posts').select('author').eq('id', pid).single();
+    
+    // B. Send notification (if I'm not commenting on my own post)
+    if (post && post.author !== me) {
+        await client.from('notifications').insert({
+            user_id: post.author,    // Who gets the alert
+            from_user: me,           // Who sent it
+            type: 'comment',
+            message: `commented: "${txt}"`, // Shows what they wrote
+            is_read: false,
+            link_id: pid             // <--- The Post ID (for clicking)
+        });
+    }
+    // --- NOTIFICATION LOGIC END ---
+}
 
 async function transfer() {
     const to = s('payTo'), amt = parseInt(s('payAmt')), note = s('payNote');
@@ -590,22 +617,60 @@ async function searchAddress() { const q = s('mapSearch'); if(!q) return; const 
 async function loadPins() { const { data } = await client.from('pins').select(); mapObj.eachLayer(l => { if(l instanceof L.Marker && l !== searchMarker) mapObj.removeLayer(l); }); (data||[]).forEach(p => L.marker([p.lat, p.lng]).addTo(mapObj).bindPopup(`<b>${p.title}</b><br>@${p.owner}`)); document.getElementById('pinList').innerHTML = (data||[]).map(p => `<div class="list-item"><div onclick="zoomTo(${p.lat},${p.lng})" style="flex:1"><b>${p.title}</b><br><small>@${p.owner}</small></div>${p.owner===me?`<button class="btn danger small" onclick="del('pins',${p.id})">x</button>`:''}</div>`).join(''); }
 function zoomTo(lat, lng){ mapObj.setView([lat,lng], 18); window.scrollTo({top:0,behavior:'smooth'}); }
 function toggleMapArm(){ mapArmed=!mapArmed; document.getElementById('armMapBtn').style.background=mapArmed?'#22c55e':''; }
+async function openNotif(type, fromUser, linkId) {
+    // 1. Mark everything as read (optional, or just mark this one)
+    // For simplicity, we just navigate.
+    
+    if (type === 'like' || type === 'comment') {
+        // Go to Feed
+        nav('feed');
+        // Wait for feed to load, then scroll to post
+        setTimeout(() => {
+            const el = document.getElementById(`post-${linkId}`);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.style.border = "2px solid var(--primary)"; // Highlight it
+                setTimeout(() => el.style.border = "1px solid var(--border)", 2000); // Remove highlight
+            } else {
+                alert("Post might have been deleted.");
+            }
+        }, 500);
+    } 
+    else if (type === 'money') {
+        // Go to Wallet history
+        nav('wallet');
+        setTimeout(() => {
+             document.getElementById('txList').scrollIntoView({ behavior: 'smooth' });
+        }, 300);
+    }
+    else {
+        // Default: Go to user profile
+        openProfile(fromUser);
+    }
+}
 
 
 async function loadNotifs() {
     const { data } = await client.from('notifications').select().eq('user_id', me).order('created_at', {ascending:false}).limit(50);
     if (!data) return;
+    
     const unread = data.filter(n => !n.is_read).length;
     const badge = document.getElementById('notifBadge');
     if (unread > 0) { badge.style.display = 'inline-block'; badge.innerText = unread; } 
     else { badge.style.display = 'none'; }
+    
     document.getElementById('notifList').innerHTML = data.map(n => `
-        <div class="card" style="border-left: 4px solid ${n.is_read ? 'transparent' : 'var(--primary)'}; opacity: ${n.is_read ? 0.6 : 1}; display:flex; gap:10px; align-items:center;">
+        <div class="card" 
+             onclick="openNotif('${n.type}', '${n.from_user}', ${n.link_id || 'null'})"
+             style="border-left: 4px solid ${n.is_read ? 'transparent' : 'var(--primary)'}; opacity: ${n.is_read ? 0.6 : 1}; display:flex; gap:10px; align-items:center; cursor:pointer; transition:0.2s;">
             <div style="font-size:20px;">${getIcon(n.type)}</div>
-            <div><div style="font-size:14px;"><b>@${n.from_user}</b> ${n.message}</div>
-            <div style="font-size:11px; color:var(--muted);">${new Date(n.created_at).toLocaleString()}</div></div>
+            <div>
+                <div style="font-size:14px;"><b>@${n.from_user}</b> ${n.message}</div>
+                <div style="font-size:11px; color:var(--muted);">${new Date(n.created_at).toLocaleString()}</div>
+            </div>
         </div>`).join('');
 }
+
 function getIcon(t) { return t==='like'?'❤️':t==='money'?'💸':t==='comment'?'💬':'📢'; }
 async function markAllRead() { await client.from('notifications').update({ is_read: true }).eq('user_id', me); loadNotifs(); }
 
