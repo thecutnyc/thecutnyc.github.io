@@ -33,7 +33,6 @@
       overflow: hidden; overscroll-behavior: none;
     }
 
-    /* APP LAYOUT */
     #app { display: flex; width: 100%; height: 100%; overflow: hidden; }
     .sidebar { width: 250px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
     .nav-item { padding: 12px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500; margin-bottom: 4px; transition: 0.2s; }
@@ -45,7 +44,6 @@
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* COMPONENTS */
     .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
     .btn { background: var(--text); color: var(--bg-card); border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
     .btn.danger { background: var(--red); color: white; }
@@ -57,7 +55,7 @@
       background: var(--bg-body); border: 1px solid var(--border);
       color: var(--text); border-radius: 8px; margin-bottom: 10px;
       font-family: inherit; font-size: 16px;
-      resize: none;
+      resize: none; 
     }
     
     .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer; }
@@ -117,6 +115,13 @@
       <div class="sidebar-brand" style="font-weight:800; font-size:20px; margin-bottom:30px;">The Cut NYC</div>
       <nav>
         <div class="nav-item active" onclick="nav('feed')">Feed</div>
+        
+        <!-- NEW NOTIFICATIONS TAB -->
+        <div class="nav-item" onclick="nav('notifs')" style="position:relative; display:flex; justify-content:space-between; align-items:center;">
+          <span>🔔 Notifications</span>
+          <span id="notifBadge" style="background:var(--red); color:white; font-size:10px; padding:2px 6px; border-radius:10px; display:none;">0</span>
+        </div>
+
         <div class="nav-item" onclick="nav('news')">News</div>
         <div class="nav-item" onclick="nav('profiles')">Profiles</div>
         <div class="nav-item" onclick="nav('law')">Law Book</div>
@@ -156,6 +161,15 @@
           </div>
         </div>
         <div id="feedList"></div>
+      </div>
+      
+      <!-- NOTIFICATIONS PAGE -->
+      <div id="notifs" class="page">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h1>Notifications</h1>
+            <button class="btn small" onclick="markAllRead()">Mark all read</button>
+        </div>
+        <div id="notifList"></div>
       </div>
 
       <!-- NEWS -->
@@ -226,7 +240,7 @@
         <div id="txList" class="card" style="padding:0"></div>
 
         <div class="card" style="margin-top:20px; border:1px solid var(--border);">
-          <h3>Money Printer (Add/Subtract money from your account)</h3>
+          <h3>Money Printer</h3>
           <div style="display:flex; gap:10px;">
             <input id="adminAmt" type="number" placeholder="Amt" style="flex:1">
             <button class="btn" onclick="modBalance(1)">+</button>
@@ -379,6 +393,8 @@ async function login() {
 }
 
 async function loadAll() {
+  
+  loadNotifs();
   await checkAdmin();
   loadBanner(); loadFeed(); loadNews(); loadProfiles(); loadJobs(); loadEvents(); loadMyProfile(); loadTx(); loadRules(); loadRequests();
 }
@@ -409,7 +425,6 @@ async function saveBanner() {
     await loadBanner(); alert('Banner Updated!');
 }
 
-// LAW - FIXED FOR PERCENTAGE
 async function addRule() {
     const isP = document.getElementById('ruleIsPercent').checked;
     await client.from('rules').insert({
@@ -521,10 +536,42 @@ async function loadFeed() {
   }).join('');
 }
 async function deletePost(id) { if(confirm('Delete post?')) await client.from('posts').delete().eq('id', id); loadFeed(); }
-async function toggleLike(pid) { const { data } = await client.from('likes').select().eq('post_id', pid).eq('user_id', me).single(); if(data) await client.from('likes').delete().eq('id', data.id); else await client.from('likes').insert({ post_id: pid, user_id: me }); loadFeed(); }
+
+async function toggleLike(pid) {
+    const { data: existingLike } = await client.from('likes').select().eq('post_id', pid).eq('user_id', me).single();
+    if (existingLike) {
+        await client.from('likes').delete().eq('id', existingLike.id);
+    } else {
+        await client.from('likes').insert({ post_id: pid, user_id: me });
+        const { data: post } = await client.from('posts').select('author').eq('id', pid).single();
+        if (post && post.author !== me) {
+            await client.from('notifications').insert({ user_id: post.author, from_user: me, type: 'like', message: 'liked your post', is_read: false });
+        }
+    }
+    loadFeed();
+}
+
 async function toggleComments(pid) { const div = document.getElementById(`comments-${pid}`); if(div.style.display === 'block') { div.style.display = 'none'; return; } div.style.display = 'block'; const { data } = await client.from('comments').select().eq('post_id', pid).order('created_at'); document.getElementById(`clist-${pid}`).innerHTML = (data||[]).map(c => `<div class="comment-item"><b>${c.author}</b>: ${c.text}</div>`).join(''); }
 async function addComment(pid) { const txt = document.getElementById(`cinput-${pid}`).value; if(!txt) return; await client.from('comments').insert({ post_id: pid, author: me, text: txt }); document.getElementById(`cinput-${pid}`).value = ''; toggleComments(pid); }
-async function transfer() { const to = s('payTo'), amt = parseInt(s('payAmt')), note = s('payNote'); const { data: my } = await client.from('profiles').select('balance').eq('username', me).single(); if(my.balance < amt) return alert('Poor'); const { data: dest } = await client.from('profiles').select('balance').eq('username', to).single(); if(!dest) return alert('No user'); await client.from('profiles').update({balance: my.balance-amt}).eq('username',me); await client.from('profiles').update({balance: dest.balance+amt}).eq('username',to); await client.from('transactions').insert({from_user:me, to_user:to, amount:amt, note: note}); alert('Sent'); loadMyProfile(); loadTx(); }
+
+async function transfer() {
+    const to = s('payTo'), amt = parseInt(s('payAmt')), note = s('payNote');
+    const { data: my } = await client.from('profiles').select('balance').eq('username', me).single();
+    if (my.balance < amt) return alert('Poor');
+    const { data: dest } = await client.from('profiles').select('balance').eq('username', to).single();
+    if (!dest) return alert('No user');
+    await client.from('profiles').update({ balance: my.balance - amt }).eq('username', me);
+    await client.from('profiles').update({ balance: dest.balance + amt }).eq('username', to);
+    await client.from('transactions').insert({ from_user: me, to_user: to, amount: amt, note: note });
+    
+    await client.from('notifications').insert({
+        user_id: to, from_user: me, type: 'money',
+        message: `sent you $${amt} ${note ? `("${note}")` : ''}`, is_read: false
+    });
+    
+    alert('Sent'); loadMyProfile(); loadTx();
+}
+
 async function loadTx() { const { data } = await client.from('transactions').select().or(`from_user.eq.${me},to_user.eq.${me}`).order('created_at',{ascending:false}); document.getElementById('txList').innerHTML = (data||[]).map(t => `<div class="tx-item"><div>${t.to_user===me?'From '+t.from_user:'To '+t.to_user}${t.note ? `<br><small style="color:var(--muted)">"${t.note}"</small>` : ''}</div><div class="${t.to_user===me?'tx-in':'tx-out'}">${t.to_user===me?'+':'-'}${t.amount}</div></div>`).join(''); }
 async function modBalance(m) { const amt = parseInt(s('adminAmt')), { data } = await client.from('profiles').select('balance').eq('username', me).single(); await client.from('profiles').update({balance: data.balance+(amt*m)}).eq('username',me); loadMyProfile(); }
 async function loadProfiles() { const { data } = await client.from('profiles').select(); document.getElementById('profileGrid').innerHTML = (data||[]).map(u => `<div class="profile-card" onclick="openProfile('${u.username}')"><img src="${u.avatar||'https://ui-avatars.com/api/?name='+u.username}"><div style="font-weight:bold; font-size:14px; margin-top:10px; overflow:hidden; text-overflow:ellipsis; width:100%;">@${u.username}</div><div style="font-size:11px; color:var(--muted)">${u.occupation||'Citizen'}</div></div>`).join(''); }
@@ -543,6 +590,25 @@ async function searchAddress() { const q = s('mapSearch'); if(!q) return; const 
 async function loadPins() { const { data } = await client.from('pins').select(); mapObj.eachLayer(l => { if(l instanceof L.Marker && l !== searchMarker) mapObj.removeLayer(l); }); (data||[]).forEach(p => L.marker([p.lat, p.lng]).addTo(mapObj).bindPopup(`<b>${p.title}</b><br>@${p.owner}`)); document.getElementById('pinList').innerHTML = (data||[]).map(p => `<div class="list-item"><div onclick="zoomTo(${p.lat},${p.lng})" style="flex:1"><b>${p.title}</b><br><small>@${p.owner}</small></div>${p.owner===me?`<button class="btn danger small" onclick="del('pins',${p.id})">x</button>`:''}</div>`).join(''); }
 function zoomTo(lat, lng){ mapObj.setView([lat,lng], 18); window.scrollTo({top:0,behavior:'smooth'}); }
 function toggleMapArm(){ mapArmed=!mapArmed; document.getElementById('armMapBtn').style.background=mapArmed?'#22c55e':''; }
+
+
+async function loadNotifs() {
+    const { data } = await client.from('notifications').select().eq('user_id', me).order('created_at', {ascending:false}).limit(50);
+    if (!data) return;
+    const unread = data.filter(n => !n.is_read).length;
+    const badge = document.getElementById('notifBadge');
+    if (unread > 0) { badge.style.display = 'inline-block'; badge.innerText = unread; } 
+    else { badge.style.display = 'none'; }
+    document.getElementById('notifList').innerHTML = data.map(n => `
+        <div class="card" style="border-left: 4px solid ${n.is_read ? 'transparent' : 'var(--primary)'}; opacity: ${n.is_read ? 0.6 : 1}; display:flex; gap:10px; align-items:center;">
+            <div style="font-size:20px;">${getIcon(n.type)}</div>
+            <div><div style="font-size:14px;"><b>@${n.from_user}</b> ${n.message}</div>
+            <div style="font-size:11px; color:var(--muted);">${new Date(n.created_at).toLocaleString()}</div></div>
+        </div>`).join('');
+}
+function getIcon(t) { return t==='like'?'❤️':t==='money'?'💸':t==='comment'?'💬':'📢'; }
+async function markAllRead() { await client.from('notifications').update({ is_read: true }).eq('user_id', me); loadNotifs(); }
+
 </script>
 </body>
 </html>
