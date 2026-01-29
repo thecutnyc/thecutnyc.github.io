@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Cut NYC (Justice v5.1)</title>
+  <title>The Cut NYC</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -143,16 +143,16 @@
       <div class="sidebar-brand" style="font-weight:800; font-size:20px; margin-bottom:30px;">The Cut NYC</div>
       <nav>
         <div class="nav-item active" onclick="nav('feed')">Feed</div>
-        <div class="nav-item" onclick="nav('profiles')">Citizens</div>
+        <div class="nav-item" onclick="nav('profiles')">Profiles</div>
         <div class="nav-item" onclick="nav('law')">Law Book</div>
         <div class="nav-item" onclick="nav('jobs')">Jobs</div>
         <div class="nav-item" onclick="nav('events')">Events</div>
         <div class="nav-item" onclick="nav('wallet')">Wallet</div>
         <div class="nav-item" onclick="nav('map')">Map</div>
-        <div class="nav-item" onclick="nav('account')">Me</div>
+        <div class="nav-item" onclick="nav('account')">Account</div>
       </nav>
       <div class="sidebar-footer" style="margin-top:auto;">
-        <button class="btn" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--text);" onclick="toggleTheme()">Theme</button>
+        <button class="btn" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--text);" onclick="toggleTheme()">Light/Dark Mode</button>
         <button class="btn danger" style="width:100%; margin-top:10px;" onclick="logout()">Logout</button>
       </div>
     </aside>
@@ -230,6 +230,16 @@
         </div>
         <h3 style="margin-top:20px">History</h3>
         <div id="txList" class="card" style="padding:0"></div>
+
+        <!-- RESTORED: Admin Panel -->
+        <div class="card" style="margin-top:20px">
+          <h3>Admin</h3>
+          <div style="display:flex; gap:10px;">
+            <input id="adminAmt" type="number" placeholder="Amt" style="flex:1">
+            <button class="btn" onclick="modBalance(1)">+</button>
+            <button class="btn danger" onclick="modBalance(-1)">-</button>
+          </div>
+        </div>
       </div>
 
       <!-- JOBS/EVENTS (Standard) -->
