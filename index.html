@@ -143,16 +143,16 @@
       <div class="sidebar-brand" style="font-weight:800; font-size:20px; margin-bottom:30px;">The Cut NYC</div>
       <nav>
         <div class="nav-item active" onclick="nav('feed')">Feed</div>
-        <div class="nav-item" onclick="nav('profiles')">Profiles</div>
+        <div class="nav-item" onclick="nav('profiles')">Citizens</div>
         <div class="nav-item" onclick="nav('law')">Law Book</div>
         <div class="nav-item" onclick="nav('jobs')">Jobs</div>
         <div class="nav-item" onclick="nav('events')">Events</div>
         <div class="nav-item" onclick="nav('wallet')">Wallet</div>
         <div class="nav-item" onclick="nav('map')">Map</div>
-        <div class="nav-item" onclick="nav('account')">Account</div>
+        <div class="nav-item" onclick="nav('account')">Me</div>
       </nav>
       <div class="sidebar-footer" style="margin-top:auto;">
-        <button class="btn" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--text);" onclick="toggleTheme()">Light/Dark Mode</button>
+        <button class="btn" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--text);" onclick="toggleTheme()">Theme</button>
         <button class="btn danger" style="width:100%; margin-top:10px;" onclick="logout()">Logout</button>
       </div>
     </aside>
@@ -231,7 +231,7 @@
         <h3 style="margin-top:20px">History</h3>
         <div id="txList" class="card" style="padding:0"></div>
 
-        <!-- RESTORED: Admin Panel -->
+        <!-- ADMIN PANEL -->
         <div class="card" style="margin-top:20px">
           <h3>Admin</h3>
           <div style="display:flex; gap:10px;">
@@ -242,7 +242,7 @@
         </div>
       </div>
 
-      <!-- JOBS/EVENTS (Standard) -->
+      <!-- JOBS/EVENTS -->
       <div id="jobs" class="page">
         <h1>Job Board</h1>
         <div class="card">
@@ -383,7 +383,7 @@ async function loadAll() {
   loadFeed(); loadProfiles(); loadJobs(); loadEvents(); loadMyProfile(); loadTx(); loadRules(); loadRequests();
 }
 
-// --- LAW & REQUESTS ---
+// --- LAW & REQUESTS (FIXED LOGIC) ---
 async function addRule() {
     await client.from('rules').insert({
         title: s('ruleTitle'),
@@ -423,7 +423,7 @@ async function issueRequest(reason, amount, type) {
     await client.from('requests').insert({
         to_user: target,
         amount: amount,
-        type: type,
+        type: type, // Stores 'crime' or 'reward'
         reason: reason,
         status: 'pending'
     });
@@ -432,12 +432,13 @@ async function issueRequest(reason, amount, type) {
 
 async function loadRequests() {
     const { data } = await client.from('requests').select().eq('to_user', me).eq('status', 'pending');
+    // FIX: Check for 'crime' instead of 'fine'
     document.getElementById('requestList').innerHTML = (data||[]).length ? (data||[]).map(r => `
-        <div class="req-item" style="border-left: 5px solid ${r.type==='fine'?'var(--red)':'var(--green)'}">
+        <div class="req-item" style="border-left: 5px solid ${r.type==='crime'?'var(--red)':'var(--green)'}">
             <div style="font-weight:bold; margin-bottom:5px;">${r.type.toUpperCase()}: ${r.reason}</div>
             <div style="font-size:20px; font-weight:800; margin-bottom:10px;">$${r.amount}</div>
-            <button class="btn ${r.type==='fine'?'danger':'success'}" style="width:100%" onclick="processRequest(${r.id}, ${r.amount}, '${r.type}')">
-                ${r.type==='fine' ? 'Pay Fine' : 'Claim Reward'}
+            <button class="btn ${r.type==='crime'?'danger':'success'}" style="width:100%" onclick="processRequest(${r.id}, ${r.amount}, '${r.type}')">
+                ${r.type==='crime' ? 'Pay Fine' : 'Claim Reward'}
             </button>
         </div>
     `).join('') : '<div style="color:var(--muted); padding:10px;">No pending requests.</div>';
@@ -445,7 +446,8 @@ async function loadRequests() {
 
 async function processRequest(id, amount, type) {
     const { data: user } = await client.from('profiles').select('balance').eq('username', me).single();
-    if(type === 'fine') {
+    // FIX: Check for 'crime' to subtract money
+    if(type === 'crime') {
         if(user.balance < amount) return alert("Not enough money to pay fine!");
         await client.from('profiles').update({ balance: user.balance - amount }).eq('username', me);
     } else {
@@ -453,7 +455,7 @@ async function processRequest(id, amount, type) {
     }
     
     await client.from('requests').update({ status: 'completed' }).eq('id', id);
-    alert(type === 'fine' ? 'Fine Paid.' : 'Reward Claimed!');
+    alert(type === 'crime' ? 'Fine Paid.' : 'Reward Claimed!');
     loadMyProfile(); loadRequests();
 }
 
