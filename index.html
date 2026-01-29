@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Cut NYC (Open Money v5.6)</title>
+  <title>The Cut NYC (Banner Fixed v5.7)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -15,12 +15,16 @@
       --bg-body: #f3f4f6; --bg-sidebar: #ffffff; --bg-card: #ffffff;
       --text: #111827; --muted: #6b7280; --border: #e5e7eb; --primary: #2563eb;
       --hover: #f9fafb; --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-      --green: #22c55e; --red: #ef4444; --yellow: #eab308; --yellow-bg: #fefce8;
+      --green: #22c55e; --red: #ef4444; 
+      /* LIGHT MODE BANNER: Yellow Background, Dark Text */
+      --banner-bg: #fefce8; --banner-border: #eab308; --banner-text: #854d0e;
     }
     [data-theme="dark"] {
       --bg-body: #000000; --bg-sidebar: #121212; --bg-card: #18181b;
       --text: #f4f4f5; --muted: #a1a1aa; --border: #27272a; --primary: #3b82f6;
-      --hover: #27272a; --shadow: none; --yellow: #facc15; --yellow-bg: #422006;
+      --hover: #27272a; --shadow: none;
+      /* DARK MODE BANNER: Dark Brown Background, Yellow Text */
+      --banner-bg: #422006; --banner-border: #a16207; --banner-text: #fef08a;
     }
     * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
     
@@ -70,12 +74,20 @@
       font-family: inherit; font-size: 16px;
     }
 
-    /* ALERT BANNER */
+    /* ALERT BANNER (FIXED VISIBILITY) */
     #alertBanner {
-        background: var(--yellow-bg); border: 1px solid var(--yellow); color: var(--text);
-        padding: 10px 15px; border-radius: 8px; margin-bottom: 20px;
-        display: none; font-size: 14px; font-weight: 500;
-        align-items: center; gap: 10px;
+        background: var(--banner-bg); 
+        border: 1px solid var(--banner-border); 
+        color: var(--banner-text);
+        padding: 15px; 
+        border-radius: 8px; 
+        margin-bottom: 30px; /* More space below */
+        display: none; /* JS will turn this to Flex */
+        font-size: 15px; 
+        font-weight: 600;
+        align-items: center; 
+        gap: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     /* NEWS ARTICLE STYLE */
@@ -105,7 +117,7 @@
     .list-item, .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border); }
     .tx-in { color: var(--green); } .tx-out { color: var(--red); }
     .hidden { display: none !important; }
-    .admin-only { display: none !important; } /* Hidden by default */
+    .admin-only { display: none !important; }
     
     /* SOCIAL & LAW */
     .actions { display: flex; gap: 15px; margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border); }
@@ -182,9 +194,9 @@
         </div>
       </div>
 
-      <!-- ADMIN ALERT BANNER -->
+      <!-- ADMIN ALERT BANNER (High Visibility) -->
       <div id="alertBanner">
-        <span>📢</span> <span id="bannerText">Loading updates...</span>
+        <span style="font-size:20px;">📢</span> <span id="bannerText">System Online. Welcome to The Cut NYC.</span>
       </div>
       
       <!-- FEED -->
@@ -348,8 +360,8 @@
         </div>
         
         <!-- PROTECTED ADMIN BANNER EDIT -->
-        <div class="card admin-only" style="margin-top:20px; border:1px solid var(--yellow);">
-            <h3>📢 Broadcast Alert</h3>
+        <div class="card admin-only" style="margin-top:20px; border:1px solid var(--banner-border);">
+            <h3 style="color:var(--banner-border)">📢 Broadcast Alert</h3>
             <input id="editBannerText" placeholder="System Message...">
             <button class="btn" onclick="saveBanner()">Update Banner</button>
         </div>
@@ -441,12 +453,16 @@ async function checkAdmin() {
 async function loadBanner() {
     const { data } = await client.from('app_config').select().eq('key', 'banner_msg').single();
     const banner = document.getElementById('alertBanner');
+    
+    // Always show banner container so it doesn't look broken
+    banner.style.display = 'flex';
+    
     if(data && data.value) {
-        banner.style.display = 'flex';
         document.getElementById('bannerText').innerText = data.value;
         document.getElementById('editBannerText').value = data.value;
     } else {
-        banner.style.display = 'none';
+        // Fallback text so you see something
+        document.getElementById('bannerText').innerText = "System Online. Welcome to The Cut NYC.";
     }
 }
 
