@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Cut NYC</title>
+  <title>The Cut NYC (Justice v5.0)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,13 +13,13 @@
   <style>
     :root {
       --bg-body: #f3f4f6; --bg-sidebar: #ffffff; --bg-card: #ffffff;
-      --text: #111827; --muted: #6b7280; --border: #e5e7eb; --primary: #F6543B;
+      --text: #111827; --muted: #6b7280; --border: #e5e7eb; --primary: #2563eb;
       --hover: #f9fafb; --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
       --green: #22c55e; --red: #ef4444;
     }
     [data-theme="dark"] {
       --bg-body: #000000; --bg-sidebar: #121212; --bg-card: #18181b;
-      --text: #f4f4f5; --muted: #a1a1aa; --border: #27272a; --primary: #F6543B;
+      --text: #f4f4f5; --muted: #a1a1aa; --border: #27272a; --primary: #3b82f6;
       --hover: #27272a; --shadow: none;
     }
     * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -60,6 +60,7 @@
     .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
     .btn { background: var(--text); color: var(--bg-card); border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
     .btn.danger { background: var(--red); color: white; }
+    .btn.success { background: var(--green); color: white; }
     .btn.small { padding: 6px 10px; font-size: 12px; }
     
     input, textarea, select {
@@ -69,19 +70,17 @@
       font-family: inherit; font-size: 16px;
     }
 
-    /* --- FIXED PROFILE GRID --- */
+    /* GRID & MAP */
     .profile-grid { 
         display: grid; 
         grid-template-columns: repeat(2, 1fr); 
         gap: 15px; 
-        grid-auto-rows: 160px; /* Force every row to be exactly 160px tall */
+        grid-auto-rows: 160px;
     }
     .profile-card {
         background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; 
-        cursor: pointer; text-align: center;
-        height: 100%; /* Fill the fixed row height */
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        overflow: hidden;
+        cursor: pointer; text-align: center; height: 100%;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
     }
     .profile-card img {
         width: 60px; height: 60px; border-radius: 50%; 
@@ -93,12 +92,15 @@
     .tx-in { color: var(--green); } .tx-out { color: var(--red); }
     .hidden { display: none !important; }
     
-    /* SOCIAL ACTIONS */
+    /* SOCIAL & LAW */
     .actions { display: flex; gap: 15px; margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border); }
     .act-btn { cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 5px; color: var(--muted); }
     .act-btn.liked { color: var(--red); }
     .comments-sec { margin-top: 15px; background: var(--hover); padding: 10px; border-radius: 8px; display: none; }
     .comment-item { font-size: 13px; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+    
+    .law-row { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--border); align-items: center; }
+    .req-item { background: var(--hover); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 10px; }
 
     #mobileHeader { display: none; }
 
@@ -141,15 +143,16 @@
       <div class="sidebar-brand" style="font-weight:800; font-size:20px; margin-bottom:30px;">The Cut NYC</div>
       <nav>
         <div class="nav-item active" onclick="nav('feed')">Feed</div>
-        <div class="nav-item" onclick="nav('profiles')">Profiles</div>
+        <div class="nav-item" onclick="nav('profiles')">Citizens</div>
+        <div class="nav-item" onclick="nav('law')">Law Book</div>
         <div class="nav-item" onclick="nav('jobs')">Jobs</div>
         <div class="nav-item" onclick="nav('events')">Events</div>
         <div class="nav-item" onclick="nav('wallet')">Wallet</div>
         <div class="nav-item" onclick="nav('map')">Map</div>
-        <div class="nav-item" onclick="nav('account')">My account</div>
+        <div class="nav-item" onclick="nav('account')">Me</div>
       </nav>
       <div class="sidebar-footer" style="margin-top:auto;">
-        <button class="btn" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--text);" onclick="toggleTheme()">Light/Dark Mode</button>
+        <button class="btn" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--text);" onclick="toggleTheme()">Theme</button>
         <button class="btn danger" style="width:100%; margin-top:10px;" onclick="logout()">Logout</button>
       </div>
     </aside>
@@ -178,11 +181,57 @@
 
       <!-- PROFILES -->
       <div id="profiles" class="page">
-        <h1>Profiles</h1>
+        <h1>Citizens</h1>
         <div id="profileGrid" class="profile-grid"></div>
       </div>
 
-      <!-- JOBS -->
+      <!-- LAW BOOK -->
+      <div id="law" class="page">
+        <h1>Law Book</h1>
+        <div class="card">
+            <h2>Add New Rule</h2>
+            <input id="ruleTitle" placeholder="Title (e.g. Speeding, Cleaning)">
+            <select id="ruleType">
+                <option value="crime">Crime (Fine)</option>
+                <option value="reward">Reward (Payment)</option>
+            </select>
+            <div style="display:flex; gap:10px;">
+                <input id="ruleAmt" type="number" placeholder="Amount ($)" style="flex:1">
+                <button class="btn" onclick="addRule()">Add Rule</button>
+            </div>
+        </div>
+        
+        <h2>Crimes & Fines</h2>
+        <div id="crimeList" class="card" style="padding:0"></div>
+        
+        <h2>Rewards & Bounties</h2>
+        <div id="rewardList" class="card" style="padding:0"></div>
+      </div>
+
+      <!-- WALLET -->
+      <div id="wallet" class="page">
+        <h1>Wallet</h1>
+        <div class="card" style="text-align:center; padding:30px;">
+          <div style="font-size:13px; color:var(--muted)">BALANCE</div>
+          <div style="font-size:42px; font-weight:800; color:var(--primary);">$<span id="myBal">0</span></div>
+        </div>
+        
+        <!-- NEW: Payment Requests -->
+        <h3 style="color:var(--red);">Pending Requests</h3>
+        <div id="requestList"></div>
+
+        <div class="card" style="margin-top:20px;">
+          <h2>Send Money</h2>
+          <input id="payTo" placeholder="Username">
+          <input id="payAmt" type="number" placeholder="Amount">
+          <input id="payNote" placeholder="Note (Optional)">
+          <button class="btn" style="width:100%" onclick="transfer()">Send</button>
+        </div>
+        <h3 style="margin-top:20px">History</h3>
+        <div id="txList" class="card" style="padding:0"></div>
+      </div>
+
+      <!-- JOBS/EVENTS (Standard) -->
       <div id="jobs" class="page">
         <h1>Job Board</h1>
         <div class="card">
@@ -197,7 +246,6 @@
         <div id="jobList"></div>
       </div>
 
-      <!-- EVENTS -->
       <div id="events" class="page">
         <h1>Events</h1>
         <div class="card">
@@ -208,33 +256,6 @@
           <button class="btn" style="width:100%" onclick="addEvent()">Create Event</button>
         </div>
         <div id="eventList"></div>
-      </div>
-
-      <!-- WALLET -->
-      <div id="wallet" class="page">
-        <h1>Wallet</h1>
-        <div class="card" style="text-align:center; padding:30px;">
-          <div style="font-size:13px; color:var(--muted)">BALANCE</div>
-          <div style="font-size:42px; font-weight:800; color:var(--primary);">$<span id="myBal">0</span></div>
-        </div>
-        <div class="card">
-          <h2>Send Money</h2>
-          <input id="payTo" placeholder="Username">
-          <input id="payAmt" type="number" placeholder="Amount">
-          <input id="payNote" placeholder="Note (Optional)">
-          <button class="btn" style="width:100%" onclick="transfer()">Send</button>
-        </div>
-        <h3 style="margin-top:20px">History</h3>
-        <div id="txList" class="card" style="padding:0"></div>
-        
-        <div class="card" style="margin-top:20px">
-          <h3>Admin</h3>
-          <div style="display:flex; gap:10px;">
-            <input id="adminAmt" type="number" placeholder="Amount" style="flex:1">
-            <button class="btn" onclick="modBalance(1)">+</button>
-            <button class="btn danger" onclick="modBalance(-1)">-</button>
-          </div>
-        </div>
       </div>
 
       <!-- MAP -->
@@ -293,7 +314,7 @@
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:20px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:15px 0; text-align:center;">
             <div><strong>Age</strong><br><span id="pvAge">-</span></div>
-            <div><strong>Occupation</strong><br><span id="pvOcc">-</span></div>
+            <div><strong>Occ</strong><br><span id="pvOcc">-</span></div>
             <div><strong>Status</strong><br><span id="pvStat">-</span></div>
           </div>
           <p id="pvBio" style="white-space:pre-wrap; color:var(--muted); font-size:14px;"></p>
@@ -348,7 +369,79 @@ async function login() {
 }
 
 async function loadAll() {
-  loadFeed(); loadProfiles(); loadJobs(); loadEvents(); loadMyProfile(); loadTx();
+  loadFeed(); loadProfiles(); loadJobs(); loadEvents(); loadMyProfile(); loadTx(); loadRules(); loadRequests();
+}
+
+// --- LAW & REQUESTS ---
+async function addRule() {
+    await client.from('rules').insert({
+        title: s('ruleTitle'),
+        type: s('ruleType'),
+        amount: parseInt(s('ruleAmt')),
+        created_by: me
+    });
+    document.getElementById('ruleTitle').value = '';
+    loadRules();
+}
+
+async function loadRules() {
+    const { data } = await client.from('rules').select();
+    const crimes = data.filter(r => r.type === 'crime');
+    const rewards = data.filter(r => r.type === 'reward');
+
+    document.getElementById('crimeList').innerHTML = crimes.map(r => `
+        <div class="law-row">
+            <div><b>${r.title}</b><br><small>$${r.amount} Fine</small></div>
+            <button class="btn danger small" onclick="issueRequest('${r.title}', ${r.amount}, 'fine')">Issue</button>
+        </div>
+    `).join('');
+
+    document.getElementById('rewardList').innerHTML = rewards.map(r => `
+        <div class="law-row">
+            <div><b>${r.title}</b><br><small>$${r.amount} Reward</small></div>
+            <button class="btn success small" onclick="issueRequest('${r.title}', ${r.amount}, 'reward')">Issue</button>
+        </div>
+    `).join('');
+}
+
+async function issueRequest(reason, amount, type) {
+    const target = prompt(`Who is this ${type} for? (Enter username)`);
+    if(!target) return;
+    await client.from('requests').insert({
+        to_user: target,
+        amount: amount,
+        type: type,
+        reason: reason,
+        status: 'pending'
+    });
+    alert(`${type} sent to ${target}`);
+}
+
+async function loadRequests() {
+    const { data } = await client.from('requests').select().eq('to_user', me).eq('status', 'pending');
+    document.getElementById('requestList').innerHTML = (data||[]).length ? (data||[]).map(r => `
+        <div class="req-item" style="border-left: 5px solid ${r.type==='fine'?'var(--red)':'var(--green)'}">
+            <div style="font-weight:bold; margin-bottom:5px;">${r.type.toUpperCase()}: ${r.reason}</div>
+            <div style="font-size:20px; font-weight:800; margin-bottom:10px;">$${r.amount}</div>
+            <button class="btn ${r.type==='fine'?'danger':'success'}" style="width:100%" onclick="processRequest(${r.id}, ${r.amount}, '${r.type}')">
+                ${r.type==='fine' ? 'Pay Fine' : 'Claim Reward'}
+            </button>
+        </div>
+    `).join('') : '<div style="color:var(--muted); padding:10px;">No pending requests.</div>';
+}
+
+async function processRequest(id, amount, type) {
+    const { data: user } = await client.from('profiles').select('balance').eq('username', me).single();
+    if(type === 'fine') {
+        if(user.balance < amount) return alert("Not enough money to pay fine!");
+        await client.from('profiles').update({ balance: user.balance - amount }).eq('username', me);
+    } else {
+        await client.from('profiles').update({ balance: user.balance + amount }).eq('username', me);
+    }
+    
+    await client.from('requests').update({ status: 'completed' }).eq('id', id);
+    alert(type === 'fine' ? 'Fine Paid.' : 'Reward Claimed!');
+    loadMyProfile(); loadRequests();
 }
 
 // FEED
@@ -373,12 +466,10 @@ async function addPost() {
 
 async function loadFeed() {
   const { data: posts } = await client.from('posts').select(`*, likes(user_id), comments(id)`).order('created_at', {ascending:false}).limit(20);
-  
   document.getElementById('feedList').innerHTML = (posts||[]).map(p => {
     const isLiked = p.likes && p.likes.some(l => l.user_id === me);
     const likeCount = p.likes ? p.likes.length : 0;
     const commentCount = p.comments ? p.comments.length : 0;
-    
     return `
     <div class="card" id="post-${p.id}">
       <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted)">
@@ -390,16 +481,10 @@ async function loadFeed() {
       </div>
       <div style="margin-top:5px;">${p.text||''}</div>
       ${p.img_url ? `<img src="${p.img_url}" style="max-width:100%; margin-top:10px; border-radius:8px;">` : ''}
-      
       <div class="actions">
-        <div class="act-btn ${isLiked?'liked':''}" onclick="toggleLike(${p.id})">
-          ${isLiked ? '❤️' : '♡'} ${likeCount}
-        </div>
-        <div class="act-btn" onclick="toggleComments(${p.id})">
-          💬 ${commentCount}
-        </div>
+        <div class="act-btn ${isLiked?'liked':''}" onclick="toggleLike(${p.id})">${isLiked ? '❤️' : '♡'} ${likeCount}</div>
+        <div class="act-btn" onclick="toggleComments(${p.id})">💬 ${commentCount}</div>
       </div>
-      
       <div id="comments-${p.id}" class="comments-sec">
         <div id="clist-${p.id}"></div>
         <div style="display:flex; gap:5px; margin-top:10px;">
@@ -410,37 +495,25 @@ async function loadFeed() {
     </div>`;
   }).join('');
 }
-
-async function deletePost(id) {
-    if(!confirm('Delete post?')) return;
-    await client.from('posts').delete().eq('id', id);
-    loadFeed();
-}
-
+async function deletePost(id) { if(confirm('Delete post?')) await client.from('posts').delete().eq('id', id); loadFeed(); }
 async function toggleLike(pid) {
     const { data } = await client.from('likes').select().eq('post_id', pid).eq('user_id', me).single();
-    if(data) { await client.from('likes').delete().eq('id', data.id); }
-    else { await client.from('likes').insert({ post_id: pid, user_id: me }); }
+    if(data) await client.from('likes').delete().eq('id', data.id);
+    else await client.from('likes').insert({ post_id: pid, user_id: me });
     loadFeed();
 }
-
 async function toggleComments(pid) {
     const div = document.getElementById(`comments-${pid}`);
     if(div.style.display === 'block') { div.style.display = 'none'; return; }
     div.style.display = 'block';
-    
     const { data } = await client.from('comments').select().eq('post_id', pid).order('created_at');
-    document.getElementById(`clist-${pid}`).innerHTML = (data||[]).map(c => `
-        <div class="comment-item"><b>${c.author}</b>: ${c.text}</div>
-    `).join('');
+    document.getElementById(`clist-${pid}`).innerHTML = (data||[]).map(c => `<div class="comment-item"><b>${c.author}</b>: ${c.text}</div>`).join('');
 }
-
 async function addComment(pid) {
     const txt = document.getElementById(`cinput-${pid}`).value;
     if(!txt) return;
     await client.from('comments').insert({ post_id: pid, author: me, text: txt });
-    document.getElementById(`cinput-${pid}`).value = '';
-    toggleComments(pid);
+    document.getElementById(`cinput-${pid}`).value = ''; toggleComments(pid);
 }
 
 // WALLET
@@ -461,22 +534,17 @@ async function loadTx() {
     `<div class="tx-item"><div>${t.to_user===me?'From '+t.from_user:'To '+t.to_user}${t.note ? `<br><small style="color:var(--muted)">"${t.note}"</small>` : ''}</div><div class="${t.to_user===me?'tx-in':'tx-out'}">${t.to_user===me?'+':'-'}${t.amount}</div></div>`
   ).join('');
 }
-async function modBalance(m) {
-  const amt = parseInt(s('adminAmt')), { data } = await client.from('profiles').select('balance').eq('username', me).single();
-  await client.from('profiles').update({balance: data.balance+(amt*m)}).eq('username',me); loadMyProfile();
-}
 
-// PROFILES (FIXED)
+// PROFILES
 async function loadProfiles() {
   const { data } = await client.from('profiles').select();
   document.getElementById('profileGrid').innerHTML = (data||[]).map(u => `
     <div class="profile-card" onclick="openProfile('${u.username}')">
-      <img src="${u.avatar||'https://ui-avatars.com/api/?name='+u.username}" style="width:60px; height:60px; border-radius:50%; object-fit:cover;">
+      <img src="${u.avatar||'https://ui-avatars.com/api/?name='+u.username}">
       <div style="font-weight:bold; font-size:14px; margin-top:10px; overflow:hidden; text-overflow:ellipsis; width:100%;">@${u.username}</div>
       <div style="font-size:11px; color:var(--muted)">${u.occupation||'Citizen'}</div>
     </div>`).join('');
 }
-
 async function openProfile(u) {
   nav('profileView');
   const { data } = await client.from('profiles').select().eq('username', u).single();
@@ -529,20 +597,12 @@ async function saveProfile() {
 async function addJob() { await client.from('jobs').insert({ author: me, title: s('jobTitle'), description: s('jobDesc'), pay: s('jobPay') }); loadJobs(); }
 async function loadJobs() {
   const { data } = await client.from('jobs').select().order('created_at', {ascending:false});
-  document.getElementById('jobList').innerHTML = (data||[]).map(j => `
-    <div class="card">
-      <div style="display:flex; justify-content:space-between;"><b>${j.title}</b>${j.author===me?`<button class="btn danger small" onclick="del('jobs',${j.id})">x</button>`:''}</div>
-      <span style="color:green">(${j.pay})</span><p>${j.description}</p><small>@${j.author}</small>
-    </div>`).join('');
+  document.getElementById('jobList').innerHTML = (data||[]).map(j => `<div class="card"><div style="display:flex; justify-content:space-between;"><b>${j.title}</b>${j.author===me?`<button class="btn danger small" onclick="del('jobs',${j.id})">x</button>`:''}</div><span style="color:green">(${j.pay})</span><p>${j.description}</p><small>@${j.author}</small></div>`).join('');
 }
 async function addEvent() { await client.from('events').insert({ author: me, title: s('evtTitle'), location: s('evtLoc'), event_date: s('evtTime') }); loadEvents(); }
 async function loadEvents() {
   const { data } = await client.from('events').select().order('created_at', {ascending:false});
-  document.getElementById('eventList').innerHTML = (data||[]).map(e => `
-    <div class="card">
-      <div style="display:flex; justify-content:space-between;"><b>${e.title}</b>${e.author===me?`<button class="btn danger small" onclick="del('events',${e.id})">x</button>`:''}</div>
-      <br>📍 ${e.location}<br><small>${new Date(e.event_date).toLocaleString()}</small>
-    </div>`).join('');
+  document.getElementById('eventList').innerHTML = (data||[]).map(e => `<div class="card"><div style="display:flex; justify-content:space-between;"><b>${e.title}</b>${e.author===me?`<button class="btn danger small" onclick="del('events',${e.id})">x</button>`:''}</div><br>📍 ${e.location}<br><small>${new Date(e.event_date).toLocaleString()}</small></div>`).join('');
 }
 async function del(table, id) { if(confirm('Delete?')){ await client.from(table).delete().eq('id', id); table==='jobs'?loadJobs():loadEvents(); } }
 function s(id){ return document.getElementById(id).value; }
