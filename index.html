@@ -658,37 +658,7 @@ async function searchAddress() { const q = s('mapSearch'); if(!q) return; const 
 async function loadPins() { const { data } = await client.from('pins').select(); mapObj.eachLayer(l => { if(l instanceof L.Marker && l !== searchMarker) mapObj.removeLayer(l); }); (data||[]).forEach(p => L.marker([p.lat, p.lng]).addTo(mapObj).bindPopup(`<b>${p.title}</b><br>@${p.owner}`)); document.getElementById('pinList').innerHTML = (data||[]).map(p => `<div class="list-item"><div onclick="zoomTo(${p.lat},${p.lng})" style="flex:1"><b>${p.title}</b><br><small>@${p.owner}</small></div>${p.owner===me?`<button class="btn danger small" onclick="del('pins',${p.id})">x</button>`:''}</div>`).join(''); }
 function zoomTo(lat, lng){ mapObj.setView([lat,lng], 18); window.scrollTo({top:0,behavior:'smooth'}); }
 function toggleMapArm(){ mapArmed=!mapArmed; document.getElementById('armMapBtn').style.background=mapArmed?'#22c55e':''; }
-async function openNotif(type, fromUser, linkId) {
-    // 1. Mark everything as read (optional, or just mark this one)
-    // For simplicity, we just navigate.
-    
-    if (type === 'like' || type === 'comment') {
-        // Go to Feed
-        nav('feed');
-        // Wait for feed to load, then scroll to post
-        setTimeout(() => {
-            const el = document.getElementById(`post-${linkId}`);
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                el.style.border = "2px solid var(--primary)"; // Highlight it
-                setTimeout(() => el.style.border = "1px solid var(--border)", 2000); // Remove highlight
-            } else {
-                alert("Post might have been deleted.");
-            }
-        }, 500);
-    } 
-    else if (type === 'money') {
-        // Go to Wallet history
-        nav('wallet');
-        setTimeout(() => {
-             document.getElementById('txList').scrollIntoView({ behavior: 'smooth' });
-        }, 300);
-    }
-    else {
-        // Default: Go to user profile
-        openProfile(fromUser);
-    }
-}
+openNotif 
 
 
 async function loadNotifs() {
