@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Cut NYC (Percent Fines v5.9)</title>
+  <title>The Cut NYC</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,14 +13,14 @@
   <style>
     :root {
       --bg-body: #f3f4f6; --bg-sidebar: #ffffff; --bg-card: #ffffff;
-      --text: #111827; --muted: #6b7280; --border: #e5e7eb; --primary: #2563eb;
+      --text: #111827; --muted: #6b7280; --border: #e5e7eb; --primary: #F6543B;
       --hover: #f9fafb; --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
       --green: #22c55e; --red: #ef4444; 
       --banner-bg: #fefce8; --banner-border: #eab308; --banner-text: #854d0e;
     }
     [data-theme="dark"] {
       --bg-body: #000000; --bg-sidebar: #121212; --bg-card: #18181b;
-      --text: #f4f4f5; --muted: #a1a1aa; --border: #27272a; --primary: #3b82f6;
+      --text: #f4f4f5; --muted: #a1a1aa; --border: #27272a; --primary: #F6543B;
       --hover: #27272a; --shadow: none;
       --banner-bg: #422006; --banner-border: #a16207; --banner-text: #fef08a;
     }
@@ -117,16 +117,16 @@
       <nav>
         <div class="nav-item active" onclick="nav('feed')">Feed</div>
         <div class="nav-item" onclick="nav('news')">News</div>
-        <div class="nav-item" onclick="nav('profiles')">Citizens</div>
+        <div class="nav-item" onclick="nav('profiles')">Profiles</div>
         <div class="nav-item" onclick="nav('law')">Law Book</div>
         <div class="nav-item" onclick="nav('jobs')">Jobs</div>
         <div class="nav-item" onclick="nav('events')">Events</div>
         <div class="nav-item" onclick="nav('wallet')">Wallet</div>
         <div class="nav-item" onclick="nav('map')">Map</div>
-        <div class="nav-item" onclick="nav('account')">Me</div>
+        <div class="nav-item" onclick="nav('account')">My Account</div>
       </nav>
       <div class="sidebar-footer" style="margin-top:auto;">
-        <button class="btn" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--text);" onclick="toggleTheme()">Theme</button>
+        <button class="btn" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--text);" onclick="toggleTheme()">Light/Dark Theme</button>
         <button class="btn danger" style="width:100%; margin-top:10px;" onclick="logout()">Logout</button>
       </div>
     </aside>
@@ -225,7 +225,7 @@
         <div id="txList" class="card" style="padding:0"></div>
 
         <div class="card" style="margin-top:20px; border:1px solid var(--border);">
-          <h3>Money Printer</h3>
+          <h3>Money Printer (Add/Subtract money from your account)</h3>
           <div style="display:flex; gap:10px;">
             <input id="adminAmt" type="number" placeholder="Amt" style="flex:1">
             <button class="btn" onclick="modBalance(1)">+</button>
