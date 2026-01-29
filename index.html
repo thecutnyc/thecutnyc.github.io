@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Cut NYC</title>
+  <title>The Cut NYC (Open Money v5.6)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,14 +13,14 @@
   <style>
     :root {
       --bg-body: #f3f4f6; --bg-sidebar: #ffffff; --bg-card: #ffffff;
-      --text: #111827; --muted: #6b7280; --border: #e5e7eb; --primary: #F6543B;
+      --text: #111827; --muted: #6b7280; --border: #e5e7eb; --primary: #2563eb;
       --hover: #f9fafb; --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-      --green: #22c55e; --red: #ef4444;
+      --green: #22c55e; --red: #ef4444; --yellow: #eab308; --yellow-bg: #fefce8;
     }
     [data-theme="dark"] {
       --bg-body: #000000; --bg-sidebar: #121212; --bg-card: #18181b;
-      --text: #f4f4f5; --muted: #a1a1aa; --border: #27272a; --primary: #F6543B;
-      --hover: #27272a; --shadow: none;
+      --text: #f4f4f5; --muted: #a1a1aa; --border: #27272a; --primary: #3b82f6;
+      --hover: #27272a; --shadow: none; --yellow: #facc15; --yellow-bg: #422006;
     }
     * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
     
@@ -70,6 +70,20 @@
       font-family: inherit; font-size: 16px;
     }
 
+    /* ALERT BANNER */
+    #alertBanner {
+        background: var(--yellow-bg); border: 1px solid var(--yellow); color: var(--text);
+        padding: 10px 15px; border-radius: 8px; margin-bottom: 20px;
+        display: none; font-size: 14px; font-weight: 500;
+        align-items: center; gap: 10px;
+    }
+
+    /* NEWS ARTICLE STYLE */
+    .news-item { margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+    .news-headline { font-size: 24px; font-weight: 800; line-height: 1.2; margin-bottom: 8px; font-family: 'Georgia', serif; }
+    .news-meta { font-size: 13px; color: var(--muted); margin-bottom: 15px; }
+    .news-body { font-size: 16px; line-height: 1.6; white-space: pre-wrap; }
+
     /* GRID & MAP */
     .profile-grid { 
         display: grid; 
@@ -91,6 +105,7 @@
     .list-item, .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border); }
     .tx-in { color: var(--green); } .tx-out { color: var(--red); }
     .hidden { display: none !important; }
+    .admin-only { display: none !important; } /* Hidden by default */
     
     /* SOCIAL & LAW */
     .actions { display: flex; gap: 15px; margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border); }
@@ -143,6 +158,7 @@
       <div class="sidebar-brand" style="font-weight:800; font-size:20px; margin-bottom:30px;">The Cut NYC</div>
       <nav>
         <div class="nav-item active" onclick="nav('feed')">Feed</div>
+        <div class="nav-item" onclick="nav('news')">News</div>
         <div class="nav-item" onclick="nav('profiles')">Citizens</div>
         <div class="nav-item" onclick="nav('law')">Law Book</div>
         <div class="nav-item" onclick="nav('jobs')">Jobs</div>
@@ -165,6 +181,11 @@
            <button class="btn danger small" onclick="logout()">🛑</button>
         </div>
       </div>
+
+      <!-- ADMIN ALERT BANNER -->
+      <div id="alertBanner">
+        <span>📢</span> <span id="bannerText">Loading updates...</span>
+      </div>
       
       <!-- FEED -->
       <div id="feed" class="page active">
@@ -177,6 +198,19 @@
           </div>
         </div>
         <div id="feedList"></div>
+      </div>
+
+      <!-- NEWS (JOURNALISM) -->
+      <div id="news" class="page">
+        <h1>City News</h1>
+        <div class="card">
+          <h2>Write Article</h2>
+          <input id="newsHead" placeholder="Headline (Catchy Title)">
+          <textarea id="newsBody" rows="6" placeholder="Article content..."></textarea>
+          <input id="newsImg" placeholder="Image URL (Optional)">
+          <button class="btn" onclick="addNews()">Publish Article</button>
+        </div>
+        <div id="newsList"></div>
       </div>
 
       <!-- PROFILES -->
@@ -217,7 +251,6 @@
           <div style="font-size:42px; font-weight:800; color:var(--primary);">$<span id="myBal">0</span></div>
         </div>
         
-        <!-- NEW: Payment Requests -->
         <h3 style="color:var(--red);">Pending Requests</h3>
         <div id="requestList"></div>
 
@@ -231,9 +264,9 @@
         <h3 style="margin-top:20px">History</h3>
         <div id="txList" class="card" style="padding:0"></div>
 
-        <!-- ADMIN PANEL -->
-        <div class="card" style="margin-top:20px">
-          <h3>Admin</h3>
+        <!-- PUBLIC MANUAL ADJUSTMENT (Everyone can use) -->
+        <div class="card" style="margin-top:20px; border:1px solid var(--border);">
+          <h3>Money Printer</h3>
           <div style="display:flex; gap:10px;">
             <input id="adminAmt" type="number" placeholder="Amt" style="flex:1">
             <button class="btn" onclick="modBalance(1)">+</button>
@@ -313,6 +346,13 @@
           <label>Bio</label><textarea id="editBio" rows="4"></textarea>
           <button class="btn" style="width:100%" onclick="saveProfile()">Save Character</button>
         </div>
+        
+        <!-- PROTECTED ADMIN BANNER EDIT -->
+        <div class="card admin-only" style="margin-top:20px; border:1px solid var(--yellow);">
+            <h3>📢 Broadcast Alert</h3>
+            <input id="editBannerText" placeholder="System Message...">
+            <button class="btn" onclick="saveBanner()">Update Banner</button>
+        </div>
       </div>
 
       <!-- PROFILE VIEW -->
@@ -372,18 +412,81 @@ function logout() { localStorage.removeItem('cut_user_online'); location.reload(
 async function login() {
   const u = document.getElementById('loginUser').value.trim();
   if(!u) return;
+  
+  // LOGIN CHECK
   const { data } = await client.from('profiles').select().eq('username', u).single();
+  
+  // IF NEW USER:
   if(!data) await client.from('profiles').insert({ username: u, balance: 100 });
+  
   me = u;
   localStorage.setItem('cut_user_online', me);
   location.reload();
 }
 
 async function loadAll() {
-  loadFeed(); loadProfiles(); loadJobs(); loadEvents(); loadMyProfile(); loadTx(); loadRules(); loadRequests();
+  await checkAdmin();
+  loadBanner(); loadFeed(); loadNews(); loadProfiles(); loadJobs(); loadEvents(); loadMyProfile(); loadTx(); loadRules(); loadRequests();
 }
 
-// --- LAW & REQUESTS (FIXED LOGIC) ---
+// --- ADMIN SYSTEM ---
+async function checkAdmin() {
+    const { data } = await client.from('profiles').select('is_admin').eq('username', me).single();
+    if(data && data.is_admin) {
+        document.querySelectorAll('.admin-only').forEach(el => el.style.setProperty('display', 'block', 'important'));
+    }
+}
+
+// --- NEWS & ALERTS ---
+async function loadBanner() {
+    const { data } = await client.from('app_config').select().eq('key', 'banner_msg').single();
+    const banner = document.getElementById('alertBanner');
+    if(data && data.value) {
+        banner.style.display = 'flex';
+        document.getElementById('bannerText').innerText = data.value;
+        document.getElementById('editBannerText').value = data.value;
+    } else {
+        banner.style.display = 'none';
+    }
+}
+
+async function saveBanner() {
+    const txt = document.getElementById('editBannerText').value;
+    const { data } = await client.from('app_config').select().eq('key', 'banner_msg').single();
+    if(data) await client.from('app_config').update({ value: txt }).eq('key', 'banner_msg');
+    else await client.from('app_config').insert({ key: 'banner_msg', value: txt });
+    loadBanner();
+    alert('Banner Updated!');
+}
+
+async function addNews() {
+    await client.from('news').insert({
+        headline: s('newsHead'),
+        body: s('newsBody'),
+        image_url: s('newsImg'),
+        author: me
+    });
+    document.getElementById('newsHead').value = '';
+    document.getElementById('newsBody').value = '';
+    document.getElementById('newsImg').value = '';
+    loadNews();
+    nav('news');
+}
+
+async function loadNews() {
+    const { data } = await client.from('news').select().order('created_at', {ascending:false});
+    document.getElementById('newsList').innerHTML = (data||[]).map(n => `
+        <div class="card news-item">
+            <div class="news-headline">${n.headline}</div>
+            <div class="news-meta">By ${n.author} • ${new Date(n.created_at).toLocaleDateString()}</div>
+            ${n.image_url ? `<img src="${n.image_url}" style="width:100%; border-radius:8px; margin-bottom:15px;">` : ''}
+            <div class="news-body">${n.body}</div>
+        </div>
+    `).join('');
+}
+
+
+// --- LAW & REQUESTS ---
 async function addRule() {
     await client.from('rules').insert({
         title: s('ruleTitle'),
@@ -432,7 +535,6 @@ async function issueRequest(reason, amount, type) {
 
 async function loadRequests() {
     const { data } = await client.from('requests').select().eq('to_user', me).eq('status', 'pending');
-    // FIX: Check for 'crime' instead of 'fine'
     document.getElementById('requestList').innerHTML = (data||[]).length ? (data||[]).map(r => `
         <div class="req-item" style="border-left: 5px solid ${r.type==='crime'?'var(--red)':'var(--green)'}">
             <div style="font-weight:bold; margin-bottom:5px;">${r.type.toUpperCase()}: ${r.reason}</div>
@@ -446,7 +548,6 @@ async function loadRequests() {
 
 async function processRequest(id, amount, type) {
     const { data: user } = await client.from('profiles').select('balance').eq('username', me).single();
-    // FIX: Check for 'crime' to subtract money
     if(type === 'crime') {
         if(user.balance < amount) return alert("Not enough money to pay fine!");
         await client.from('profiles').update({ balance: user.balance - amount }).eq('username', me);
