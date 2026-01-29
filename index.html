@@ -673,6 +673,7 @@ async function loadNotifs() {
     document.getElementById('notifList').innerHTML = data.map(n => `
         <div class="card" 
              onclick="openNotif('${n.type}', '${n.from_user}', ${n.link_id || 'null'})"
+             
              style="border-left: 4px solid ${n.is_read ? 'transparent' : 'var(--primary)'}; opacity: ${n.is_read ? 0.6 : 1}; display:flex; gap:10px; align-items:center; cursor:pointer; transition:0.2s;">
             <div style="font-size:20px;">${getIcon(n.type)}</div>
             <div>
@@ -680,6 +681,80 @@ async function loadNotifs() {
                 <div style="font-size:11px; color:var(--muted);">${new Date(n.created_at).toLocaleString()}</div>
             </div>
         </div>`).join('');
+}
+async function openNotif(type, fromUser, linkId) {
+    // 1. Log the click to see if it works
+    console.log("Opening Notification:", type, fromUser, linkId);
+
+    // 2. Handle missing IDs
+    if (linkId === 'null' || linkId === 'undefined') linkId = null;
+
+    // 3. LOGIC: Where to go?
+    if (type === 'like' || type === 'comment') {
+        // A. Go to Feed
+        nav('feed');
+
+        if (!linkId) return;
+
+        // B. Try to find the post on screen
+        let el = document.getElementById(`post-${linkId}`);
+
+        // C. If NOT found, fetch it from database (restore deleted/old post)
+        if (!el) {
+            const { data: p } = await client.from('posts').select(`*, likes(user_id), comments(id)`).eq('id', linkId).single();
+            
+            if (p) {
+                // Manually create the HTML for this missing post
+                const isLiked = p.likes && p.likes.some(l => l.user_id === me); 
+                const likeCount = p.likes ? p.likes.length : 0; 
+                const commentCount = p.comments ? p.comments.length : 0;
+
+                const html = `
+                <div class="card" id="post-${p.id}" style="border: 2px solid var(--primary); animation: fadeIn 0.5s;">
+                    <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted)">
+                        <strong onclick="openProfile('${p.author}')">@${p.author}</strong>
+                        <span>${new Date(p.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                    </div>
+                    <div style="margin-top:5px;">${p.text||''}</div>
+                    ${p.img_url ? `<img src="${p.img_url}" style="max-width:100%; margin-top:10px; border-radius:8px;">` : ''}
+                    <div class="actions">
+                        <div class="act-btn ${isLiked?'liked':''}" onclick="toggleLike(${p.id})">${isLiked ? '❤️' : '♡'} ${likeCount}</div>
+                        <div class="act-btn" onclick="toggleComments(${p.id})">💬 ${commentCount}</div>
+                    </div>
+                    <div id="comments-${p.id}" class="comments-sec">
+                        <div id="clist-${p.id}"></div>
+                        <div style="display:flex; gap:5px; margin-top:10px;">
+                            <input id="cinput-${p.id}" placeholder="Write comment..." style="margin:0; font-size:12px; padding:8px;">
+                            <button class="btn small" onclick="addComment(${p.id})">Send</button>
+                        </div>
+                    </div>
+                </div>`;
+                
+                // Insert at the top
+                document.getElementById('feedList').insertAdjacentHTML('afterbegin', html);
+                el = document.getElementById(`post-${linkId}`);
+            } else {
+                alert("This post has been deleted permanently.");
+                return;
+            }
+        }
+
+        // D. Scroll to the post and highlight it
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.style.border = "2px solid var(--primary)";
+            setTimeout(() => el.style.border = "1px solid var(--border)", 3000);
+        }
+    } 
+    else if (type === 'money') {
+        // Go to Wallet History
+        nav('wallet');
+        setTimeout(() => document.getElementById('txList').scrollIntoView({ behavior: 'smooth' }), 300);
+    }
+    else {
+        // Go to their profile
+        openProfile(fromUser);
+    }
 }
 
 function getIcon(t) { return t==='like'?'❤️':t==='money'?'💸':t==='comment'?'💬':'📢'; }
