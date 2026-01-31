@@ -228,21 +228,21 @@
         <div id="newsList"></div>
       </div>
 
-      <!-- PROFILES -->
-     <div id="profiles" class="page">
+     <!-- PROFILES -->
+<div id="profiles" class="page">
   <h1>Citizens</h1>
-  
+
   <!-- NEW SEARCH BAR -->
-  <div class="card" style="margin-bottom:20px;">
-    <div style="position:relative;">
-      <input id="searchUsers" placeholder="🔍 Search by username or name..." 
-             style="padding-left:40px; font-size:16px;">
-      <div style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted);">🔍</div>
-    </div>
-  </div>
+  <input 
+    id="profileSearch"
+    placeholder="Search username..."
+    oninput="filterProfiles()"
+    style="margin-bottom:15px;"
+  >
 
   <div id="profileGrid" class="profile-grid"></div>
 </div>
+
 
       <!-- LAW BOOK -->
       <div id="law" class="page">
@@ -443,7 +443,6 @@ const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let me = localStorage.getItem('cut_user_online') || null;
 let mapObj = null, mapArmed = false, searchMarker = null;
 
-
 // INIT
 document.documentElement.setAttribute('data-theme', localStorage.getItem('theme')||'light');
 if(me) {
@@ -566,20 +565,7 @@ async function loadRequests() {
 async function processRequest(id, amount, type, isPercent) {
     const { data: user } = await client.from('profiles').select('balance').eq('username', me).single();
     let finalAmt = amount;
-   
-// 1. Add this helper function (put anywhere in your <script>)
-function renderProfiles(users) {
-  document.getElementById('profileGrid').innerHTML = users.map(u => `
-    <div class="profile-card" onclick="openProfile('${u.username}')">
-      <img src="${u.avatar || 'https://ui-avatars.com/api/?name=' + u.username}" alt="${u.username}">
-      <div style="font-weight:bold; font-size:14px; margin-top:10px; overflow:hidden; text-overflow:ellipsis; width:100%;">
-        ${u.username}
-      </div>
-      <div style="font-size:11px; color:var(--muted);">${u.real_name || 'Citizen'}</div>
-    </div>
-  `).join('') || '<div style="text-align:center; color:var(--muted); padding:40px;">No users found</div>';
-}
-
+    
     // PERCENTAGE CALCULATION
     if(isPercent) {
         finalAmt = Math.floor(user.balance * (amount / 100));
@@ -702,9 +688,39 @@ async function transfer() {
 
 async function loadTx() { const { data } = await client.from('transactions').select().or(`from_user.eq.${me},to_user.eq.${me}`).order('created_at',{ascending:false}); document.getElementById('txList').innerHTML = (data||[]).map(t => `<div class="tx-item"><div>${t.to_user===me?'From '+t.from_user:'To '+t.to_user}${t.note ? `<br><small style="color:var(--muted)">"${t.note}"</small>` : ''}</div><div class="${t.to_user===me?'tx-in':'tx-out'}">${t.to_user===me?'+':'-'}${t.amount}</div></div>`).join(''); }
 async function modBalance(m) { const amt = parseInt(s('adminAmt')), { data } = await client.from('profiles').select('balance').eq('username', me).single(); await client.from('profiles').update({balance: data.balance+(amt*m)}).eq('username',me); loadMyProfile(); }
+let allProfiles = []; // store once so we can filter locally
+
 async function loadProfiles() {
-  const { data } = await client.from('profiles').select().limit(100);
-  renderProfiles(data || []);
+  const { data } = await client.from('profiles').select();
+  allProfiles = data || [];
+  renderProfiles(allProfiles);
+}
+
+function renderProfiles(list) {
+  document.getElementById('profileGrid').innerHTML = list.map(u => `
+    <div class="profile-card" onclick="openProfile('${u.username}')">
+      <img src="${u.avatar || 'https://ui-avatars.com/api/?name=' + u.username}">
+      <div style="font-weight:bold; font-size:14px; margin-top:10px; overflow:hidden; text-overflow:ellipsis; width:100%;">
+        @${u.username}
+      </div>
+      <div style="font-size:11px; color:var(--muted)">
+        ${u.occupation || 'Citizen'}
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterProfiles() {
+  const q = document.getElementById('profileSearch').value.toLowerCase();
+
+  const filtered = allProfiles.filter(u =>
+    u.username.toLowerCase().includes(q) ||
+    (u.real_name || '').toLowerCase().includes(q)
+  );
+
+  renderProfiles(filtered);
+}
+
 async function openProfile(u) {
   nav('profileView');
   
@@ -997,7 +1013,6 @@ async function openNotif(type, fromUser, linkId) {
 
 function getIcon(t) { return t==='like'?'❤️':t==='money'?'💸':t==='comment'?'💬':'📢'; }
 async function markAllRead() { await client.from('notifications').update({ is_read: true }).eq('user_id', me); loadNotifs(); }
-
 
 </script>
 </body>
