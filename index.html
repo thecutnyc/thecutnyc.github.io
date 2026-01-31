@@ -337,42 +337,6 @@
       <!-- ACCOUNT -->
       <div id="account" class="page">
         <h1>My Character</h1>
-        <!-- PROFILE COVER BANNER - ADD THIS RIGHT HERE -->
-<div class="profile-cover" style="
-    position: relative; width: 100vw; height: 280px; 
-    left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw;
-    background: var(--banner-border) center/cover; margin-bottom: -120px; z-index: 1;
-">
-    <img id="coverPhoto" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=280&fit=crop" 
-         style="width:100%; height:100%; object-fit:cover;">
-    <div id="coverNameOverlay" style="
-        position: absolute; bottom: 60px; left: 30px; 
-        color: white; font-size: 28px; font-weight: bold; 
-        text-shadow: 2px 2px 6px rgba(0,0,0,0.9); 
-        background: rgba(0,0,0,0.3); padding: 8px 16px; border-radius: 8px;
-    ">Loading...</div>
-</div>
-
-<!-- Avatar overlaps cover -->
-<div style="position: relative; z-index: 2; padding-top: 180px;">
-    <div style="
-        position: absolute; top: -70px; right: 30px;
-        width: 110px; height: 110px; border-radius: 50%; 
-        border: 4px solid white; overflow: hidden; 
-        box-shadow: 0 6px 20px rgba(0,0,0,0.4); z-index: 3;
-    ">
-        <img id="displayAvatar" src="https://via.placeholder.com/110/333/fff?text=👤" 
-             style="width:100%; height:100%; object-fit:cover;">
-    </div>
-</div>
-
-<h1>My Character</h1>
-<div class="card">
-  <!-- Your existing card content stays EXACTLY the same -->
-  <label>Profile Picture</label>
-  <!-- ... rest of your existing code unchanged ... -->
-</div>
-
         <div class="card">
           <label>Profile Picture</label>
           <div style="display:flex; gap:10px; margin-bottom:10px;">
@@ -380,13 +344,6 @@
              <button class="btn small" onclick="document.getElementById('avatarUpload').click()" style="background:var(--border); color:var(--text); width:auto;">📂 Upload</button>
              <input id="editAvatar" placeholder="Or paste URL..." style="margin:0; flex:1;">
           </div>
-          <label>Cover Photo</label>
-<div style="display:flex; gap:10px; margin-bottom:10px;">
-   <input type="file" id="coverUpload" accept="image/*" style="display:none" onchange="uploadCover()">
-   <button class="btn small" onclick="document.getElementById('coverUpload').click()" style="background:var(--border); color:var(--text); width:auto;">📂 Upload Cover</button>
-   <input id="editCoverUrl" placeholder="Or paste cover URL..." style="margin:0; flex:1;">
-</div>
-
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <div><label>Real Name</label><input id="editReal"></div>
             <div><label>Age</label><input id="editAge" type="number"></div>
@@ -411,35 +368,45 @@
         </div>
       </div>
 
-      <!-- PROFILE VIEW -->
-            <!-- PROFILE VIEW -->
-      <div id="profileView" class="page">
-        <button class="btn small" style="margin-bottom:15px;" onclick="nav('profiles')">← Back</button>
-        
-        <!-- Profile Info Card -->
-        <div class="card">
-          <div style="display:flex; gap:15px; align-items:center;">
-            <img id="pvAvatar" style="width:70px; height:70px; border-radius:50%; object-fit:cover; background:#333;">
-            <div>
-                <h2 id="pvName" style="margin:0; font-size:20px;"></h2>
-                <div id="pvReal" style="color:var(--muted); font-size:14px;"></div>
-            </div>
-          </div>
-          
-          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:20px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:15px 0; text-align:center;">
-            <div><strong>Age</strong><br><span id="pvAge">-</span></div>
-            <div><strong>Occ</strong><br><span id="pvOcc">-</span></div>
-            <div><strong>Status</strong><br><span id="pvStat">-</span></div>
-          </div>
-          
-          <p id="pvBio" style="white-space:pre-wrap; color:var(--muted); font-size:14px;"></p>
-          <div style="font-size:13px; color:var(--muted); margin-top:20px;">📍 <span id="pvLoc"></span></div>
-        </div>
+   
+         <!-- PROFILE VIEW -->
+<div id="profileView" class="page">
+  <button class="btn small" style="margin-bottom:15px;" onclick="nav('profiles')">← Back</button>
+  
+  <!-- NEW: Cover Photo Banner -->
+  <div style="position:relative; height:200px; border-radius:12px; overflow:hidden; margin-bottom:20px;">
+    <img id="pvCover" src="" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'">
+    <!-- Avatar overlay on bottom-right -->
+    <div style="position:absolute; bottom: -35px; right:20px; width:70px; height:70px; border:3px solid var(--bg-card); border-radius:50%; overflow:hidden;">
+      <img id="pvAvatar" style="width:100%; height:100%; object-fit:cover;">
+    </div>
+  </div>
 
-        <!-- NEW: User Posts Section -->
-        <h3 style="margin-top:20px; padding-left:5px;">Posts</h3>
-        <div id="pvPosts"></div>
+  <!-- Profile Info (now below cover) -->
+  <div class="card" style="margin-top:20px; padding-top:30px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <div>
+        <h2 id="pvName" style="margin:0; font-size:20px;"></h2>
+        <div id="pvReal" style="color:var(--muted); font-size:14px;"></div>
       </div>
+      <!-- Edit button for owner -->
+      <button class="btn small" id="editCoverBtn" onclick="uploadCover()" style="display:none;">Change Cover</button>
+    </div>
+    
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:20px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:15px 0; text-align:center;">
+      <div><strong>Age</strong><br><span id="pvAge">-</span></div>
+      <div><strong>Occ</strong><br><span id="pvOcc">-</span></div>
+      <div><strong>Status</strong><br><span id="pvStat">-</span></div>
+    </div>
+    
+    <p id="pvBio" style="white-space:pre-wrap; color:var(--muted); font-size:14px;"></p>
+    <div style="font-size:13px; color:var(--muted); margin-top:20px;">📍 <span id="pvLoc"></span></div>
+  </div>
+
+  <!-- Posts Section -->
+  <h3 style="margin-top:30px; padding-left:5px;">Posts</h3>
+  <div id="pvPosts"></div>
+</div>
 
 
     </main>
@@ -487,26 +454,6 @@ async function login() {
   me = u;
   localStorage.setItem('cut_user_online', me);
   location.reload();
-}
-async function loadProfileCover() {
-    const profile = await supabase.from('profiles').select('name, avatar_url, banner_url').single();
-    if (profile.data) {
-        document.getElementById('displayAvatar').src = profile.data.avatar_url;
-        document.getElementById('coverPhoto').src = profile.data.banner_url;
-        document.getElementById('coverNameOverlay').textContent = profile.data.name;
-        document.getElementById('editReal').value = profile.data.name;
-        // ... update other fields
-    }
-}
-
-async function uploadCover() {
-    const file = document.getElementById('coverUpload').files[0];
-    if (file) {
-        const { data } = await supabase.storage.from('banners').upload('cover.jpg', file);
-        const { publicUrl } = supabase.storage.from('banners').getPublicUrl('cover.jpg').data;
-        document.getElementById('editCoverUrl').value = publicUrl;
-        document.getElementById('coverPhoto').src = publicUrl;
-    }
 }
 
 async function loadAll() {
@@ -721,9 +668,10 @@ async function modBalance(m) { const amt = parseInt(s('adminAmt')), { data } = a
 async function loadProfiles() { const { data } = await client.from('profiles').select(); document.getElementById('profileGrid').innerHTML = (data||[]).map(u => `<div class="profile-card" onclick="openProfile('${u.username}')"><img src="${u.avatar||'https://ui-avatars.com/api/?name='+u.username}"><div style="font-weight:bold; font-size:14px; margin-top:10px; overflow:hidden; text-overflow:ellipsis; width:100%;">@${u.username}</div><div style="font-size:11px; color:var(--muted)">${u.occupation||'Citizen'}</div></div>`).join(''); }
 async function openProfile(u) {
   nav('profileView');
-
+  
   const { data } = await client.from('profiles').select().eq('username', u).single();
   document.getElementById('pvName').innerText = '@' + data.username;
+  document.getElementById('pvCover').src = data.cover_url || '';
   document.getElementById('pvAvatar').src = data.avatar || '';
   document.getElementById('pvReal').innerText = data.real_name || '';
   document.getElementById('pvAge').innerText = data.age || '-';
@@ -731,8 +679,77 @@ async function openProfile(u) {
   document.getElementById('pvStat').innerText = data.status || '-';
   document.getElementById('pvLoc').innerText = data.location || '-';
   document.getElementById('pvBio').innerText = data.bio || '';
+  
+  // Show edit button if it's my profile
+  document.getElementById('editCoverBtn').style.display = (data.username === me) ? 'block' : 'none';
+  
+  loadUserPosts(u);
+}
 
-  await loadUserPosts(u);
+// Cover photo upload
+async function uploadCoverFile() {
+  const file = document.getElementById('coverUpload').files[0];
+  if (!file) return;
+  
+  document.getElementById('editCover').value = 'Uploading...';
+  
+  const cleanName = file.name.replace(/[^a-zA-Z0-9]/g, '');
+  const name = 'cover-' + Date.now() + '-' + cleanName;
+  
+  const { error } = await client.storage.from('uploads').upload(name, file);
+  if (error) {
+    alert('Upload failed');
+    return;
+  }
+  
+  const { data } = client.storage.from('uploads').getPublicUrl(name);
+  document.getElementById('editCover').value = data.publicUrl;
+  
+  // Save to profile
+  await client.from('profiles').update({ cover_url: data.publicUrl }).eq('username', me);
+  loadMyProfile();
+  alert('Cover updated!');
+}
+
+// Save cover URL from input field
+async function uploadCover() {
+  const url = document.getElementById('editCover').value.trim();
+  if (!url) return;
+  
+  await client.from('profiles').update({ cover_url: url }).eq('username', me);
+  loadMyProfile();
+  alert('Cover updated!');
+}
+
+// Update saveProfile to include cover
+async function saveProfile() {
+  await client.from('profiles').update({
+    avatar: document.getElementById('editAvatar').value,
+    cover_url: document.getElementById('editCover').value,  // <-- NEW
+    real_name: document.getElementById('editReal').value,
+    age: document.getElementById('editAge').value,
+    occupation: document.getElementById('editOcc').value,
+    status: document.getElementById('editStatus').value,
+    location: document.getElementById('editLoc').value,
+    bio: document.getElementById('editBio').value
+  }).eq('username', me);
+  alert('Saved!');
+}
+
+// Update loadMyProfile to load cover
+async function loadMyProfile() {
+  const { data } = await client.from('profiles').select().eq('username', me).single();
+  if (!data) return;
+  
+  document.getElementById('editAvatar').value = data.avatar || '';
+  document.getElementById('editCover').value = data.cover_url || '';  // <-- NEW
+  document.getElementById('editReal').value = data.real_name || '';
+  document.getElementById('editAge').value = data.age || '';
+  document.getElementById('editOcc').value = data.occupation || '';
+  document.getElementById('editStatus').value = data.status || 'Single';
+  document.getElementById('editLoc').value = data.location || '';
+  document.getElementById('editBio').value = data.bio || '';
+  document.getElementById('myBal').innerText = data.balance || 0;
 }
 async function loadUserPosts(username) {
   document.getElementById('pvPosts').innerHTML = `<div style="color:var(--muted);">Loading posts...</div>`;
