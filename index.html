@@ -229,10 +229,20 @@
       </div>
 
       <!-- PROFILES -->
-      <div id="profiles" class="page">
-        <h1>Citizens</h1>
-        <div id="profileGrid" class="profile-grid"></div>
-      </div>
+     <div id="profiles" class="page">
+  <h1>Citizens</h1>
+  
+  <!-- NEW SEARCH BAR -->
+  <div class="card" style="margin-bottom:20px;">
+    <div style="position:relative;">
+      <input id="searchUsers" placeholder="🔍 Search by username or name..." 
+             style="padding-left:40px; font-size:16px;">
+      <div style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted);">🔍</div>
+    </div>
+  </div>
+
+  <div id="profileGrid" class="profile-grid"></div>
+</div>
 
       <!-- LAW BOOK -->
       <div id="law" class="page">
@@ -432,6 +442,26 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let me = localStorage.getItem('cut_user_online') || null;
 let mapObj = null, mapArmed = false, searchMarker = null;
+// Real-time user search
+document.getElementById('searchUsers').addEventListener('input', async function() {
+  const query = this.value.toLowerCase();
+  
+  if (query.length < 2) {
+    loadProfiles(); // Show all if short query
+    return;
+  }
+
+  const { data } = await client
+    .from('profiles')
+    .select()
+    .ilike('username', `%${query}%`)
+    .or(`real_name.ilike.%${query}%,occupation.ilike.%${query}%`)
+    .limit(50);
+
+  renderProfiles(data || []);
+});
+
+async
 
 // INIT
 document.documentElement.setAttribute('data-theme', localStorage.getItem('theme')||'light');
