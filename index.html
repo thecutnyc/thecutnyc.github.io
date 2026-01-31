@@ -379,27 +379,28 @@
 </div>
 
 
-      <!-- PROFILE VIEW -->
+     <!-- PROFILE VIEW -->
 <div id="profileView" class="page">
   <button class="btn small" style="margin-bottom:15px;" onclick="nav('profiles')">← Back</button>
   
-  <!-- NEW: Cover Photo Banner -->
-  <div style="position:relative; height:200px; border-radius:12px; overflow:hidden; margin-bottom:20px;">
-    <img id="pvCover" src="" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'">
-    <!-- Avatar overlay on bottom-right -->
-    <div style="position:absolute; bottom: -35px; right:20px; width:70px; height:70px; border:3px solid var(--bg-card); border-radius:50%; overflow:hidden;">
-      <img id="pvAvatar" style="width:100%; height:100%; object-fit:cover;">
+ <!-- FIXED Cover Photo Banner -->
+  <div style="position:relative; height:180px; border-radius:12px; overflow:hidden; margin-bottom:10px; background:var(--bg-card);">
+    <img id="pvCover" src="" style="width:100%; height:100%; object-fit:cover;" 
+         onerror="this.src='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'">
+    
+    <!-- FIXED Avatar position -->
+    <div style="position:absolute; bottom:-25px; right:20px; width:70px; height:70px; border:4px solid var(--bg-card); border-radius:50%; overflow:hidden; background:var(--bg-card); box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+      <img id="pvAvatar" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://ui-avatars.com/api/?name=User'">
     </div>
   </div>
 
-  <!-- Profile Info (now below cover) -->
-  <div class="card" style="margin-top:20px; padding-top:30px;">
+ <!-- Profile Info Card -->
+  <div class="card" style="margin-top:30px; padding-top:20px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
       <div>
-        <h2 id="pvName" style="margin:0; font-size:20px;"></h2>
+        <h2 id="pvName" style="margin:0;"></h2>
         <div id="pvReal" style="color:var(--muted); font-size:14px;"></div>
       </div>
-      <!-- Edit button for owner -->
       <button class="btn small" id="editCoverBtn" onclick="uploadCover()" style="display:none;">Change Cover</button>
     </div>
     
@@ -408,6 +409,14 @@
       <div><strong>Occ</strong><br><span id="pvOcc">-</span></div>
       <div><strong>Status</strong><br><span id="pvStat">-</span></div>
     </div>
+    
+    <p id="pvBio" style="white-space:pre-wrap; color:var(--muted); font-size:14px;"></p>
+    <div style="font-size:13px; color:var(--muted);">📍 <span id="pvLoc"></span></div>
+  </div>
+
+  <h3 style="margin-top:30px;">Posts</h3>
+  <div id="pvPosts"></div>
+</div>
     
     <p id="pvBio" style="white-space:pre-wrap; color:var(--muted); font-size:14px;"></p>
     <div style="font-size:13px; color:var(--muted); margin-top:20px;">📍 <span id="pvLoc"></span></div>
