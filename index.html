@@ -334,39 +334,49 @@
         <div id="pinList" class="card" style="padding:0;"></div>
       </div>
 
-      <!-- ACCOUNT -->
-      <div id="account" class="page">
-        <h1>My Character</h1>
-        <div class="card">
-          <label>Profile Picture</label>
-          <div style="display:flex; gap:10px; margin-bottom:10px;">
-             <input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="uploadAvatar()">
-             <button class="btn small" onclick="document.getElementById('avatarUpload').click()" style="background:var(--border); color:var(--text); width:auto;">📂 Upload</button>
-             <input id="editAvatar" placeholder="Or paste URL..." style="margin:0; flex:1;">
-          </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <div><label>Real Name</label><input id="editReal"></div>
-            <div><label>Age</label><input id="editAge" type="number"></div>
-          </div>
-          <label>Occupation</label><input id="editOcc">
-          <label>Status</label>
-          <select id="editStatus">
-            <option value="Single">Single</option>
-            <option value="Taken">Taken</option>
-            <option value="Complicated">Complicated</option>
-            <option value="Married">Married</option>
-          </select>
-          <label>Location</label><input id="editLoc">
-          <label>Bio</label><textarea id="editBio" rows="4"></textarea>
-          <button class="btn" style="width:100%" onclick="saveProfile()">Save Character</button>
-        </div>
-        
-        <div class="card admin-only" style="margin-top:20px; border:1px solid var(--banner-border);">
-            <h3 style="color:var(--banner-border)">📢 Broadcast Alert</h3>
-            <input id="editBannerText" placeholder="System Message...">
-            <button class="btn" onclick="saveBanner()">Update Banner</button>
-        </div>
-      </div>
+     <!-- ACCOUNT -->
+<div id="account" class="page">
+  <h1>My Character</h1>
+  <div class="card">
+    <label>Profile Picture</label>
+    <div style="display:flex; gap:10px; margin-bottom:10px;">
+       <input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="uploadAvatar()">
+       <button class="btn small" onclick="document.getElementById('avatarUpload').click()" style="background:var(--border); color:var(--text); width:auto;">📂 Upload</button>
+       <input id="editAvatar" placeholder="Or paste URL..." style="margin:0; flex:1;">
+    </div>
+
+    <!-- ADD THIS NEW COVER PHOTO SECTION -->
+    <label style="margin-top:15px;">Cover Photo</label>
+    <div style="display:flex; gap:10px; margin-bottom:10px;">
+       <input type="file" id="coverUpload" accept="image/*" style="display:none" onchange="uploadCoverFile()">
+       <button class="btn small" onclick="document.getElementById('coverUpload').click()" style="background:var(--border); color:var(--text); width:auto;">🖼️ Upload Cover</button>
+       <input id="editCover" placeholder="Or paste Cover URL..." style="margin:0; flex:1;">
+    </div>
+    <!-- END NEW SECTION -->
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <div><label>Real Name</label><input id="editReal"></div>
+      <div><label>Age</label><input id="editAge" type="number"></div>
+    </div>
+    <label>Occupation</label><input id="editOcc">
+    <label>Status</label>
+    <select id="editStatus">
+      <option value="Single">Single</option>
+      <option value="Taken">Taken</option>
+      <option value="Complicated">Complicated</option>
+      <option value="Married">Married</option>
+    </select>
+    <label>Location</label><input id="editLoc">
+    <label>Bio</label><textarea id="editBio" rows="4"></textarea>
+    <button class="btn" style="width:100%" onclick="saveProfile()">Save Character</button>
+  </div>
+  
+  <div class="card admin-only" style="margin-top:20px; border:1px solid var(--banner-border);">
+      <h3 style="color:var(--banner-border)">📢 Broadcast Alert</h3>
+      <input id="editBannerText" placeholder="System Message...">
+      <button class="btn" onclick="saveBanner()">Update Banner</button>
+  </div>
+</div>
 
    
          <!-- PROFILE VIEW -->
