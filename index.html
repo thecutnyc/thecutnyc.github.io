@@ -442,26 +442,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let me = localStorage.getItem('cut_user_online') || null;
 let mapObj = null, mapArmed = false, searchMarker = null;
-// Real-time user search
-document.getElementById('searchUsers').addEventListener('input', async function() {
-  const query = this.value.toLowerCase();
-  
-  if (query.length < 2) {
-    loadProfiles(); // Show all if short query
-    return;
-  }
 
-  const { data } = await client
-    .from('profiles')
-    .select()
-    .ilike('username', `%${query}%`)
-    .or(`real_name.ilike.%${query}%,occupation.ilike.%${query}%`)
-    .limit(50);
-
-  renderProfiles(data || []);
-});
-
-async
 
 // INIT
 document.documentElement.setAttribute('data-theme', localStorage.getItem('theme')||'light');
