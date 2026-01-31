@@ -998,48 +998,7 @@ async function openNotif(type, fromUser, linkId) {
 function getIcon(t) { return t==='like'?'❤️':t==='money'?'💸':t==='comment'?'💬':'📢'; }
 async function markAllRead() { await client.from('notifications').update({ is_read: true }).eq('user_id', me); loadNotifs(); }
 
- function renderProfiles(users) {
-  document.getElementById('profileGrid').innerHTML = users.map(u => `
-    <div class="profile-card" onclick="openProfile('${u.username}')">
-      <img src="${u.avatar || 'https://ui-avatars.com/api/?name=' + u.username}" alt="${u.username}">
-      <div style="font-weight:bold; font-size:14px; margin-top:10px;">
-        ${u.username}
-      </div>
-      <div style="font-size:11px; color:var(--muted);">
-        ${u.real_name || 'Citizen'}
-      </div>
-    </div>
-  `).join('') || '<div style="text-align:center; padding:40px;">No users found</div>';
-}
 
-async function loadProfiles() {
-  const { data } = await client.from('profiles').select().limit(100);
-  renderProfiles(data || []);
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-
-  loadProfiles(); // ← show users when page opens
-
-  const searchInput = document.getElementById('searchUsers');
-
-  searchInput.addEventListener('input', async function() {
-    const query = this.value.toLowerCase();
-
-    if (query.length < 2) {
-      loadProfiles();
-      return;
-    }
-
-    const { data } = await client
-      .from('profiles')
-      .select()
-      .or(`username.ilike.%${query}%,real_name.ilike.%${query}%`)
-      .limit(50);
-
-    renderProfiles(data || []);
-  });
-});
 </script>
 </body>
 </html>
