@@ -566,7 +566,8 @@ async function loadRequests() {
 async function processRequest(id, amount, type, isPercent) {
     const { data: user } = await client.from('profiles').select('balance').eq('username', me).single();
     let finalAmt = amount;
-    // 1. Add this helper function (put anywhere in your <script>)
+   
+// 1. Add this helper function (put anywhere in your <script>)
 function renderProfiles(users) {
   document.getElementById('profileGrid').innerHTML = users.map(u => `
     <div class="profile-card" onclick="openProfile('${u.username}')">
@@ -578,36 +579,6 @@ function renderProfiles(users) {
     </div>
   `).join('') || '<div style="text-align:center; color:var(--muted); padding:40px;">No users found</div>';
 }
-
-// 2. Replace your loadProfiles function with this:
-async function loadProfiles() {
-  const { data } = await client.from('profiles').select().limit(100);
-  renderProfiles(data || []);
-}
-
-// 3. Add the search listener (put this after loadProfiles is defined):
-document.addEventListener('DOMContentLoaded', function() {
-  const searchInput = document.getElementById('searchUsers');
-  if (searchInput) {
-    searchInput.addEventListener('input', async function() {
-      const query = this.value.toLowerCase();
-      
-      if (query.length < 2) {
-        loadProfiles(); // Show all users
-        return;
-      }
-
-      // Search usernames AND real names
-      const { data } = await client
-        .from('profiles')
-        .select()
-        .or(`username.ilike.%${query}%,real_name.ilike.%${query}%`)
-        .limit(50);
-
-      renderProfiles(data || []);
-    });
-  }
-});
 
     // PERCENTAGE CALCULATION
     if(isPercent) {
@@ -731,7 +702,9 @@ async function transfer() {
 
 async function loadTx() { const { data } = await client.from('transactions').select().or(`from_user.eq.${me},to_user.eq.${me}`).order('created_at',{ascending:false}); document.getElementById('txList').innerHTML = (data||[]).map(t => `<div class="tx-item"><div>${t.to_user===me?'From '+t.from_user:'To '+t.to_user}${t.note ? `<br><small style="color:var(--muted)">"${t.note}"</small>` : ''}</div><div class="${t.to_user===me?'tx-in':'tx-out'}">${t.to_user===me?'+':'-'}${t.amount}</div></div>`).join(''); }
 async function modBalance(m) { const amt = parseInt(s('adminAmt')), { data } = await client.from('profiles').select('balance').eq('username', me).single(); await client.from('profiles').update({balance: data.balance+(amt*m)}).eq('username',me); loadMyProfile(); }
-async function loadProfiles() { const { data } = await client.from('profiles').select(); document.getElementById('profileGrid').innerHTML = (data||[]).map(u => `<div class="profile-card" onclick="openProfile('${u.username}')"><img src="${u.avatar||'https://ui-avatars.com/api/?name='+u.username}"><div style="font-weight:bold; font-size:14px; margin-top:10px; overflow:hidden; text-overflow:ellipsis; width:100%;">@${u.username}</div><div style="font-size:11px; color:var(--muted)">${u.occupation||'Citizen'}</div></div>`).join(''); }
+async function loadProfiles() {
+  const { data } = await client.from('profiles').select().limit(100);
+  renderProfiles(data || []);
 async function openProfile(u) {
   nav('profileView');
   
@@ -1025,6 +998,28 @@ async function openNotif(type, fromUser, linkId) {
 function getIcon(t) { return t==='like'?'❤️':t==='money'?'💸':t==='comment'?'💬':'📢'; }
 async function markAllRead() { await client.from('notifications').update({ is_read: true }).eq('user_id', me); loadNotifs(); }
 
+  document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('searchUsers');
+  if (searchInput) {
+    searchInput.addEventListener('input', async function() {
+      const query = this.value.toLowerCase();
+      
+      if (query.length < 2) {
+        loadProfiles(); // Show all users
+        return;
+      }
+
+      // Search usernames AND real names
+      const { data } = await client
+        .from('profiles')
+        .select()
+        .or(`username.ilike.%${query}%,real_name.ilike.%${query}%`)
+        .limit(50);
+
+      renderProfiles(data || []);
+    });
+  }
+});
 </script>
 </body>
 </html>
