@@ -159,7 +159,7 @@
       <nav>
         <div class="nav-item active" onclick="nav('feed')">Feed</div>
         
-        <!-- NOTIFICATIONS TAB -->
+        <!-- NEW NOTIFICATIONS TAB -->
         <div class="nav-item" onclick="nav('notifs')" style="position:relative; display:flex; justify-content:space-between; align-items:center;">
           <span>🔔 Notifications</span>
           <span id="notifBadge" style="background:var(--red); color:white; font-size:10px; padding:2px 6px; border-radius:10px; display:none;">0</span>
@@ -214,44 +214,6 @@
         </div>
         <div id="notifList"></div>
       </div>
-<!-- CHAT WINDOW -->
-<div id="chatModal" style="
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  width:320px;
-  height:420px;
-  background:var(--bg-card);
-  border-radius:14px;
-  display:none;
-  flex-direction:column;
-  box-shadow:0 10px 30px rgba(0,0,0,.4);
-  overflow:hidden;
-  z-index:999;
-">
-
-  <div id="chatHeader" style="
-    padding:12px;
-    font-weight:bold;
-    border-bottom:1px solid #222;
-  ">
-    Chat
-    <span onclick="closeChat()" style="float:right; cursor:pointer;">✕</span>
-  </div>
-
-  <div id="chatMessages" style="
-    flex:1;
-    overflow-y:auto;
-    padding:10px;
-    font-size:14px;
-  "></div>
-
-  <div style="display:flex; border-top:1px solid #222;">
-    <input id="chatInput" placeholder="type a message..."
-      style="flex:1; border:none; padding:10px; outline:none;">
-    <button onclick="sendChat()" style="padding:0 15px;">Send</button>
-  </div>
-</div>
 
       <!-- NEWS -->
       <div id="news" class="page">
@@ -265,6 +227,35 @@
         </div>
         <div id="newsList"></div>
       </div>
+<!-- MESSAGES PAGE -->
+<div id="messages" class="page">
+  <h1>Messages</h1>
+
+  <div style="display:flex; height:75vh; gap:15px;">
+
+    <!-- LEFT: user list -->
+    <div style="width:260px; display:flex; flex-direction:column;">
+      <input id="chatSearch" placeholder="🔍 search users..." oninput="filterChatUsers()" style="margin-bottom:10px;">
+      <div id="chatUserList" style="overflow-y:auto; flex:1;"></div>
+    </div>
+
+    <!-- RIGHT: chat -->
+    <div style="flex:1; display:flex; flex-direction:column; background:var(--bg-card); border-radius:12px;">
+
+      <div id="chatHeader" style="padding:12px; border-bottom:1px solid #222; font-weight:bold;">
+        Select a user
+      </div>
+
+      <div id="chatMessages" style="flex:1; overflow-y:auto; padding:15px;"></div>
+
+      <div style="display:flex; border-top:1px solid #222;">
+        <input id="chatInput" placeholder="type message..." style="flex:1; padding:10px; border:none;">
+        <button onclick="sendChat()" style="padding:0 20px;">Send</button>
+      </div>
+
+    </div>
+  </div>
+</div>
 
      <!-- PROFILES -->
 <div id="profiles" class="page">
@@ -521,7 +512,7 @@ async function loadAll() {
   
   loadNotifs();
   await checkAdmin();
-  loadBanner(); loadFeed(); loadNews(); loadProfiles(); loadJobs(); loadEvents(); loadMyProfile(); loadTx(); loadRules(); loadRequests();
+  loadBanner(); loadFeed(); loadNews(); loadProfiles(); loadJobs(); loadEvents(); loadMyProfile(); loadTx(); loadRules(); loadRequests(); loadChatUsers();
 }
 
 async function checkAdmin() {
@@ -603,7 +594,33 @@ async function loadRequests() {
 async function processRequest(id, amount, type, isPercent) {
     const { data: user } = await client.from('profiles').select('balance').eq('username', me).single();
     let finalAmt = amount;
-    
+    let chatUsers = [];
+
+async function loadChatUsers() {
+  const { data } = await client.from('profiles').select();
+  chatUsers = data || [];
+  renderChatUsers(chatUsers);
+}
+
+function renderChatUsers(list) {
+  const box = document.getElementById('chatUserList');
+
+  box.innerHTML = list.map(u => `
+    <div onclick="openChat('${u.username}')" 
+      style="padding:10px; cursor:pointer; border-radius:8px;">
+      @${u.username}
+    </div>
+  `).join('');
+}
+
+function filterChatUsers() {
+  const q = document.getElementById('chatSearch').value.toLowerCase();
+  const filtered = chatUsers.filter(u =>
+    u.username.toLowerCase().includes(q)
+  );
+  renderChatUsers(filtered);
+}
+
     // PERCENTAGE CALCULATION
     if(isPercent) {
         finalAmt = Math.floor(user.balance * (amount / 100));
@@ -736,7 +753,7 @@ async function loadProfiles() {
 
 function renderProfiles(list) {
   document.getElementById('profileGrid').innerHTML = list.map(u => `
-    <div class="profile-card" onclick="openProfile('${u.username}'); openChat('${u.username}')">
+    <div class="profile-card" onclick="openProfile('${u.username}')">
       <img src="${u.avatar || 'https://ui-avatars.com/api/?name=' + u.username}">
       <div style="font-weight:bold; font-size:14px; margin-top:10px; overflow:hidden; text-overflow:ellipsis; width:100%;">
         @${u.username}
@@ -778,14 +795,6 @@ async function openProfile(u) {
   
   loadUserPosts(u);
 }
-client
-  .channel('live-messages')
-  .on(
-    'postgres_changes',
-    { event: 'INSERT', schema: 'public', table: 'messages' },
-    () => loadMessages()
-  )
-  .subscribe();
 
 // Cover photo upload
 async function uploadCoverFile() {
@@ -810,70 +819,6 @@ async function uploadCoverFile() {
   await client.from('profiles').update({ cover_url: data.publicUrl }).eq('username', me);
   loadMyProfile();
   alert('Cover updated!');
-}
-let activeChatUser = null;
-
-// open chat
-function openChat(username) {
-  activeChatUser = username;
-  document.getElementById('chatModal').style.display = 'flex';
-  document.getElementById('chatHeader').innerText = 'Chat with @' + username;
-  loadMessages();
-}
-
-// close
-function closeChat() {
-  document.getElementById('chatModal').style.display = 'none';
-}
-
-// send message
-async function sendChat() {
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if (!text) return;
-
-  await client.from('messages').insert({
-    sender: currentUser.username,
-    receiver: activeChatUser,
-    content: text
-  });
-
-  input.value = '';
-}
-
-// load conversation
-async function loadMessages() {
-  if (!activeChatUser) return;
-
-  const { data } = await client
-    .from('messages')
-    .select('*')
-    .order('created_at');
-
-  const convo = data.filter(m =>
-    (m.sender === currentUser.username && m.receiver === activeChatUser) ||
-    (m.receiver === currentUser.username && m.sender === activeChatUser)
-  );
-
-  const box = document.getElementById('chatMessages');
-
-  box.innerHTML = convo.map(m => `
-    <div style="
-      margin:6px 0;
-      text-align:${m.sender === currentUser.username ? 'right' : 'left'};
-    ">
-      <span style="
-        background:${m.sender === currentUser.username ? '#4cafef' : '#333'};
-        padding:6px 10px;
-        border-radius:10px;
-        display:inline-block;
-      ">
-        ${m.content}
-      </span>
-    </div>
-  `).join('');
-
-  box.scrollTop = box.scrollHeight;
 }
 
 // Save cover URL from input field
@@ -1123,12 +1068,6 @@ async function openNotif(type, fromUser, linkId) {
 
 function getIcon(t) { return t==='like'?'❤️':t==='money'?'💸':t==='comment'?'💬':'📢'; }
 async function markAllRead() { await client.from('notifications').update({ is_read: true }).eq('user_id', me); loadNotifs(); }
-
-  setInterval(() => {
-  loadFeed();
-  loadProfiles();
-  loadNotifs();
-}, 5000);
 
 </script>
 </body>
