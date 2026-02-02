@@ -35,7 +35,7 @@
 #editCoverBtn {
   display: none !important;
 }
-#app { display: flex; width: 100%; height: 100%; overflow: hidden; }
+    #app { display: flex; width: 100%; height: 100%; overflow: hidden; }
     .sidebar { width: 250px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
     .nav-item { padding: 12px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500; margin-bottom: 4px; transition: 0.2s; }
     .nav-item:hover { background: var(--hover); color: var(--text); }
@@ -45,7 +45,8 @@
     .page { display: none; max-width: 600px; margin: 0 auto; animation: fadeIn 0.2s; }
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-	.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
     .btn { background: var(--text); color: var(--bg-card); border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
     .btn.danger { background: var(--red); color: white; }
     .btn.success { background: var(--green); color: white; }
@@ -59,18 +60,7 @@
       resize: none; 
     }
     
-	/* RP ROOMS & CHAT STYLES */
-    .room-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-    .room-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; cursor: pointer; text-align: center; transition: 0.2s; }
-    .room-card:hover { border-color: var(--primary); }
-    #chatWindow { display: flex; flex-direction: column; height: 500px; }
-    #chatMessages { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-    .msg { max-width: 85%; padding: 10px; border-radius: 12px; font-size: 14px; position: relative; }
-    .msg.me { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 2px; }
-    .msg.them { align-self: flex-start; background: var(--hover); color: var(--text); border-bottom-left-radius: 2px; }
-    .msg-user { font-weight: 700; font-size: 11px; display: block; margin-bottom: 2px; }
-	
-	    .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer; }
+    .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer; }
     .checkbox-wrapper input { width: auto; margin: 0; }
 
     #alertBanner { background: var(--banner-bg); border: 1px solid var(--banner-border); color: var(--banner-text); padding: 15px; border-radius: 8px; margin-bottom: 30px; display: none; font-size: 15px; font-weight: 600; align-items: center; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -97,7 +87,8 @@
     .law-row { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--border); align-items: center; }
     .req-item { background: var(--hover); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 10px; }
     #mobileHeader { display: none; }
-   @media (max-width: 768px) {
+
+        @media (max-width: 768px) {
       #app { flex-direction: column; }
       
       /* Updated Mobile Bottom Bar */
@@ -147,7 +138,7 @@
       #mobileHeader { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border); position: relative; margin: -30px -30px 20px -30px; width: calc(100% + 60px); }
     }
 
- </style>
+  </style>
 </head>
 <body>
 
@@ -174,7 +165,6 @@
           <span id="notifBadge" style="background:var(--red); color:white; font-size:10px; padding:2px 6px; border-radius:10px; display:none;">0</span>
         </div>
 
-<div class="nav-item" onclick="nav('rooms')">RP Rooms</div>
         <div class="nav-item" onclick="nav('news')">News</div>
         <div class="nav-item" onclick="nav('profiles')">Profiles</div>
         <div class="nav-item" onclick="nav('law')">Law Book</div>
@@ -189,7 +179,7 @@
         <button class="btn danger" style="width:100%; margin-top:10px;" onclick="logout()">Logout</button>
       </div>
     </aside>
-	
+
     <main class="main">
       <div id="mobileHeader">
         <div style="font-weight:800; font-size:18px;">The Cut NYC</div>
@@ -198,10 +188,12 @@
            <button class="btn danger small" onclick="logout()">🛑</button>
         </div>
       </div>
+
       <div id="alertBanner">
         <span style="font-size:20px;">📢</span> <span id="bannerText">System Online. Welcome to The Cut NYC.</span>
       </div>
-       <!-- FEED -->
+      
+      <!-- FEED -->
       <div id="feed" class="page active">
         <h1>City Feed</h1>
         <div class="card">
@@ -213,45 +205,6 @@
         </div>
         <div id="feedList"></div>
       </div>
-	  
-	  // RP ROOMS
-	  
-	 <div id="rooms" class="page">
-        <h1>RP Locations</h1>
-        <p style="color:var(--muted); margin-bottom:20px;">Enter a room to start roleplaying.</p>
-        <div class="room-grid">
-          <div class="room-card" onclick="openRoom('times_square', 'Times Square')"><h3>🗽 Times Square</h3></div>
-          <div class="room-card" onclick="openRoom('club', 'The Nightclub')"><h3>💃 The Nightclub</h3></div>
-          <div class="room-card" onclick="openRoom('hospital', 'Mt. Sinai')"><h3>🏥 Hospital</h3></div>
-          <div class="room-card" onclick="openRoom('nypd', 'NYPD Precinct')"><h3>🚔 NYPD</h3></div>
-          <div class="room-card" onclick="openRoom('park', 'Central Park')"><h3>🌳 Central Park</h3></div>
-          <div class="room-card" onclick="openRoom('bank', 'NYC Bank')"><h3>💰 NYC Bank</h3></div>
-        </div>
-      </div>
-
-      <div id="chatRoom" class="page">
-        <button class="btn small" onclick="nav('rooms')" style="margin-bottom:15px;">← Back to Locations</button>
-        <div class="card" id="chatWindow">
-          <h2 id="roomTitle" style="margin-top:0;">Room</h2>
-          <div id="chatMessages"></div>
-          <div style="display:flex; gap:10px; margin-top:10px;">
-            <input id="chatInput" placeholder="Action..." style="margin:0;">
-            <button class="btn" onclick="sendChat()">Send</button>
-          </div>
-        </div>
-      </div>
-	  
-	  //end rp rooms
-	  
-	  
-    
-
-
-     
- 
-
-
-     
       
       <!-- NOTIFICATIONS PAGE -->
       <div id="notifs" class="page">
