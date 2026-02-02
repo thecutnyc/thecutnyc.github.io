@@ -32,8 +32,10 @@
       background: var(--bg-body); color: var(--text);
       overflow: hidden; overscroll-behavior: none;
     }
-    #editCoverBtn { display: none !important; }
-    #app { display: flex; width: 100%; height: 100%; overflow: hidden; }
+#editCoverBtn {
+  display: none !important;
+}
+#app { display: flex; width: 100%; height: 100%; overflow: hidden; }
     .sidebar { width: 250px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
     .nav-item { padding: 12px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500; margin-bottom: 4px; transition: 0.2s; }
     .nav-item:hover { background: var(--hover); color: var(--text); }
@@ -43,8 +45,7 @@
     .page { display: none; max-width: 600px; margin: 0 auto; animation: fadeIn 0.2s; }
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
+	.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
     .btn { background: var(--text); color: var(--bg-card); border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
     .btn.danger { background: var(--red); color: white; }
     .btn.success { background: var(--green); color: white; }
@@ -58,7 +59,7 @@
       resize: none; 
     }
     
-    /* RP ROOMS & CHAT STYLES */
+	/* RP ROOMS & CHAT STYLES */
     .room-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
     .room-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; cursor: pointer; text-align: center; transition: 0.2s; }
     .room-card:hover { border-color: var(--primary); }
@@ -68,21 +69,26 @@
     .msg.me { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 2px; }
     .msg.them { align-self: flex-start; background: var(--hover); color: var(--text); border-bottom-left-radius: 2px; }
     .msg-user { font-weight: 700; font-size: 11px; display: block; margin-bottom: 2px; }
-
-    .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer; }
+	
+	    .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer; }
     .checkbox-wrapper input { width: auto; margin: 0; }
+
     #alertBanner { background: var(--banner-bg); border: 1px solid var(--banner-border); color: var(--banner-text); padding: 15px; border-radius: 8px; margin-bottom: 30px; display: none; font-size: 15px; font-weight: 600; align-items: center; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
     .news-item { margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
     .news-headline { font-size: 24px; font-weight: 800; line-height: 1.2; margin-bottom: 8px; font-family: 'Georgia', serif; }
     .news-meta { font-size: 13px; color: var(--muted); margin-bottom: 15px; }
     .news-body { font-size: 16px; line-height: 1.6; white-space: pre-wrap; }
+
     .profile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; grid-auto-rows: 160px; }
     .profile-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; cursor: pointer; text-align: center; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
     .profile-card img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; flex-shrink: 0; margin-bottom: 10px; }
+
     #map { height: 400px; width: 100%; border-radius: 8px; z-index: 1; margin-top: 10px; }
     .list-item, .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border); }
     .tx-in { color: var(--green); } .tx-out { color: var(--red); }
     .hidden { display: none !important; } .admin-only { display: none !important; }
+    
     .actions { display: flex; gap: 15px; margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border); }
     .act-btn { cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 5px; color: var(--muted); }
     .act-btn.liked { color: var(--red); }
@@ -91,20 +97,61 @@
     .law-row { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--border); align-items: center; }
     .req-item { background: var(--hover); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 10px; }
     #mobileHeader { display: none; }
-
-    @media (max-width: 768px) {
+   @media (max-width: 768px) {
       #app { flex-direction: column; }
-      .sidebar { width: 100%; height: 85px; border-right: none; border-top: 1px solid var(--border); position: fixed; bottom: 0; left: 0; z-index: 1000; padding: 10px 0; flex-direction: row; overflow-x: auto; background: var(--bg-sidebar); align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+      
+      /* Updated Mobile Bottom Bar */
+      .sidebar { 
+          width: 100%; 
+          height: 85px; /* INCREASED from 70px */
+          border-right: none; 
+          border-top: 1px solid var(--border); 
+          position: fixed; 
+          bottom: 0; 
+          left: 0; 
+          z-index: 1000; 
+          padding: 10px 0; /* Add top/bottom padding */
+          flex-direction: row; 
+          overflow-x: auto; 
+          background: var(--bg-sidebar); 
+          align-items: center; 
+          box-shadow: 0 -2px 10px rgba(0,0,0,0.05); /* Optional: Adds a subtle shadow */
+      }
+
       .sidebar-brand, .sidebar-footer { display: none; }
-      nav { display: flex; width: 100%; padding: 0 15px; gap: 10px; align-items: center; }
-      .nav-item { margin: 0; padding: 0 16px; font-size: 14px; white-space: nowrap; border-radius: 25px; background: var(--bg-body); flex-shrink: 0; height: 44px; display: flex; align-items: center; justify-content: center; }
-      .main { padding: 30px; padding-bottom: 120px; width: 100%; }
+      
+      nav { 
+          display: flex; 
+          width: 100%; 
+          padding: 0 15px; 
+          gap: 10px; /* More space between buttons */
+          align-items: center; 
+      }
+      
+      .nav-item { 
+          margin: 0; 
+          padding: 0 16px; 
+          font-size: 14px; /* Slightly larger text */
+          white-space: nowrap; 
+          border-radius: 25px; 
+          background: var(--bg-body); 
+          flex-shrink: 0; 
+          height: 44px; /* INCREASED from 36px */
+          display: flex; 
+          align-items: center; 
+          justify-content: center;
+      }
+      
+      .main { padding: 30px; padding-bottom: 120px; width: 100%; } /* Increase bottom padding so content isn't hidden */
+      
       #mobileHeader { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border); position: relative; margin: -30px -30px 20px -30px; width: calc(100% + 60px); }
     }
-  </style>
+
+ </style>
 </head>
 <body>
 
+  <!-- LOGIN -->
   <div id="loginScreen" style="position:fixed; inset:0; background:var(--bg-body); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;">
     <div class="card" style="width:100%; max-width:350px; text-align:center;">
       <h1>The Cut NYC</h1>
@@ -115,15 +162,19 @@
   </div>
 
   <div id="app" class="hidden">
+    
     <aside class="sidebar">
       <div class="sidebar-brand" style="font-weight:800; font-size:20px; margin-bottom:30px;">The Cut NYC</div>
-      <nav id="sidebarNav">
+      <nav>
         <div class="nav-item active" onclick="nav('feed')">Feed</div>
+        
+        <!-- NEW NOTIFICATIONS TAB -->
         <div class="nav-item" onclick="nav('notifs')" style="position:relative; display:flex; justify-content:space-between; align-items:center;">
           <span>🔔 Notifications</span>
           <span id="notifBadge" style="background:var(--red); color:white; font-size:10px; padding:2px 6px; border-radius:10px; display:none;">0</span>
         </div>
-        <div class="nav-item" onclick="nav('rooms')">🏙️ RP Rooms</div>
+
+<div class="nav-item" onclick="nav('rooms')">RP Rooms</div>
         <div class="nav-item" onclick="nav('news')">News</div>
         <div class="nav-item" onclick="nav('profiles')">Profiles</div>
         <div class="nav-item" onclick="nav('law')">Law Book</div>
@@ -134,24 +185,23 @@
         <div class="nav-item" onclick="nav('account')">My Account</div>
       </nav>
       <div class="sidebar-footer" style="margin-top:auto;">
-        <button class="btn" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--text);" onclick="toggleTheme()">Theme</button>
+        <button class="btn" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--text);" onclick="toggleTheme()">Light/Dark Theme</button>
         <button class="btn danger" style="width:100%; margin-top:10px;" onclick="logout()">Logout</button>
       </div>
     </aside>
-
+	
     <main class="main">
       <div id="mobileHeader">
         <div style="font-weight:800; font-size:18px;">The Cut NYC</div>
         <div style="display:flex; gap:8px;">
-           <button class="btn small" onclick="toggleTheme()">🌗</button>
+           <button class="btn small" style="background:var(--bg-body); color:var(--text); border:1px solid var(--border);" onclick="toggleTheme()">🌗</button>
            <button class="btn danger small" onclick="logout()">🛑</button>
         </div>
       </div>
-
       <div id="alertBanner">
         <span style="font-size:20px;">📢</span> <span id="bannerText">System Online. Welcome to The Cut NYC.</span>
       </div>
-      
+       <!-- FEED -->
       <div id="feed" class="page active">
         <h1>City Feed</h1>
         <div class="card">
@@ -163,8 +213,10 @@
         </div>
         <div id="feedList"></div>
       </div>
-
-      <div id="rooms" class="page">
+	  
+	  // RP ROOMS
+	  
+	 <div id="rooms" class="page">
         <h1>RP Locations</h1>
         <p style="color:var(--muted); margin-bottom:20px;">Enter a room to start roleplaying.</p>
         <div class="room-grid">
@@ -188,7 +240,20 @@
           </div>
         </div>
       </div>
+	  
+	  //end rp rooms
+	  
+	  
+    
 
+
+     
+ 
+
+
+     
+      
+      <!-- NOTIFICATIONS PAGE -->
       <div id="notifs" class="page">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h1>Notifications</h1>
@@ -197,66 +262,84 @@
         <div id="notifList"></div>
       </div>
 
+      <!-- NEWS -->
       <div id="news" class="page">
         <h1>City News</h1>
         <div class="card">
           <h2>Write Article</h2>
-          <input id="newsHead" placeholder="Headline">
-          <textarea id="newsBody" rows="6" placeholder="Content..."></textarea>
+          <input id="newsHead" placeholder="Headline (Catchy Title)">
+          <textarea id="newsBody" rows="6" placeholder="Article content..."></textarea>
           <input id="newsImg" placeholder="Image URL (Optional)">
-          <button class="btn" onclick="addNews()">Publish</button>
+          <button class="btn" onclick="addNews()">Publish Article</button>
         </div>
         <div id="newsList"></div>
       </div>
 
-      <div id="profiles" class="page">
-        <h1>Citizens</h1>
-        <input id="profileSearch" placeholder="Search username..." oninput="filterProfiles()" style="margin-bottom:15px;">
-        <div id="profileGrid" class="profile-grid"></div>
-      </div>
+     <!-- PROFILES -->
+<div id="profiles" class="page">
+  <h1>Citizens</h1>
 
+  <!-- NEW SEARCH BAR -->
+  <input 
+    id="profileSearch"
+    placeholder="Search username..."
+    oninput="filterProfiles()"
+    style="margin-bottom:15px;"
+  >
+
+  <div id="profileGrid" class="profile-grid"></div>
+</div>
+
+
+      <!-- LAW BOOK -->
       <div id="law" class="page">
         <h1>Law Book</h1>
         <div class="card">
             <h2>Add New Rule</h2>
-            <input id="ruleTitle" placeholder="Title">
-            <input id="ruleDesc" placeholder="Description">
+            <input id="ruleTitle" placeholder="Title (e.g. Speeding)">
+            <input id="ruleDesc" placeholder="Description (Optional)">
             <select id="ruleType">
                 <option value="crime">Crime (Fine)</option>
                 <option value="reward">Reward (Payment)</option>
             </select>
             <div style="display:flex; gap:10px; align-items:center;">
-                <input id="ruleAmt" type="number" placeholder="Amt" style="flex:1">
+                <input id="ruleAmt" type="number" placeholder="Amount ($ or %)" style="flex:1">
                 <label class="checkbox-wrapper" style="margin:0;">
-                    <input type="checkbox" id="ruleIsPercent"> <span>%?</span>
+                    <input type="checkbox" id="ruleIsPercent"> <span>Is %?</span>
                 </label>
-                <button class="btn" onclick="addRule()">Add</button>
+                <button class="btn" onclick="addRule()">Add Rule</button>
             </div>
+            <small style="color:var(--muted); display:block; margin-top:5px;">Check "Is %?" to fine percentage of wealth (e.g. 10 = 10%)</small>
         </div>
+        
         <h2>Crimes & Fines</h2>
         <div id="crimeList" class="card" style="padding:0"></div>
         <h2>Rewards & Bounties</h2>
         <div id="rewardList" class="card" style="padding:0"></div>
       </div>
 
+      <!-- WALLET -->
       <div id="wallet" class="page">
         <h1>Wallet</h1>
         <div class="card" style="text-align:center; padding:30px;">
           <div style="font-size:13px; color:var(--muted)">BALANCE</div>
           <div style="font-size:42px; font-weight:800; color:var(--primary);">$<span id="myBal">0</span></div>
         </div>
+        
         <h3 style="color:var(--red);">Pending Requests</h3>
         <div id="requestList"></div>
-        <div class="card">
+
+        <div class="card" style="margin-top:20px;">
           <h2>Send Money</h2>
           <input id="payTo" placeholder="Username">
           <input id="payAmt" type="number" placeholder="Amount">
-          <input id="payNote" placeholder="Note">
+          <input id="payNote" placeholder="Note (Optional)">
           <button class="btn" style="width:100%" onclick="transfer()">Send</button>
         </div>
-        <h3>History</h3>
+        <h3 style="margin-top:20px">History</h3>
         <div id="txList" class="card" style="padding:0"></div>
-        <div class="card admin-only">
+
+        <div class="card" style="margin-top:20px; border:1px solid var(--border);">
           <h3>Money Printer</h3>
           <div style="display:flex; gap:10px;">
             <input id="adminAmt" type="number" placeholder="Amt" style="flex:1">
@@ -266,6 +349,7 @@
         </div>
       </div>
 
+      <!-- JOBS/EVENTS -->
       <div id="jobs" class="page">
         <h1>Job Board</h1>
         <div class="card">
@@ -279,7 +363,6 @@
         </div>
         <div id="jobList"></div>
       </div>
-
       <div id="events" class="page">
         <h1>Events</h1>
         <div class="card">
@@ -292,6 +375,7 @@
         <div id="eventList"></div>
       </div>
 
+      <!-- MAP -->
       <div id="mapPage" class="page">
         <h1>City Map</h1>
         <div class="card">
@@ -301,7 +385,7 @@
           </div>
           <div style="display:flex; align-items:center; gap:8px; margin-top:10px;">
             <input id="pinTitle" placeholder="Pin Title" style="margin:0; flex:1;">
-            <button id="armMapBtn" class="btn small" onclick="toggleMapArm()">Add Pin</button>
+            <button id="armMapBtn" class="btn small" onclick="toggleMapArm()">Add</button>
           </div>
         </div>
         <div id="map"></div>
@@ -309,78 +393,104 @@
         <div id="pinList" class="card" style="padding:0;"></div>
       </div>
 
-      <div id="account" class="page">
-        <h1>My Character</h1>
-        <div class="card">
-          <label>Profile Picture</label>
-          <div style="display:flex; gap:10px; margin-bottom:10px;">
-             <input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="uploadAvatar()">
-             <button class="btn small" onclick="document.getElementById('avatarUpload').click()">📂 Upload</button>
-             <input id="editAvatar" placeholder="URL..." style="margin:0; flex:1;">
-          </div>
-          <label>Cover Photo</label>
-          <div style="display:flex; gap:10px; margin-bottom:10px;">
-             <input type="file" id="coverUpload" accept="image/*" style="display:none" onchange="uploadCoverFile()">
-             <button class="btn small" onclick="document.getElementById('coverUpload').click()">🖼️ Upload Cover</button>
-             <input id="editCover" placeholder="URL..." style="margin:0; flex:1;">
-          </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <div><label>Real Name</label><input id="editReal"></div>
-            <div><label>Age</label><input id="editAge" type="number"></div>
-          </div>
-          <label>Occupation</label><input id="editOcc">
-          <label>Status</label>
-          <select id="editStatus">
-            <option value="Single">Single</option>
-            <option value="Taken">Taken</option>
-            <option value="Complicated">Complicated</option>
-            <option value="Married">Married</option>
-          </select>
-          <label>Location</label><input id="editLoc">
-          <label>Bio</label><textarea id="editBio" rows="4"></textarea>
-          <button class="btn" style="width:100%" onclick="saveProfile()">Save Character</button>
-        </div>
-        <div class="card admin-only">
-            <h3>📢 Broadcast Alert</h3>
-            <input id="editBannerText" placeholder="System Message...">
-            <button class="btn" onclick="saveBanner()">Update Banner</button>
-        </div>
-      </div>
+     <!-- ACCOUNT -->
+<div id="account" class="page">
+  <h1>My Character</h1>
+  <div class="card">
+    <label>Profile Picture</label>
+    <div style="display:flex; gap:10px; margin-bottom:10px;">
+       <input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="uploadAvatar()">
+       <button class="btn small" onclick="document.getElementById('avatarUpload').click()" style="background:var(--border); color:var(--text); width:auto;">📂 Upload</button>
+       <input id="editAvatar" placeholder="Or paste URL..." style="margin:0; flex:1;">
+    </div>
 
-      <div id="profileView" class="page">
-        <button class="btn small" style="margin-bottom:15px;" onclick="nav('profiles')">← Back</button>
-        <div style="position:relative; height:180px; border-radius:12px; overflow:hidden; margin-bottom:10px; background:var(--bg-card);">
-          <img id="pvCover" src="" style="width:100%; height:100%; object-fit:cover;">
-          <div style="position:absolute; bottom:2px; right:20px; width:90px; height:90px; border:4px solid var(--bg-card); border-radius:50%; overflow:hidden; background:var(--bg-card); box-shadow:0 4px 12px rgba(0,0,0,0.15);">
-            <img id="pvAvatar" style="width:100%; height:100%; object-fit:cover;">
-          </div>
-        </div>
-        <div class="card" style="margin-top:20px; padding-top:30px;">
-          <h2 id="pvName"></h2>
-          <div id="pvReal" style="color:var(--muted); font-size:14px;"></div>
-          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:20px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:15px 0; text-align:center;">
-            <div><strong>Age</strong><br><span id="pvAge">-</span></div>
-            <div><strong>Occ</strong><br><span id="pvOcc">-</span></div>
-            <div><strong>Status</strong><br><span id="pvStat">-</span></div>
-          </div>
-          <p id="pvBio" style="white-space:pre-wrap; color:var(--muted); font-size:14px;"></p>
-          <div style="font-size:13px; color:var(--muted); margin-top:20px;">📍 <span id="pvLoc"></span></div>
-        </div>
-        <h3>Posts</h3>
-        <div id="pvPosts"></div>
+    <!-- ADD THIS NEW COVER PHOTO SECTION -->
+    <label style="margin-top:15px;">Cover Photo</label>
+    <div style="display:flex; gap:10px; margin-bottom:10px;">
+       <input type="file" id="coverUpload" accept="image/*" style="display:none" onchange="uploadCoverFile()">
+       <button class="btn small" onclick="document.getElementById('coverUpload').click()" style="background:var(--border); color:var(--text); width:auto;">🖼️ Upload Cover</button>
+       <input id="editCover" placeholder="Or paste Cover URL..." style="margin:0; flex:1;">
+    </div>
+    <!-- END NEW SECTION -->
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <div><label>Real Name</label><input id="editReal"></div>
+      <div><label>Age</label><input id="editAge" type="number"></div>
+    </div>
+    <label>Occupation</label><input id="editOcc">
+    <label>Status</label>
+    <select id="editStatus">
+      <option value="Single">Single</option>
+      <option value="Taken">Taken</option>
+      <option value="Complicated">Complicated</option>
+      <option value="Married">Married</option>
+    </select>
+    <label>Location</label><input id="editLoc">
+    <label>Bio</label><textarea id="editBio" rows="4"></textarea>
+    <button class="btn" style="width:100%" onclick="saveProfile()">Save Character</button>
+  </div>
+  
+  <div class="card admin-only" style="margin-top:20px; border:1px solid var(--banner-border);">
+      <h3 style="color:var(--banner-border)">📢 Broadcast Alert</h3>
+      <input id="editBannerText" placeholder="System Message...">
+      <button class="btn" onclick="saveBanner()">Update Banner</button>
+  </div>
+</div>
+
+   
+<!-- PROFILE VIEW -->
+<div id="profileView" class="page">
+  <button class="btn small" style="margin-bottom:15px;" onclick="nav('profiles')">← Back</button>
+  
+   <!-- FIXED Cover Photo Banner -->
+  <div style="position:relative; height:180px; border-radius:12px; overflow:hidden; margin-bottom:10px; background:var(--bg-card);">
+    <img id="pvCover" src="" style="width:100%; height:100%; object-fit:cover;" 
+         onerror="this.src='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'">
+    <!-- FIXED Avatar position -->
+    <div style="position:absolute; bottom:2px; right:20px; width:90px; height:90px; border:4px solid var(--bg-card); border-radius:50%; overflow:hidden; background:var(--bg-card); box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+      <img id="pvAvatar" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://ui-avatars.com/api/?name=User'">
+    </div>
+  </div>
+
+ <!-- Profile Info (now below cover) -->
+  <div class="card" style="margin-top:20px; padding-top:30px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <div>
+        <h2 id="pvName" style="margin:0; font-size:20px;"></h2>
+        <div id="pvReal" style="color:var(--muted); font-size:14px;"></div>
       </div>
+      <!-- Edit button for owner -->
+     <button class="btn small" id="editCoverBtn" onclick="uploadCover()" style="display:none !important;">Change Cover</button>
+    </div>
+    
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:20px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:15px 0; text-align:center;">
+      <div><strong>Age</strong><br><span id="pvAge">-</span></div>
+      <div><strong>Occ</strong><br><span id="pvOcc">-</span></div>
+      <div><strong>Status</strong><br><span id="pvStat">-</span></div>
+    </div>
+    
+    <p id="pvBio" style="white-space:pre-wrap; color:var(--muted); font-size:14px;"></p>
+    <div style="font-size:13px; color:var(--muted); margin-top:20px;">📍 <span id="pvLoc"></span></div>
+  </div>
+
+  <!-- Posts Section -->
+  <h3 style="margin-top:30px; padding-left:5px;">Posts</h3>
+  <div id="pvPosts"></div>
+</div>
+
+
     </main>
   </div>
 
 <script>
 const SUPABASE_URL = 'https://virppeuknikpgmtgthnh.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpcnBwZXVrbmlrcGdtdGd0aG5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2MjA0ODksImV4cCI6MjA4NTE5NjQ4OX0.Klc3IcZEjp1dI1fLwkqSKVw9n5VfPPREsxkQhRcP0a0';
-const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let me = localStorage.getItem('cut_user_online') || null;
 let mapObj = null, mapArmed = false, searchMarker = null;
-let currentRoom = null, chatSub = null, allProfiles = [];
 
+// INIT
 document.documentElement.setAttribute('data-theme', localStorage.getItem('theme')||'light');
 if(me) {
   document.getElementById('loginScreen').style.display = 'none';
@@ -388,206 +498,569 @@ if(me) {
   loadAll();
 }
 
+function toggleTheme() {
+  const n = document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme', n);
+  localStorage.setItem('theme', n);
+}
+
 function nav(id) {
   document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
   document.getElementById(id==='map'?'mapPage':id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
-  if (event && event.target.classList.contains('nav-item')) event.target.classList.add('active');
-  if(id === 'map') setTimeout(initMap, 200);
-  if(id !== 'chatRoom' && chatSub) { client.removeChannel(chatSub); chatSub = null; }
-  loadBanner();
+  event.target.classList.add('active');
+  if(window.innerWidth < 768) event.target.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+  if(id) loadBanner();
+  if(id==='map') setTimeout(initMap,200);
 }
 
-// RP ROOMS LOGIC
-async function openRoom(roomId, title) {
-  currentRoom = roomId;
-  document.getElementById('roomTitle').innerText = title;
-  document.getElementById('chatMessages').innerHTML = 'Loading...';
-  nav('chatRoom');
-  
-  const { data } = await client.from('chat_messages').select('*').eq('room_id', roomId).order('created_at', { ascending: true }).limit(50);
-  renderMessages(data || []);
-  
-  chatSub = client.channel(`room-${roomId}`)
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `room_id=eq.${roomId}` }, 
-    payload => appendChatMessage(payload.new))
-    .subscribe();
-}
+function logout() { localStorage.removeItem('cut_user_online'); location.reload(); }
 
-function renderMessages(msgs) {
-  const container = document.getElementById('chatMessages');
-  container.innerHTML = msgs.map(m => messageHTML(m)).join('');
-  container.scrollTop = container.scrollHeight;
-}
-
-function appendChatMessage(m) {
-  const container = document.getElementById('chatMessages');
-  if(container.innerHTML === 'Loading...') container.innerHTML = '';
-  container.insertAdjacentHTML('beforeend', messageHTML(m));
-  container.scrollTop = container.scrollHeight;
-}
-
-function messageHTML(m) {
-  const isMe = m.user_id === me;
-  return `<div class="msg ${isMe ? 'me' : 'them'}"><span class="msg-user">@${m.user_id}</span>${m.text}</div>`;
-}
-
-async function sendChat() {
-  const input = document.getElementById('chatInput');
-  if(!input.value.trim()) return;
-  await client.from('chat_messages').insert({ room_id: currentRoom, user_id: me, text: input.value });
-  input.value = '';
-}
-
-// CORE FUNCTIONS (PRESERVED FROM ORIGINAL)
 async function login() {
   const u = document.getElementById('loginUser').value.trim();
   if(!u) return;
   const { data } = await client.from('profiles').select().eq('username', u).single();
   if(!data) await client.from('profiles').insert({ username: u, balance: 100 });
-  me = u; localStorage.setItem('cut_user_online', me); location.reload();
+  me = u;
+  localStorage.setItem('cut_user_online', me);
+  location.reload();
 }
-function logout() { localStorage.removeItem('cut_user_online'); location.reload(); }
-function toggleTheme() {
-  const n = document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
-  document.documentElement.setAttribute('data-theme', n); localStorage.setItem('theme', n);
-}
+
 async function loadAll() {
-  loadNotifs(); checkAdmin(); loadBanner(); loadFeed(); loadNews(); loadProfiles(); loadJobs(); loadEvents(); loadMyProfile(); loadTx(); loadRules(); loadRequests();
+  
+  loadNotifs();
+  await checkAdmin();
+  loadBanner(); loadFeed(); loadNews(); loadProfiles(); loadJobs(); loadEvents(); loadMyProfile(); loadTx(); loadRules(); loadRequests();
 }
+
 async function checkAdmin() {
-  const { data } = await client.from('profiles').select('is_admin').eq('username', me).single();
-  if(data && data.is_admin) document.querySelectorAll('.admin-only').forEach(el => el.style.setProperty('display', 'block', 'important'));
+    const { data } = await client.from('profiles').select('is_admin').eq('username', me).single();
+    if(data && data.is_admin) {
+        document.querySelectorAll('.admin-only').forEach(el => el.style.setProperty('display', 'block', 'important'));
+    }
 }
+
 async function loadBanner() {
-  const { data } = await client.from('app_config').select().eq('key', 'banner_msg').maybeSingle();
-  const banner = document.getElementById('alertBanner'); banner.style.display = 'flex';
-  if(data) { document.getElementById('bannerText').innerText = data.value; document.getElementById('editBannerText').value = data.value; }
+    const { data } = await client.from('app_config').select().eq('key', 'banner_msg').maybeSingle();
+    const banner = document.getElementById('alertBanner');
+    banner.style.display = 'flex';
+    if(data && data.value) {
+        document.getElementById('bannerText').innerText = data.value;
+        document.getElementById('editBannerText').value = data.value;
+    } else {
+        document.getElementById('bannerText').innerText = "System Online. Welcome to The Cut NYC.";
+    }
 }
 async function saveBanner() {
-  const txt = document.getElementById('editBannerText').value;
-  const { data } = await client.from('app_config').select().eq('key', 'banner_msg').maybeSingle();
-  if(data) await client.from('app_config').update({ value: txt }).eq('key', 'banner_msg');
-  else await client.from('app_config').insert({ key: 'banner_msg', value: txt });
-  loadBanner(); alert('Updated');
+    const txt = document.getElementById('editBannerText').value;
+    const { data } = await client.from('app_config').select().eq('key', 'banner_msg').maybeSingle();
+    if(data) await client.from('app_config').update({ value: txt }).eq('key', 'banner_msg');
+    else await client.from('app_config').insert({ key: 'banner_msg', value: txt });
+    await loadBanner(); alert('Banner Updated!');
+}
+
+async function addRule() {
+    const isP = document.getElementById('ruleIsPercent').checked;
+    await client.from('rules').insert({
+        title: s('ruleTitle'),
+        description: s('ruleDesc'),
+        type: s('ruleType'),
+        amount: parseInt(s('ruleAmt')),
+        is_percent: isP,
+        created_by: me
+    });
+    document.getElementById('ruleTitle').value = ''; document.getElementById('ruleDesc').value = ''; 
+    document.getElementById('ruleIsPercent').checked = false;
+    loadRules();
+}
+
+async function loadRules() {
+    const { data } = await client.from('rules').select();
+    const crimes = data.filter(r => r.type === 'crime'); const rewards = data.filter(r => r.type === 'reward');
+    const renderRow = (r) => `
+        <div class="law-row">
+            <div>
+                <b>${r.title}</b>
+                ${r.description ? `<br><small style="color:var(--muted); font-style:italic;">"${r.description}"</small>` : ''}
+                <br><small style="color:${r.type==='crime'?'var(--red)':'var(--green)'}">
+                   ${r.type==='crime'?'Fine':'Reward'}: ${r.is_percent ? r.amount+'%' : '$'+r.amount}
+                </small>
+            </div>
+            <button class="btn ${r.type==='crime'?'danger':'success'} small" onclick="issueRequest('${r.title}', ${r.amount}, '${r.type}', ${r.is_percent})">Issue</button>
+        </div>`;
+    document.getElementById('crimeList').innerHTML = crimes.map(renderRow).join(''); document.getElementById('rewardList').innerHTML = rewards.map(renderRow).join('');
+}
+
+async function issueRequest(reason, amount, type, isPercent) {
+    const target = prompt(`Who is this ${type} for? (Enter username)`); if(!target) return;
+    await client.from('requests').insert({ to_user: target, amount: amount, type: type, reason: reason, status: 'pending', is_percent: isPercent });
+    alert(`${type} sent to ${target}`);
+}
+
+async function loadRequests() {
+    const { data } = await client.from('requests').select().eq('to_user', me).eq('status', 'pending');
+    document.getElementById('requestList').innerHTML = (data||[]).length ? (data||[]).map(r => `
+        <div class="req-item" style="border-left: 5px solid ${r.type==='crime'?'var(--red)':'var(--green)'}">
+            <div style="font-weight:bold; margin-bottom:5px;">${r.type.toUpperCase()}: ${r.reason}</div>
+            <div style="font-size:20px; font-weight:800; margin-bottom:10px;">${r.is_percent ? r.amount+'%' : '$'+r.amount}</div>
+            <button class="btn ${r.type==='crime'?'danger':'success'}" style="width:100%" onclick="processRequest(${r.id}, ${r.amount}, '${r.type}', ${r.is_percent})">
+                ${r.type==='crime' ? 'Pay Fine' : 'Claim Reward'}
+            </button>
+        </div>`).join('') : '<div style="color:var(--muted); padding:10px;">No pending requests.</div>';
+}
+
+async function processRequest(id, amount, type, isPercent) {
+    const { data: user } = await client.from('profiles').select('balance').eq('username', me).single();
+    let finalAmt = amount;
+    
+    // PERCENTAGE CALCULATION
+    if(isPercent) {
+        finalAmt = Math.floor(user.balance * (amount / 100));
+        if(finalAmt < 1) finalAmt = 0; // Don't take money if they have 0
+    }
+
+    if(type === 'crime') {
+        if(user.balance < finalAmt) return alert("Not enough money!");
+        await client.from('profiles').update({ balance: user.balance - finalAmt }).eq('username', me);
+    } else {
+        await client.from('profiles').update({ balance: user.balance + finalAmt }).eq('username', me);
+    }
+    
+    await client.from('requests').update({ status: 'completed' }).eq('id', id);
+    alert(type === 'crime' ? `Fine Paid ($${finalAmt})` : `Reward Claimed ($${finalAmt})`);
+    loadMyProfile(); loadRequests();
+}
+
+async function addNews() {
+    await client.from('news').insert({
+        headline: s('newsHead'),
+        body: s('newsBody'),
+        image_url: s('newsImg'),
+        author: me
+    });
+    document.getElementById('newsHead').value = '';
+    document.getElementById('newsBody').value = '';
+    document.getElementById('newsImg').value = '';
+    loadNews();
+    nav('news');
+}
+async function loadNews() {
+    const { data } = await client.from('news').select().order('created_at', {ascending:false});
+    document.getElementById('newsList').innerHTML = (data||[]).map(n => `
+        <div class="card news-item">
+            <div class="news-headline">${n.headline}</div>
+            <div class="news-meta">By ${n.author} • ${new Date(n.created_at).toLocaleDateString()}</div>
+            ${n.image_url ? `<img src="${n.image_url}" style="width:100%; border-radius:8px; margin-bottom:15px;">` : ''}
+            <div class="news-body">${n.body}</div>
+        </div>
+    `).join('');
+}
+
+async function addPost() {
+  const txt = document.getElementById('postText').value; const file = document.getElementById('postFile').files[0]; const btn = document.getElementById('postBtn');
+  if(!txt && !file) return; btn.innerText = '...'; let url = null;
+  if(file) { const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '_'); const name = `${Date.now()}_${cleanName}`; await client.storage.from('uploads').upload(name, file); const { data } = client.storage.from('uploads').getPublicUrl(name); url = data.publicUrl; }
+  await client.from('posts').insert({ author: me, text: txt, img_url: url }); document.getElementById('postText').value = ''; document.getElementById('postFile').value = ''; btn.innerText = 'Post'; loadFeed();
 }
 async function loadFeed() {
   const { data: posts } = await client.from('posts').select(`*, likes(user_id), comments(id)`).order('created_at', {ascending:false}).limit(20);
   document.getElementById('feedList').innerHTML = (posts||[]).map(p => {
-    const isLiked = p.likes && p.likes.some(l => l.user_id === me);
-    return `<div class="card" id="post-${p.id}"><div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted)"><strong onclick="openProfile('${p.author}')">@${p.author}</strong><span>${new Date(p.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span></div><div style="margin-top:5px;">${p.text||''}</div>${p.img_url ? `<img src="${p.img_url}" style="max-width:100%; margin-top:10px; border-radius:8px;">` : ''}<div class="actions"><div class="act-btn ${isLiked?'liked':''}" onclick="toggleLike(${p.id})">${isLiked?'❤️':'♡'} ${p.likes?p.likes.length:0}</div><div class="act-btn" onclick="toggleComments(${p.id})">💬 ${p.comments?p.comments.length:0}</div></div><div id="comments-${p.id}" class="comments-sec"><div id="clist-${p.id}"></div><div style="display:flex; gap:5px; margin-top:10px;"><input id="cinput-${p.id}" placeholder="Comment..." style="margin:0; font-size:12px;"><button class="btn small" onclick="addComment(${p.id})">Send</button></div></div></div>`;
+    const isLiked = p.likes && p.likes.some(l => l.user_id === me); const likeCount = p.likes ? p.likes.length : 0; const commentCount = p.comments ? p.comments.length : 0;
+    return `<div class="card" id="post-${p.id}"><div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted)"><strong onclick="openProfile('${p.author}')">@${p.author}</strong><div style="display:flex; gap:10px; align-items:center;"><span>${new Date(p.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>${p.author === me ? `<span onclick="deletePost(${p.id})" style="cursor:pointer; color:var(--red);">🗑</span>` : ''}</div></div><div style="margin-top:5px;">${p.text||''}</div>${p.img_url ? `<img src="${p.img_url}" style="max-width:100%; margin-top:10px; border-radius:8px;">` : ''}<div class="actions"><div class="act-btn ${isLiked?'liked':''}" onclick="toggleLike(${p.id})">${isLiked ? '❤️' : '♡'} ${likeCount}</div><div class="act-btn" onclick="toggleComments(${p.id})">💬 ${commentCount}</div></div><div id="comments-${p.id}" class="comments-sec"><div id="clist-${p.id}"></div><div style="display:flex; gap:5px; margin-top:10px;"><input id="cinput-${p.id}" placeholder="Write comment..." style="margin:0; font-size:12px; padding:8px;"><button class="btn small" onclick="addComment(${p.id})">Send</button></div></div></div>`;
   }).join('');
 }
-async function addPost() {
-  const txt = document.getElementById('postText').value; const file = document.getElementById('postFile').files[0];
-  if(!txt && !file) return; let url = null;
-  if(file) { const name = `${Date.now()}_${file.name}`; await client.storage.from('uploads').upload(name, file); const { data } = client.storage.from('uploads').getPublicUrl(name); url = data.publicUrl; }
-  await client.from('posts').insert({ author: me, text: txt, img_url: url });
-  document.getElementById('postText').value = ''; document.getElementById('postFile').value = ''; loadFeed();
-}
+async function deletePost(id) { if(confirm('Delete post?')) await client.from('posts').delete().eq('id', id); loadFeed(); }
+
 async function toggleLike(pid) {
-    const { data: ex } = await client.from('likes').select().eq('post_id', pid).eq('user_id', me).single();
-    if(ex) await client.from('likes').delete().eq('id', ex.id);
-    else { await client.from('likes').insert({ post_id: pid, user_id: me }); const { data: p } = await client.from('posts').select('author').eq('id', pid).single(); if(p && p.author!==me) await client.from('notifications').insert({ user_id: p.author, from_user: me, type: 'like', message: 'liked your post', link_id: pid }); }
+    const { data: existingLike } = await client.from('likes').select().eq('post_id', pid).eq('user_id', me).single();
+    if (existingLike) {
+        await client.from('likes').delete().eq('id', existingLike.id);
+    } else {
+        await client.from('likes').insert({ post_id: pid, user_id: me });
+        const { data: post } = await client.from('posts').select('author').eq('id', pid).single();
+        if (post && post.author !== me) {
+            await client.from('notifications').insert({ user_id: post.author, from_user: me, type: 'like', message: 'liked your post', is_read: false, link_id: pid  });
+        }
+    }
     loadFeed();
 }
-async function toggleComments(pid) {
-  const div = document.getElementById(`comments-${pid}`); if(div.style.display==='block'){ div.style.display='none'; return; } div.style.display='block';
-  const { data } = await client.from('comments').select().eq('post_id', pid).order('created_at');
-  document.getElementById(`clist-${pid}`).innerHTML = (data||[]).map(c => `<div class="comment-item"><b>${c.author}</b>: ${c.text}</div>`).join('');
-}
+
+async function toggleComments(pid) { const div = document.getElementById(`comments-${pid}`); if(div.style.display === 'block') { div.style.display = 'none'; return; } div.style.display = 'block'; const { data } = await client.from('comments').select().eq('post_id', pid).order('created_at'); document.getElementById(`clist-${pid}`).innerHTML = (data||[]).map(c => `<div class="comment-item"><b>${c.author}</b>: ${c.text}</div>`).join(''); }
 async function addComment(pid) {
-  const txt = document.getElementById(`cinput-${pid}`).value; if(!txt) return;
-  await client.from('comments').insert({ post_id: pid, author: me, text: txt });
-  document.getElementById(`cinput-${pid}`).value = ''; toggleComments(pid);
-  const { data: p } = await client.from('posts').select('author').eq('id', pid).single();
-  if(p && p.author!==me) await client.from('notifications').insert({ user_id: p.author, from_user: me, type: 'comment', message: `commented: "${txt}"`, link_id: pid });
+    const txt = document.getElementById(`cinput-${pid}`).value;
+    if (!txt) return;
+
+    // 1. Add the comment
+    await client.from('comments').insert({ post_id: pid, author: me, text: txt });
+    
+    // 2. Clear input & refresh comments
+    document.getElementById(`cinput-${pid}`).value = '';
+    toggleComments(pid);
+
+    // --- NOTIFICATION LOGIC START ---
+    // A. Find who owns the post
+    const { data: post } = await client.from('posts').select('author').eq('id', pid).single();
+    
+    // B. Send notification (if I'm not commenting on my own post)
+    if (post && post.author !== me) {
+        await client.from('notifications').insert({
+            user_id: post.author,    // Who gets the alert
+            from_user: me,           // Who sent it
+            type: 'comment',
+            message: `commented: "${txt}"`, // Shows what they wrote
+            is_read: false,
+            link_id: pid             // <--- The Post ID (for clicking)
+        });
+    }
+    // --- NOTIFICATION LOGIC END ---
 }
-async function loadProfiles() { const { data } = await client.from('profiles').select(); allProfiles = data || []; renderProfiles(allProfiles); }
-function renderProfiles(list) { document.getElementById('profileGrid').innerHTML = list.map(u => `<div class="profile-card" onclick="openProfile('${u.username}')"><img src="${u.avatar || 'https://ui-avatars.com/api/?name='+u.username}"><div style="font-weight:bold; font-size:14px;">@${u.username}</div><div style="font-size:11px; color:var(--muted)">${u.occupation || 'Citizen'}</div></div>`).join(''); }
-function filterProfiles() { const q = document.getElementById('profileSearch').value.toLowerCase(); renderProfiles(allProfiles.filter(u => u.username.toLowerCase().includes(q) || (u.real_name||'').toLowerCase().includes(q))); }
+
+async function transfer() {
+    const to = s('payTo'), amt = parseInt(s('payAmt')), note = s('payNote');
+    const { data: my } = await client.from('profiles').select('balance').eq('username', me).single();
+    if (my.balance < amt) return alert('Poor');
+    const { data: dest } = await client.from('profiles').select('balance').eq('username', to).single();
+    if (!dest) return alert('No user');
+    await client.from('profiles').update({ balance: my.balance - amt }).eq('username', me);
+    await client.from('profiles').update({ balance: dest.balance + amt }).eq('username', to);
+    await client.from('transactions').insert({ from_user: me, to_user: to, amount: amt, note: note });
+    
+    await client.from('notifications').insert({
+        user_id: to, from_user: me, type: 'money',
+        message: `sent you $${amt} ${note ? `("${note}")` : ''}`, is_read: false
+    });
+    
+    alert('Sent'); loadMyProfile(); loadTx();
+}
+
+async function loadTx() { const { data } = await client.from('transactions').select().or(`from_user.eq.${me},to_user.eq.${me}`).order('created_at',{ascending:false}); document.getElementById('txList').innerHTML = (data||[]).map(t => `<div class="tx-item"><div>${t.to_user===me?'From '+t.from_user:'To '+t.to_user}${t.note ? `<br><small style="color:var(--muted)">"${t.note}"</small>` : ''}</div><div class="${t.to_user===me?'tx-in':'tx-out'}">${t.to_user===me?'+':'-'}${t.amount}</div></div>`).join(''); }
+async function modBalance(m) { const amt = parseInt(s('adminAmt')), { data } = await client.from('profiles').select('balance').eq('username', me).single(); await client.from('profiles').update({balance: data.balance+(amt*m)}).eq('username',me); loadMyProfile(); }
+let allProfiles = []; // store once so we can filter locally
+
+async function loadProfiles() {
+  const { data } = await client.from('profiles').select();
+  allProfiles = data || [];
+  renderProfiles(allProfiles);
+}
+
+function renderProfiles(list) {
+  document.getElementById('profileGrid').innerHTML = list.map(u => `
+    <div class="profile-card" onclick="openProfile('${u.username}')">
+      <img src="${u.avatar || 'https://ui-avatars.com/api/?name=' + u.username}">
+      <div style="font-weight:bold; font-size:14px; margin-top:10px; overflow:hidden; text-overflow:ellipsis; width:100%;">
+        @${u.username}
+      </div>
+      <div style="font-size:11px; color:var(--muted)">
+        ${u.occupation || 'Citizen'}
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterProfiles() {
+  const q = document.getElementById('profileSearch').value.toLowerCase();
+
+  const filtered = allProfiles.filter(u =>
+    u.username.toLowerCase().includes(q) ||
+    (u.real_name || '').toLowerCase().includes(q)
+  );
+
+  renderProfiles(filtered);
+}
+
 async function openProfile(u) {
-  nav('profileView'); const { data } = await client.from('profiles').select().eq('username', u).single();
-  document.getElementById('pvName').innerText = '@'+data.username; document.getElementById('pvCover').src = data.cover_url||''; document.getElementById('pvAvatar').src = data.avatar||'';
-  document.getElementById('pvReal').innerText = data.real_name||''; document.getElementById('pvAge').innerText = data.age||'-';
-  document.getElementById('pvOcc').innerText = data.occupation||'-'; document.getElementById('pvStat').innerText = data.status||'-';
-  document.getElementById('pvLoc').innerText = data.location||'-'; document.getElementById('pvBio').innerText = data.bio||'';
+  nav('profileView');
+  
+  const { data } = await client.from('profiles').select().eq('username', u).single();
+  document.getElementById('pvName').innerText = '@' + data.username;
+  document.getElementById('pvCover').src = data.cover_url || '';
+  document.getElementById('pvAvatar').src = data.avatar || '';
+  document.getElementById('pvReal').innerText = data.real_name || '';
+  document.getElementById('pvAge').innerText = data.age || '-';
+  document.getElementById('pvOcc').innerText = data.occupation || '-';
+  document.getElementById('pvStat').innerText = data.status || '-';
+  document.getElementById('pvLoc').innerText = data.location || '-';
+  document.getElementById('pvBio').innerText = data.bio || '';
+  
+  // Show edit button if it's my profile
+  document.getElementById('editCoverBtn').style.display = (data.username === me) ? 'block' : 'none';
+  
   loadUserPosts(u);
 }
-async function loadUserPosts(u) {
-  const { data } = await client.from('posts').select(`*`).eq('author', u).order('created_at', {ascending:false});
-  document.getElementById('pvPosts').innerHTML = (data||[]).map(p => `<div class="card"><b>@${u}</b><p>${p.text||''}</p></div>`).join('');
+
+// Cover photo upload
+async function uploadCoverFile() {
+  const file = document.getElementById('coverUpload').files[0];
+  if (!file) return;
+  
+  document.getElementById('editCover').value = 'Uploading...';
+  
+  const cleanName = file.name.replace(/[^a-zA-Z0-9]/g, '');
+  const name = 'cover-' + Date.now() + '-' + cleanName;
+  
+  const { error } = await client.storage.from('uploads').upload(name, file);
+  if (error) {
+    alert('Upload failed');
+    return;
+  }
+  
+  const { data } = client.storage.from('uploads').getPublicUrl(name);
+  document.getElementById('editCover').value = data.publicUrl;
+  
+  // Save to profile
+  await client.from('profiles').update({ cover_url: data.publicUrl }).eq('username', me);
+  loadMyProfile();
+  alert('Cover updated!');
 }
+
+// Save cover URL from input field
+async function uploadCover() {
+  const url = document.getElementById('editCover').value.trim();
+  if (!url) return;
+  
+  await client.from('profiles').update({ cover_url: url }).eq('username', me);
+  loadMyProfile();
+  alert('Cover updated!');
+}
+
+// Update saveProfile to include cover
 async function saveProfile() {
-  await client.from('profiles').update({ avatar: s('editAvatar'), cover_url: s('editCover'), real_name: s('editReal'), age: s('editAge'), occupation: s('editOcc'), status: s('editStatus'), location: s('editLoc'), bio: s('editBio') }).eq('username', me);
-  alert('Saved!'); loadMyProfile();
+  await client.from('profiles').update({
+    avatar: document.getElementById('editAvatar').value,
+    cover_url: document.getElementById('editCover').value,  // <-- NEW
+    real_name: document.getElementById('editReal').value,
+    age: document.getElementById('editAge').value,
+    occupation: document.getElementById('editOcc').value,
+    status: document.getElementById('editStatus').value,
+    location: document.getElementById('editLoc').value,
+    bio: document.getElementById('editBio').value
+  }).eq('username', me);
+  alert('Saved!');
 }
+
+// Update loadMyProfile to load cover
 async function loadMyProfile() {
-  const { data } = await client.from('profiles').select().eq('username', me).single(); if(!data) return;
-  document.getElementById('editAvatar').value = data.avatar||''; document.getElementById('editCover').value = data.cover_url||'';
-  document.getElementById('editReal').value = data.real_name||''; document.getElementById('editAge').value = data.age||'';
-  document.getElementById('editOcc').value = data.occupation||''; document.getElementById('editStatus').value = data.status||'Single';
-  document.getElementById('editLoc').value = data.location||''; document.getElementById('editBio').value = data.bio||'';
-  document.getElementById('myBal').innerText = data.balance||0;
+  const { data } = await client.from('profiles').select().eq('username', me).single();
+  if (!data) return;
+  
+  document.getElementById('editAvatar').value = data.avatar || '';
+  document.getElementById('editCover').value = data.cover_url || '';  // <-- NEW
+  document.getElementById('editReal').value = data.real_name || '';
+  document.getElementById('editAge').value = data.age || '';
+  document.getElementById('editOcc').value = data.occupation || '';
+  document.getElementById('editStatus').value = data.status || 'Single';
+  document.getElementById('editLoc').value = data.location || '';
+  document.getElementById('editBio').value = data.bio || '';
+  document.getElementById('myBal').innerText = data.balance || 0;
 }
-async function uploadAvatar() { const file = document.getElementById('avatarUpload').files[0]; if(!file) return; const name = `av_${Date.now()}`; await client.storage.from('uploads').upload(name, file); const { data } = client.storage.from('uploads').getPublicUrl(name); document.getElementById('editAvatar').value = data.publicUrl; }
-async function uploadCoverFile() { const file = document.getElementById('coverUpload').files[0]; if(!file) return; const name = `cv_${Date.now()}`; await client.storage.from('uploads').upload(name, file); const { data } = client.storage.from('uploads').getPublicUrl(name); document.getElementById('editCover').value = data.publicUrl; }
-async function transfer() {
-  const to = s('payTo'), amt = parseInt(s('payAmt')), note = s('payNote');
-  const { data: my } = await client.from('profiles').select('balance').eq('username', me).single();
-  if(my.balance<amt) return alert('No funds');
-  const { data: dest } = await client.from('profiles').select('balance').eq('username', to).single();
-  if(!dest) return alert('No user');
-  await client.from('profiles').update({ balance: my.balance - amt }).eq('username', me);
-  await client.from('profiles').update({ balance: dest.balance + amt }).eq('username', to);
-  await client.from('transactions').insert({ from_user: me, to_user: to, amount: amt, note: note });
-  await client.from('notifications').insert({ user_id: to, from_user: me, type: 'money', message: `sent you $${amt}` });
-  alert('Sent'); loadMyProfile(); loadTx();
+async function loadUserPosts(username) {
+  document.getElementById('pvPosts').innerHTML = `<div style="color:var(--muted);">Loading posts...</div>`;
+
+  const { data: posts } = await client
+    .from('posts')
+    .select(`id, created_at, text, img_url, likes(user_id), comments(id)`)
+    .eq('author', username)
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  if (!posts || posts.length === 0) {
+    document.getElementById('pvPosts').innerHTML = `<div style="color:var(--muted);">No posts yet.</div>`;
+    return;
+  }
+
+  document.getElementById('pvPosts').innerHTML = posts.map(p => {
+    const likeCount = p.likes ? p.likes.length : 0;
+    const commentCount = p.comments ? p.comments.length : 0;
+
+    return `
+      <div class="card" onclick="openPost(${p.id})" style="cursor:pointer;">
+        <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted);">
+          <strong>@${username}</strong>
+          <span>${new Date(p.created_at).toLocaleString()}</span>
+        </div>
+
+        <div style="margin-top:8px; white-space:pre-wrap;">${p.text || ''}</div>
+
+        ${p.img_url ? `<img src="${p.img_url}" style="max-width:100%; margin-top:10px; border-radius:8px;">` : ''}
+
+        <div style="margin-top:10px; color:var(--muted); font-size:13px;">
+          ❤️ ${likeCount} · 💬 ${commentCount} · <span style="text-decoration:underline;">View in feed</span>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
-async function loadTx() { const { data } = await client.from('transactions').select().or(`from_user.eq.${me},to_user.eq.${me}`).order('created_at',{ascending:false}); document.getElementById('txList').innerHTML = (data||[]).map(t => `<div class="tx-item"><div>${t.to_user===me?'From '+t.from_user:'To '+t.to_user}</div><div class="${t.to_user===me?'tx-in':'tx-out'}">${t.to_user===me?'+':'-'}${t.amount}</div></div>`).join(''); }
-async function loadRules() {
-  const { data } = await client.from('rules').select();
-  const render = (r) => `<div class="law-row"><div><b>${r.title}</b><br><small>${r.is_percent?r.amount+'%':'$'+r.amount}</small></div><button class="btn small" onclick="issueRequest('${r.title}', ${r.amount}, '${r.type}', ${r.is_percent})">Issue</button></div>`;
-  document.getElementById('crimeList').innerHTML = data.filter(r=>r.type==='crime').map(render).join('');
-  document.getElementById('rewardList').innerHTML = data.filter(r=>r.type==='reward').map(render).join('');
+
+async function openPost(postId) {
+  // Go to feed and jump to the post (works even if the post is not in the first 20 loaded). [file:106]
+  nav('feed');
+
+  setTimeout(async () => {
+    let el = document.getElementById(`post-${postId}`);
+
+    if (!el) {
+      const { data: p } = await client
+        .from('posts')
+        .select(`*, likes(user_id), comments(id)`)
+        .eq('id', postId)
+        .single();
+
+      if (!p) return alert('Post might have been deleted.');
+
+      const isLiked = p.likes && p.likes.some(l => l.user_id === me);
+      const likeCount = p.likes ? p.likes.length : 0;
+      const commentCount = p.comments ? p.comments.length : 0;
+
+      const html = `
+        <div class="card" id="post-${p.id}">
+          <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted)">
+            <strong onclick="openProfile('${p.author}')">@${p.author}</strong>
+            <span>${new Date(p.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+          </div>
+          <div style="margin-top:5px;">${p.text || ''}</div>
+          ${p.img_url ? `<img src="${p.img_url}" style="max-width:100%; margin-top:10px; border-radius:8px;">` : ''}
+          <div class="actions">
+            <div class="act-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike(${p.id})">${isLiked ? '❤️' : '♡'} ${likeCount}</div>
+            <div class="act-btn" onclick="toggleComments(${p.id})">💬 ${commentCount}</div>
+          </div>
+          <div id="comments-${p.id}" class="comments-sec">
+            <div id="clist-${p.id}"></div>
+            <div style="display:flex; gap:5px; margin-top:10px;">
+              <input id="cinput-${p.id}" placeholder="Write comment..." style="margin:0; font-size:12px; padding:8px;">
+              <button class="btn small" onclick="addComment(${p.id})">Send</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('feedList').insertAdjacentHTML('afterbegin', html);
+      el = document.getElementById(`post-${postId}`);
+    }
+
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.style.border = "2px solid var(--primary)";
+      setTimeout(() => el.style.border = "1px solid var(--border)", 2500);
+    }
+  }, 200);
 }
-async function addRule() { await client.from('rules').insert({ title: s('ruleTitle'), description: s('ruleDesc'), type: s('ruleType'), amount: parseInt(s('ruleAmt')), is_percent: document.getElementById('ruleIsPercent').checked }); loadRules(); }
-async function issueRequest(reason, amt, type, isP) { const t = prompt('Username?'); if(!t) return; await client.from('requests').insert({ to_user: t, amount: amt, type: type, reason: reason, status: 'pending', is_percent: isP }); alert('Sent'); }
-async function loadRequests() {
-  const { data } = await client.from('requests').select().eq('to_user', me).eq('status', 'pending');
-  document.getElementById('requestList').innerHTML = (data||[]).map(r => `<div class="req-item"><b>${r.reason}</b>: ${r.is_percent?r.amount+'%':'$'+r.amount} <button class="btn small" onclick="processRequest(${r.id}, ${r.amount}, '${r.type}', ${r.is_percent})">Process</button></div>`).join('');
-}
-async function processRequest(id, amt, type, isP) {
-  const { data: u } = await client.from('profiles').select('balance').eq('username', me).single();
-  let f = isP ? Math.floor(u.balance * (amt/100)) : amt;
-  if(type==='crime') await client.from('profiles').update({ balance: u.balance - f }).eq('username', me);
-  else await client.from('profiles').update({ balance: u.balance + f }).eq('username', me);
-  await client.from('requests').update({ status: 'completed' }).eq('id', id); loadMyProfile(); loadRequests();
-}
-async function loadNews() { const { data } = await client.from('news').select().order('created_at',{ascending:false}); document.getElementById('newsList').innerHTML = (data||[]).map(n => `<div class="card"><h3>${n.headline}</h3><p>${n.body}</p></div>`).join(''); }
-async function addNews() { await client.from('news').insert({ headline: s('newsHead'), body: s('newsBody'), author: me }); loadNews(); }
-async function loadJobs() { const { data } = await client.from('jobs').select().order('created_at',{ascending:false}); document.getElementById('jobList').innerHTML = (data||[]).map(j => `<div class="card"><b>${j.title}</b><p>${j.description}</p></div>`).join(''); }
+
+async function loadMyProfile() { const { data } = await client.from('profiles').select().eq('username', me).single(); if(!data) return; document.getElementById('editAvatar').value = data.avatar||''; document.getElementById('editReal').value = data.real_name||''; document.getElementById('editAge').value = data.age||''; document.getElementById('editOcc').value = data.occupation||''; document.getElementById('editStatus').value = data.status||'Single'; document.getElementById('editLoc').value = data.location||''; document.getElementById('editBio').value = data.bio||''; document.getElementById('myBal').innerText = data.balance; }
+async function uploadAvatar() { const file = document.getElementById('avatarUpload').files[0]; if(!file) return; document.getElementById('editAvatar').value = "Uploading..."; const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '_'); const name = `avatar_${Date.now()}_${cleanName}`; const { error } = await client.storage.from('uploads').upload(name, file); if(error) { alert("Upload failed"); return; } const { data } = client.storage.from('uploads').getPublicUrl(name); document.getElementById('editAvatar').value = data.publicUrl; }
+async function saveProfile() { await client.from('profiles').update({ avatar: document.getElementById('editAvatar').value, real_name: document.getElementById('editReal').value, age: document.getElementById('editAge').value, occupation: document.getElementById('editOcc').value, status: document.getElementById('editStatus').value, location: document.getElementById('editLoc').value, bio: document.getElementById('editBio').value }).eq('username', me); alert('Saved!'); }
 async function addJob() { await client.from('jobs').insert({ author: me, title: s('jobTitle'), description: s('jobDesc'), pay: s('jobPay') }); loadJobs(); }
-async function loadEvents() { const { data } = await client.from('events').select().order('created_at',{ascending:false}); document.getElementById('eventList').innerHTML = (data||[]).map(e => `<div class="card"><b>${e.title}</b><br>${e.location}</div>`).join(''); }
+async function loadJobs() { const { data } = await client.from('jobs').select().order('created_at', {ascending:false}); document.getElementById('jobList').innerHTML = (data||[]).map(j => `<div class="card"><div style="display:flex; justify-content:space-between;"><b>${j.title}</b>${j.author===me?`<button class="btn danger small" onclick="del('jobs',${j.id})">x</button>`:''}</div><span style="color:green">(${j.pay})</span><p>${j.description}</p><small>@${j.author}</small></div>`).join(''); }
 async function addEvent() { await client.from('events').insert({ author: me, title: s('evtTitle'), location: s('evtLoc'), event_date: s('evtTime') }); loadEvents(); }
-function initMap() {
-  if(mapObj) { mapObj.invalidateSize(); return; }
-  mapObj = L.map('map').setView([40.7128, -74.0060], 13);
-  L.tileLayer(document.documentElement.getAttribute('data-theme')==='dark'?'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png':'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(mapObj);
-  loadPins();
-  mapObj.on('click', async (e) => { if(mapArmed){ await client.from('pins').insert({owner:me, lat:e.latlng.lat, lng:e.latlng.lng, title:s('pinTitle')||'Pin'}); mapArmed=false; document.getElementById('armMapBtn').style.background=''; loadPins(); } });
-}
-async function searchAddress() { const q = s('mapSearch'); const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`); const data = await res.json(); if(data[0]){ mapObj.setView([data[0].lat, data[0].lon], 18); document.getElementById('pinTitle').value = data[0].display_name.split(',')[0]; mapArmed=true; document.getElementById('armMapBtn').style.background='#22c55e'; } }
-async function loadPins() { const { data } = await client.from('pins').select(); (data||[]).forEach(p => L.marker([p.lat, p.lng]).addTo(mapObj).bindPopup(p.title)); document.getElementById('pinList').innerHTML = (data||[]).map(p => `<div class="list-item" onclick="mapObj.setView([${p.lat},${p.lng}],18)">${p.title} (@${p.owner})</div>`).join(''); }
-function toggleMapArm(){ mapArmed=!mapArmed; document.getElementById('armMapBtn').style.background=mapArmed?'#22c55e':''; }
-async function loadNotifs() {
-  const { data } = await client.from('notifications').select().eq('user_id', me).order('created_at',{ascending:false});
-  const u = (data||[]).filter(n => !n.is_read).length;
-  if(u>0){ document.getElementById('notifBadge').style.display='inline-block'; document.getElementById('notifBadge').innerText=u; }
-  document.getElementById('notifList').innerHTML = (data||[]).map(n => `<div class="card" style="opacity:${n.is_read?0.6:1}"><b>@${n.from_user}</b> ${n.message}</div>`).join('');
-}
-async function markAllRead() { await client.from('notifications').update({ is_read: true }).eq('user_id', me); loadNotifs(); }
+async function loadEvents() { const { data } = await client.from('events').select().order('created_at', {ascending:false}); document.getElementById('eventList').innerHTML = (data||[]).map(e => `<div class="card"><div style="display:flex; justify-content:space-between;"><b>${e.title}</b>${e.author===me?`<button class="btn danger small" onclick="del('events',${e.id})">x</button>`:''}</div><br>📍 ${e.location}<br><small>${new Date(e.event_date).toLocaleString()}</small></div>`).join(''); }
+async function del(table, id) { if(confirm('Delete?')){ await client.from(table).delete().eq('id', id); table==='jobs'?loadJobs():loadEvents(); } }
 function s(id){ return document.getElementById(id).value; }
+function initMap() { if(mapObj) { mapObj.invalidateSize(); return; } mapObj = L.map('map').setView([40.7128, -74.0060], 13); L.tileLayer(document.documentElement.getAttribute('data-theme')==='dark' ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(mapObj); loadPins(); mapObj.on('click', async (e) => { if(mapArmed) { await client.from('pins').insert({owner:me, lat:e.latlng.lat, lng:e.latlng.lng, title:s('pinTitle')||'Pin'}); mapArmed=false; document.getElementById('armMapBtn').style.background=''; if(searchMarker) mapObj.removeLayer(searchMarker); loadPins(); } }); }
+async function searchAddress() { const q = s('mapSearch'); if(!q) return; const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`); const data = await res.json(); if(data[0]) { const { lat, lon, display_name } = data[0]; mapObj.setView([lat, lon], 18); if(searchMarker) mapObj.removeLayer(searchMarker); searchMarker = L.marker([lat, lon], {icon: L.divIcon({className: 'search-icon', html: '🔴', iconSize: [20, 20]})}).addTo(mapObj); document.getElementById('pinTitle').value = display_name.split(',')[0]; mapArmed=true; document.getElementById('armMapBtn').style.background='#22c55e'; } else alert('Not found'); }
+async function loadPins() { const { data } = await client.from('pins').select(); mapObj.eachLayer(l => { if(l instanceof L.Marker && l !== searchMarker) mapObj.removeLayer(l); }); (data||[]).forEach(p => L.marker([p.lat, p.lng]).addTo(mapObj).bindPopup(`<b>${p.title}</b><br>@${p.owner}`)); document.getElementById('pinList').innerHTML = (data||[]).map(p => `<div class="list-item"><div onclick="zoomTo(${p.lat},${p.lng})" style="flex:1"><b>${p.title}</b><br><small>@${p.owner}</small></div>${p.owner===me?`<button class="btn danger small" onclick="del('pins',${p.id})">x</button>`:''}</div>`).join(''); }
+function zoomTo(lat, lng){ mapObj.setView([lat,lng], 18); window.scrollTo({top:0,behavior:'smooth'}); }
+function toggleMapArm(){ mapArmed=!mapArmed; document.getElementById('armMapBtn').style.background=mapArmed?'#22c55e':''; }
+openNotif 
+
+
+async function loadNotifs() {
+    const { data } = await client.from('notifications').select().eq('user_id', me).order('created_at', {ascending:false}).limit(50);
+    if (!data) return;
+    
+    const unread = data.filter(n => !n.is_read).length;
+    const badge = document.getElementById('notifBadge');
+    if (unread > 0) { badge.style.display = 'inline-block'; badge.innerText = unread; } 
+    else { badge.style.display = 'none'; }
+    
+    document.getElementById('notifList').innerHTML = data.map(n => `
+        <div class="card" 
+             onclick="openNotif('${n.type}', '${n.from_user}', ${n.link_id || 'null'})"
+             
+             style="border-left: 4px solid ${n.is_read ? 'transparent' : 'var(--primary)'}; opacity: ${n.is_read ? 0.6 : 1}; display:flex; gap:10px; align-items:center; cursor:pointer; transition:0.2s;">
+            <div style="font-size:20px;">${getIcon(n.type)}</div>
+            <div>
+                <div style="font-size:14px;"><b>@${n.from_user}</b> ${n.message}</div>
+                <div style="font-size:11px; color:var(--muted);">${new Date(n.created_at).toLocaleString()}</div>
+            </div>
+        </div>`).join('');
+}
+async function openNotif(type, fromUser, linkId) {
+    // 1. Log the click to see if it works
+    console.log("Opening Notification:", type, fromUser, linkId);
+
+    // 2. Handle missing IDs
+    if (linkId === 'null' || linkId === 'undefined') linkId = null;
+
+    // 3. LOGIC: Where to go?
+    if (type === 'like' || type === 'comment') {
+        // A. Go to Feed
+        nav('feed');
+
+        if (!linkId) return;
+
+        // B. Try to find the post on screen
+        let el = document.getElementById(`post-${linkId}`);
+
+        // C. If NOT found, fetch it from database (restore deleted/old post)
+        if (!el) {
+            const { data: p } = await client.from('posts').select(`*, likes(user_id), comments(id)`).eq('id', linkId).single();
+            
+            if (p) {
+                // Manually create the HTML for this missing post
+                const isLiked = p.likes && p.likes.some(l => l.user_id === me); 
+                const likeCount = p.likes ? p.likes.length : 0; 
+                const commentCount = p.comments ? p.comments.length : 0;
+
+                const html = `
+                <div class="card" id="post-${p.id}" style="border: 2px solid var(--primary); animation: fadeIn 0.5s;">
+                    <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted)">
+                        <strong onclick="openProfile('${p.author}')">@${p.author}</strong>
+                        <span>${new Date(p.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                    </div>
+                    <div style="margin-top:5px;">${p.text||''}</div>
+                    ${p.img_url ? `<img src="${p.img_url}" style="max-width:100%; margin-top:10px; border-radius:8px;">` : ''}
+                    <div class="actions">
+                        <div class="act-btn ${isLiked?'liked':''}" onclick="toggleLike(${p.id})">${isLiked ? '❤️' : '♡'} ${likeCount}</div>
+                        <div class="act-btn" onclick="toggleComments(${p.id})">💬 ${commentCount}</div>
+                    </div>
+                    <div id="comments-${p.id}" class="comments-sec">
+                        <div id="clist-${p.id}"></div>
+                        <div style="display:flex; gap:5px; margin-top:10px;">
+                            <input id="cinput-${p.id}" placeholder="Write comment..." style="margin:0; font-size:12px; padding:8px;">
+                            <button class="btn small" onclick="addComment(${p.id})">Send</button>
+                        </div>
+                    </div>
+                </div>`;
+                
+                // Insert at the top
+                document.getElementById('feedList').insertAdjacentHTML('afterbegin', html);
+                el = document.getElementById(`post-${linkId}`);
+            } else {
+                alert("This post has been deleted permanently.");
+                return;
+            }
+        }
+
+        // D. Scroll to the post and highlight it
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.style.border = "2px solid var(--primary)";
+            setTimeout(() => el.style.border = "1px solid var(--border)", 3000);
+        }
+    } 
+    else if (type === 'money') {
+        // Go to Wallet History
+        nav('wallet');
+        setTimeout(() => document.getElementById('txList').scrollIntoView({ behavior: 'smooth' }), 300);
+    }
+    else {
+        // Go to their profile
+        openProfile(fromUser);
+    }
+}
+
+function getIcon(t) { return t==='like'?'❤️':t==='money'?'💸':t==='comment'?'💬':'📢'; }
+async function markAllRead() { await client.from('notifications').update({ is_read: true }).eq('user_id', me); loadNotifs(); }
+
 </script>
 </body>
 </html>
