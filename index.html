@@ -32,6 +32,7 @@
       background: var(--bg-body); color: var(--text);
       overflow: hidden; overscroll-behavior: none;
     }
+    #editCoverBtn { display: none !important; }
     #app { display: flex; width: 100%; height: 100%; overflow: hidden; }
     .sidebar { width: 250px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
     .nav-item { padding: 12px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500; margin-bottom: 4px; transition: 0.2s; }
@@ -46,15 +47,17 @@
     .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
     .btn { background: var(--text); color: var(--bg-card); border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
     .btn.danger { background: var(--red); color: white; }
+    .btn.success { background: var(--green); color: white; }
     .btn.small { padding: 6px 10px; font-size: 12px; }
-
+    
     input, textarea, select {
       width: 100%; padding: 12px;
       background: var(--bg-body); border: 1px solid var(--border);
       color: var(--text); border-radius: 8px; margin-bottom: 10px;
       font-family: inherit; font-size: 16px;
+      resize: none; 
     }
-
+    
     /* RP ROOMS & CHAT STYLES */
     .room-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
     .room-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; cursor: pointer; text-align: center; transition: 0.2s; }
@@ -66,14 +69,37 @@
     .msg.them { align-self: flex-start; background: var(--hover); color: var(--text); border-bottom-left-radius: 2px; }
     .msg-user { font-weight: 700; font-size: 11px; display: block; margin-bottom: 2px; }
 
-    /* LEAFLET MAP */
-    #map { height: 400px; width: 100%; border-radius: 8px; margin-top: 10px; }
+    .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer; }
+    .checkbox-wrapper input { width: auto; margin: 0; }
+    #alertBanner { background: var(--banner-bg); border: 1px solid var(--banner-border); color: var(--banner-text); padding: 15px; border-radius: 8px; margin-bottom: 30px; display: none; font-size: 15px; font-weight: 600; align-items: center; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .news-item { margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+    .news-headline { font-size: 24px; font-weight: 800; line-height: 1.2; margin-bottom: 8px; font-family: 'Georgia', serif; }
+    .news-meta { font-size: 13px; color: var(--muted); margin-bottom: 15px; }
+    .news-body { font-size: 16px; line-height: 1.6; white-space: pre-wrap; }
+    .profile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; grid-auto-rows: 160px; }
+    .profile-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; cursor: pointer; text-align: center; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+    .profile-card img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; flex-shrink: 0; margin-bottom: 10px; }
+    #map { height: 400px; width: 100%; border-radius: 8px; z-index: 1; margin-top: 10px; }
+    .list-item, .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border); }
+    .tx-in { color: var(--green); } .tx-out { color: var(--red); }
+    .hidden { display: none !important; } .admin-only { display: none !important; }
+    .actions { display: flex; gap: 15px; margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .act-btn { cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 5px; color: var(--muted); }
+    .act-btn.liked { color: var(--red); }
+    .comments-sec { margin-top: 15px; background: var(--hover); padding: 10px; border-radius: 8px; display: none; }
+    .comment-item { font-size: 13px; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+    .law-row { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--border); align-items: center; }
+    .req-item { background: var(--hover); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+    #mobileHeader { display: none; }
 
     @media (max-width: 768px) {
-      .sidebar { width: 100%; height: 85px; position: fixed; bottom: 0; left: 0; z-index: 1000; flex-direction: row; overflow-x: auto; padding: 10px; border-top: 1px solid var(--border); }
+      #app { flex-direction: column; }
+      .sidebar { width: 100%; height: 85px; border-right: none; border-top: 1px solid var(--border); position: fixed; bottom: 0; left: 0; z-index: 1000; padding: 10px 0; flex-direction: row; overflow-x: auto; background: var(--bg-sidebar); align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
       .sidebar-brand, .sidebar-footer { display: none; }
-      .main { padding-bottom: 120px; }
-      .nav-item { padding: 0 15px; height: 44px; display: flex; align-items: center; white-space: nowrap; }
+      nav { display: flex; width: 100%; padding: 0 15px; gap: 10px; align-items: center; }
+      .nav-item { margin: 0; padding: 0 16px; font-size: 14px; white-space: nowrap; border-radius: 25px; background: var(--bg-body); flex-shrink: 0; height: 44px; display: flex; align-items: center; justify-content: center; }
+      .main { padding: 30px; padding-bottom: 120px; width: 100%; }
+      #mobileHeader { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border); position: relative; margin: -30px -30px 20px -30px; width: calc(100% + 60px); }
     }
   </style>
 </head>
@@ -82,8 +108,9 @@
   <div id="loginScreen" style="position:fixed; inset:0; background:var(--bg-body); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;">
     <div class="card" style="width:100%; max-width:350px; text-align:center;">
       <h1>The Cut NYC</h1>
-      <input id="loginUser" placeholder="Username">
-      <button class="btn" style="width:100%" onclick="login()">Connect</button>
+      <p style="color:var(--muted); font-size:14px;">Online Mode</p>
+      <input id="loginUser" placeholder="Enter Username">
+      <button class="btn" style="width:100%; padding:14px;" onclick="login()">Connect</button>
     </div>
   </div>
 
@@ -92,48 +119,68 @@
       <div class="sidebar-brand" style="font-weight:800; font-size:20px; margin-bottom:30px;">The Cut NYC</div>
       <nav id="sidebarNav">
         <div class="nav-item active" onclick="nav('feed')">Feed</div>
+        <div class="nav-item" onclick="nav('notifs')" style="position:relative; display:flex; justify-content:space-between; align-items:center;">
+          <span>🔔 Notifications</span>
+          <span id="notifBadge" style="background:var(--red); color:white; font-size:10px; padding:2px 6px; border-radius:10px; display:none;">0</span>
+        </div>
         <div class="nav-item" onclick="nav('rooms')">🏙️ RP Rooms</div>
         <div class="nav-item" onclick="nav('news')">News</div>
-        <div class="nav-item" onclick="nav('profiles')">Citizens</div>
+        <div class="nav-item" onclick="nav('profiles')">Profiles</div>
         <div class="nav-item" onclick="nav('law')">Law Book</div>
         <div class="nav-item" onclick="nav('jobs')">Jobs</div>
+        <div class="nav-item" onclick="nav('events')">Events</div>
         <div class="nav-item" onclick="nav('wallet')">Wallet</div>
-        <div class="nav-item" onclick="nav('mapPage')">Map</div>
-        <div class="nav-item" onclick="nav('account')">Account</div>
+        <div class="nav-item" onclick="nav('map')">Map</div>
+        <div class="nav-item" onclick="nav('account')">My Account</div>
       </nav>
       <div class="sidebar-footer" style="margin-top:auto;">
-        <button class="btn danger" style="width:100%" onclick="logout()">Logout</button>
+        <button class="btn" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--text);" onclick="toggleTheme()">Theme</button>
+        <button class="btn danger" style="width:100%; margin-top:10px;" onclick="logout()">Logout</button>
       </div>
     </aside>
 
     <main class="main">
-      <div id="alertBanner" style="display:none; background:var(--banner-bg); color:var(--banner-text); padding:15px; border-radius:8px; margin-bottom:20px;">
-        📢 <span id="bannerText"></span>
+      <div id="mobileHeader">
+        <div style="font-weight:800; font-size:18px;">The Cut NYC</div>
+        <div style="display:flex; gap:8px;">
+           <button class="btn small" onclick="toggleTheme()">🌗</button>
+           <button class="btn danger small" onclick="logout()">🛑</button>
+        </div>
       </div>
 
+      <div id="alertBanner">
+        <span style="font-size:20px;">📢</span> <span id="bannerText">System Online. Welcome to The Cut NYC.</span>
+      </div>
+      
       <div id="feed" class="page active">
         <h1>City Feed</h1>
         <div class="card">
           <textarea id="postText" rows="3" placeholder="What's happening?"></textarea>
-          <button class="btn" onclick="addPost()">Post</button>
+          <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+            <input type="file" id="postFile" accept="image/*" style="margin:0;">
+            <button class="btn" id="postBtn" onclick="addPost()">Post</button>
+          </div>
         </div>
         <div id="feedList"></div>
       </div>
 
       <div id="rooms" class="page">
         <h1>RP Locations</h1>
+        <p style="color:var(--muted); margin-bottom:20px;">Enter a room to start roleplaying.</p>
         <div class="room-grid">
           <div class="room-card" onclick="openRoom('times_square', 'Times Square')"><h3>🗽 Times Square</h3></div>
           <div class="room-card" onclick="openRoom('club', 'The Nightclub')"><h3>💃 The Nightclub</h3></div>
           <div class="room-card" onclick="openRoom('hospital', 'Mt. Sinai')"><h3>🏥 Hospital</h3></div>
           <div class="room-card" onclick="openRoom('nypd', 'NYPD Precinct')"><h3>🚔 NYPD</h3></div>
+          <div class="room-card" onclick="openRoom('park', 'Central Park')"><h3>🌳 Central Park</h3></div>
+          <div class="room-card" onclick="openRoom('bank', 'NYC Bank')"><h3>💰 NYC Bank</h3></div>
         </div>
       </div>
 
       <div id="chatRoom" class="page">
-        <button class="btn small" onclick="nav('rooms')" style="margin-bottom:15px;">← Back</button>
+        <button class="btn small" onclick="nav('rooms')" style="margin-bottom:15px;">← Back to Locations</button>
         <div class="card" id="chatWindow">
-          <h2 id="roomTitle">Room</h2>
+          <h2 id="roomTitle" style="margin-top:0;">Room</h2>
           <div id="chatMessages"></div>
           <div style="display:flex; gap:10px; margin-top:10px;">
             <input id="chatInput" placeholder="Action..." style="margin:0;">
@@ -142,47 +189,185 @@
         </div>
       </div>
 
+      <div id="notifs" class="page">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h1>Notifications</h1>
+            <button class="btn small" onclick="markAllRead()">Mark all read</button>
+        </div>
+        <div id="notifList"></div>
+      </div>
+
       <div id="news" class="page">
         <h1>City News</h1>
+        <div class="card">
+          <h2>Write Article</h2>
+          <input id="newsHead" placeholder="Headline">
+          <textarea id="newsBody" rows="6" placeholder="Content..."></textarea>
+          <input id="newsImg" placeholder="Image URL (Optional)">
+          <button class="btn" onclick="addNews()">Publish</button>
+        </div>
         <div id="newsList"></div>
       </div>
 
       <div id="profiles" class="page">
         <h1>Citizens</h1>
-        <div id="profileGrid" class="room-grid"></div>
+        <input id="profileSearch" placeholder="Search username..." oninput="filterProfiles()" style="margin-bottom:15px;">
+        <div id="profileGrid" class="profile-grid"></div>
       </div>
 
       <div id="law" class="page">
         <h1>Law Book</h1>
-        <div id="crimeList"></div>
-      </div>
-
-      <div id="jobs" class="page">
-        <h1>Job Board</h1>
-        <div id="jobList"></div>
+        <div class="card">
+            <h2>Add New Rule</h2>
+            <input id="ruleTitle" placeholder="Title">
+            <input id="ruleDesc" placeholder="Description">
+            <select id="ruleType">
+                <option value="crime">Crime (Fine)</option>
+                <option value="reward">Reward (Payment)</option>
+            </select>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <input id="ruleAmt" type="number" placeholder="Amt" style="flex:1">
+                <label class="checkbox-wrapper" style="margin:0;">
+                    <input type="checkbox" id="ruleIsPercent"> <span>%?</span>
+                </label>
+                <button class="btn" onclick="addRule()">Add</button>
+            </div>
+        </div>
+        <h2>Crimes & Fines</h2>
+        <div id="crimeList" class="card" style="padding:0"></div>
+        <h2>Rewards & Bounties</h2>
+        <div id="rewardList" class="card" style="padding:0"></div>
       </div>
 
       <div id="wallet" class="page">
         <h1>Wallet</h1>
-        <div class="card" style="text-align:center;">
-            <div style="font-size:13px; color:var(--muted)">BALANCE</div>
-            <div style="font-size:42px; font-weight:800;">$<span id="myBal">0</span></div>
+        <div class="card" style="text-align:center; padding:30px;">
+          <div style="font-size:13px; color:var(--muted)">BALANCE</div>
+          <div style="font-size:42px; font-weight:800; color:var(--primary);">$<span id="myBal">0</span></div>
         </div>
-        <div id="txList"></div>
+        <h3 style="color:var(--red);">Pending Requests</h3>
+        <div id="requestList"></div>
+        <div class="card">
+          <h2>Send Money</h2>
+          <input id="payTo" placeholder="Username">
+          <input id="payAmt" type="number" placeholder="Amount">
+          <input id="payNote" placeholder="Note">
+          <button class="btn" style="width:100%" onclick="transfer()">Send</button>
+        </div>
+        <h3>History</h3>
+        <div id="txList" class="card" style="padding:0"></div>
+        <div class="card admin-only">
+          <h3>Money Printer</h3>
+          <div style="display:flex; gap:10px;">
+            <input id="adminAmt" type="number" placeholder="Amt" style="flex:1">
+            <button class="btn" onclick="modBalance(1)">+</button>
+            <button class="btn danger" onclick="modBalance(-1)">-</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="jobs" class="page">
+        <h1>Job Board</h1>
+        <div class="card">
+          <h2>Post a Job</h2>
+          <input id="jobTitle" placeholder="Job Title">
+          <textarea id="jobDesc" rows="2" placeholder="Description"></textarea>
+          <div style="display:flex; gap:10px;">
+            <input id="jobPay" placeholder="Pay ($)" style="flex:1">
+            <button class="btn" onclick="addJob()">Post</button>
+          </div>
+        </div>
+        <div id="jobList"></div>
+      </div>
+
+      <div id="events" class="page">
+        <h1>Events</h1>
+        <div class="card">
+          <h2>Host Event</h2>
+          <input id="evtTitle" placeholder="Event Name">
+          <input id="evtLoc" placeholder="Location">
+          <input id="evtTime" type="datetime-local">
+          <button class="btn" style="width:100%" onclick="addEvent()">Create Event</button>
+        </div>
+        <div id="eventList"></div>
       </div>
 
       <div id="mapPage" class="page">
-        <h1>Map</h1>
+        <h1>City Map</h1>
+        <div class="card">
+          <div style="display:flex; gap:8px;">
+            <input id="mapSearch" placeholder="Exact address..." style="flex:1">
+            <button class="btn small" onclick="searchAddress()">Search</button>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:10px;">
+            <input id="pinTitle" placeholder="Pin Title" style="margin:0; flex:1;">
+            <button id="armMapBtn" class="btn small" onclick="toggleMapArm()">Add Pin</button>
+          </div>
+        </div>
         <div id="map"></div>
+        <h3 style="margin-top:20px;">Locations</h3>
+        <div id="pinList" class="card" style="padding:0;"></div>
       </div>
 
       <div id="account" class="page">
-        <h1>My Profile</h1>
+        <h1>My Character</h1>
         <div class="card">
-          <label>Bio</label>
-          <textarea id="editBio"></textarea>
-          <button class="btn" onclick="saveProfile()">Save</button>
+          <label>Profile Picture</label>
+          <div style="display:flex; gap:10px; margin-bottom:10px;">
+             <input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="uploadAvatar()">
+             <button class="btn small" onclick="document.getElementById('avatarUpload').click()">📂 Upload</button>
+             <input id="editAvatar" placeholder="URL..." style="margin:0; flex:1;">
+          </div>
+          <label>Cover Photo</label>
+          <div style="display:flex; gap:10px; margin-bottom:10px;">
+             <input type="file" id="coverUpload" accept="image/*" style="display:none" onchange="uploadCoverFile()">
+             <button class="btn small" onclick="document.getElementById('coverUpload').click()">🖼️ Upload Cover</button>
+             <input id="editCover" placeholder="URL..." style="margin:0; flex:1;">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div><label>Real Name</label><input id="editReal"></div>
+            <div><label>Age</label><input id="editAge" type="number"></div>
+          </div>
+          <label>Occupation</label><input id="editOcc">
+          <label>Status</label>
+          <select id="editStatus">
+            <option value="Single">Single</option>
+            <option value="Taken">Taken</option>
+            <option value="Complicated">Complicated</option>
+            <option value="Married">Married</option>
+          </select>
+          <label>Location</label><input id="editLoc">
+          <label>Bio</label><textarea id="editBio" rows="4"></textarea>
+          <button class="btn" style="width:100%" onclick="saveProfile()">Save Character</button>
         </div>
+        <div class="card admin-only">
+            <h3>📢 Broadcast Alert</h3>
+            <input id="editBannerText" placeholder="System Message...">
+            <button class="btn" onclick="saveBanner()">Update Banner</button>
+        </div>
+      </div>
+
+      <div id="profileView" class="page">
+        <button class="btn small" style="margin-bottom:15px;" onclick="nav('profiles')">← Back</button>
+        <div style="position:relative; height:180px; border-radius:12px; overflow:hidden; margin-bottom:10px; background:var(--bg-card);">
+          <img id="pvCover" src="" style="width:100%; height:100%; object-fit:cover;">
+          <div style="position:absolute; bottom:2px; right:20px; width:90px; height:90px; border:4px solid var(--bg-card); border-radius:50%; overflow:hidden; background:var(--bg-card); box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+            <img id="pvAvatar" style="width:100%; height:100%; object-fit:cover;">
+          </div>
+        </div>
+        <div class="card" style="margin-top:20px; padding-top:30px;">
+          <h2 id="pvName"></h2>
+          <div id="pvReal" style="color:var(--muted); font-size:14px;"></div>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:20px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:15px 0; text-align:center;">
+            <div><strong>Age</strong><br><span id="pvAge">-</span></div>
+            <div><strong>Occ</strong><br><span id="pvOcc">-</span></div>
+            <div><strong>Status</strong><br><span id="pvStat">-</span></div>
+          </div>
+          <p id="pvBio" style="white-space:pre-wrap; color:var(--muted); font-size:14px;"></p>
+          <div style="font-size:13px; color:var(--muted); margin-top:20px;">📍 <span id="pvLoc"></span></div>
+        </div>
+        <h3>Posts</h3>
+        <div id="pvPosts"></div>
       </div>
     </main>
   </div>
@@ -193,60 +378,58 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let me = localStorage.getItem('cut_user_online') || null;
-let currentRoom = null;
-let chatSub = null;
-let mapObj = null;
+let mapObj = null, mapArmed = false, searchMarker = null;
+let currentRoom = null, chatSub = null, allProfiles = [];
 
+document.documentElement.setAttribute('data-theme', localStorage.getItem('theme')||'light');
 if(me) {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('app').classList.remove('hidden');
   loadAll();
 }
 
-async function login() {
-  const u = document.getElementById('loginUser').value.trim();
-  if(!u) return;
-  me = u;
-  localStorage.setItem('cut_user_online', me);
-  location.reload();
-}
-
-function logout() { localStorage.removeItem('cut_user_online'); location.reload(); }
-
 function nav(id) {
   document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if(id === 'mapPage') setTimeout(initMap, 200);
+  document.getElementById(id==='map'?'mapPage':id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+  if (event && event.target.classList.contains('nav-item')) event.target.classList.add('active');
+  if(id === 'map') setTimeout(initMap, 200);
   if(id !== 'chatRoom' && chatSub) { client.removeChannel(chatSub); chatSub = null; }
+  loadBanner();
 }
 
-function loadAll() {
-  loadFeed(); loadProfiles(); loadMyProfile(); loadNews(); loadJobs(); loadRules(); loadTx();
-}
-
+// RP ROOMS LOGIC
 async function openRoom(roomId, title) {
   currentRoom = roomId;
   document.getElementById('roomTitle').innerText = title;
+  document.getElementById('chatMessages').innerHTML = 'Loading...';
   nav('chatRoom');
+  
   const { data } = await client.from('chat_messages').select('*').eq('room_id', roomId).order('created_at', { ascending: true }).limit(50);
   renderMessages(data || []);
   
   chatSub = client.channel(`room-${roomId}`)
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `room_id=eq.${roomId}` }, 
-    payload => appendMessage(payload.new))
+    payload => appendChatMessage(payload.new))
     .subscribe();
 }
 
 function renderMessages(msgs) {
   const container = document.getElementById('chatMessages');
-  container.innerHTML = msgs.map(m => `<div class="msg ${m.user_id===me?'me':'them'}"><span class="msg-user">@${m.user_id}</span>${m.text}</div>`).join('');
+  container.innerHTML = msgs.map(m => messageHTML(m)).join('');
   container.scrollTop = container.scrollHeight;
 }
 
-function appendMessage(m) {
+function appendChatMessage(m) {
   const container = document.getElementById('chatMessages');
-  container.insertAdjacentHTML('beforeend', `<div class="msg ${m.user_id===me?'me':'them'}"><span class="msg-user">@${m.user_id}</span>${m.text}</div>`);
+  if(container.innerHTML === 'Loading...') container.innerHTML = '';
+  container.insertAdjacentHTML('beforeend', messageHTML(m));
   container.scrollTop = container.scrollHeight;
+}
+
+function messageHTML(m) {
+  const isMe = m.user_id === me;
+  return `<div class="msg ${isMe ? 'me' : 'them'}"><span class="msg-user">@${m.user_id}</span>${m.text}</div>`;
 }
 
 async function sendChat() {
@@ -256,46 +439,155 @@ async function sendChat() {
   input.value = '';
 }
 
+// CORE FUNCTIONS (PRESERVED FROM ORIGINAL)
+async function login() {
+  const u = document.getElementById('loginUser').value.trim();
+  if(!u) return;
+  const { data } = await client.from('profiles').select().eq('username', u).single();
+  if(!data) await client.from('profiles').insert({ username: u, balance: 100 });
+  me = u; localStorage.setItem('cut_user_online', me); location.reload();
+}
+function logout() { localStorage.removeItem('cut_user_online'); location.reload(); }
+function toggleTheme() {
+  const n = document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme', n); localStorage.setItem('theme', n);
+}
+async function loadAll() {
+  loadNotifs(); checkAdmin(); loadBanner(); loadFeed(); loadNews(); loadProfiles(); loadJobs(); loadEvents(); loadMyProfile(); loadTx(); loadRules(); loadRequests();
+}
+async function checkAdmin() {
+  const { data } = await client.from('profiles').select('is_admin').eq('username', me).single();
+  if(data && data.is_admin) document.querySelectorAll('.admin-only').forEach(el => el.style.setProperty('display', 'block', 'important'));
+}
+async function loadBanner() {
+  const { data } = await client.from('app_config').select().eq('key', 'banner_msg').maybeSingle();
+  const banner = document.getElementById('alertBanner'); banner.style.display = 'flex';
+  if(data) { document.getElementById('bannerText').innerText = data.value; document.getElementById('editBannerText').value = data.value; }
+}
+async function saveBanner() {
+  const txt = document.getElementById('editBannerText').value;
+  const { data } = await client.from('app_config').select().eq('key', 'banner_msg').maybeSingle();
+  if(data) await client.from('app_config').update({ value: txt }).eq('key', 'banner_msg');
+  else await client.from('app_config').insert({ key: 'banner_msg', value: txt });
+  loadBanner(); alert('Updated');
+}
 async function loadFeed() {
-  const { data } = await client.from('posts').select('*').order('created_at', {ascending:false});
-  document.getElementById('feedList').innerHTML = (data||[]).map(p => `<div class="card"><b>@${p.author}</b><p>${p.text}</p></div>`).join('');
+  const { data: posts } = await client.from('posts').select(`*, likes(user_id), comments(id)`).order('created_at', {ascending:false}).limit(20);
+  document.getElementById('feedList').innerHTML = (posts||[]).map(p => {
+    const isLiked = p.likes && p.likes.some(l => l.user_id === me);
+    return `<div class="card" id="post-${p.id}"><div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted)"><strong onclick="openProfile('${p.author}')">@${p.author}</strong><span>${new Date(p.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span></div><div style="margin-top:5px;">${p.text||''}</div>${p.img_url ? `<img src="${p.img_url}" style="max-width:100%; margin-top:10px; border-radius:8px;">` : ''}<div class="actions"><div class="act-btn ${isLiked?'liked':''}" onclick="toggleLike(${p.id})">${isLiked?'❤️':'♡'} ${p.likes?p.likes.length:0}</div><div class="act-btn" onclick="toggleComments(${p.id})">💬 ${p.comments?p.comments.length:0}</div></div><div id="comments-${p.id}" class="comments-sec"><div id="clist-${p.id}"></div><div style="display:flex; gap:5px; margin-top:10px;"><input id="cinput-${p.id}" placeholder="Comment..." style="margin:0; font-size:12px;"><button class="btn small" onclick="addComment(${p.id})">Send</button></div></div></div>`;
+  }).join('');
 }
-
 async function addPost() {
-  const txt = document.getElementById('postText').value;
-  await client.from('posts').insert({ author: me, text: txt });
-  document.getElementById('postText').value = '';
-  loadFeed();
+  const txt = document.getElementById('postText').value; const file = document.getElementById('postFile').files[0];
+  if(!txt && !file) return; let url = null;
+  if(file) { const name = `${Date.now()}_${file.name}`; await client.storage.from('uploads').upload(name, file); const { data } = client.storage.from('uploads').getPublicUrl(name); url = data.publicUrl; }
+  await client.from('posts').insert({ author: me, text: txt, img_url: url });
+  document.getElementById('postText').value = ''; document.getElementById('postFile').value = ''; loadFeed();
 }
-
-async function loadMyProfile() {
-  const { data } = await client.from('profiles').select().eq('username', me).single();
-  if(data) {
-    document.getElementById('myBal').innerText = data.balance || 0;
-    document.getElementById('editBio').value = data.bio || '';
-  }
+async function toggleLike(pid) {
+    const { data: ex } = await client.from('likes').select().eq('post_id', pid).eq('user_id', me).single();
+    if(ex) await client.from('likes').delete().eq('id', ex.id);
+    else { await client.from('likes').insert({ post_id: pid, user_id: me }); const { data: p } = await client.from('posts').select('author').eq('id', pid).single(); if(p && p.author!==me) await client.from('notifications').insert({ user_id: p.author, from_user: me, type: 'like', message: 'liked your post', link_id: pid }); }
+    loadFeed();
 }
-
+async function toggleComments(pid) {
+  const div = document.getElementById(`comments-${pid}`); if(div.style.display==='block'){ div.style.display='none'; return; } div.style.display='block';
+  const { data } = await client.from('comments').select().eq('post_id', pid).order('created_at');
+  document.getElementById(`clist-${pid}`).innerHTML = (data||[]).map(c => `<div class="comment-item"><b>${c.author}</b>: ${c.text}</div>`).join('');
+}
+async function addComment(pid) {
+  const txt = document.getElementById(`cinput-${pid}`).value; if(!txt) return;
+  await client.from('comments').insert({ post_id: pid, author: me, text: txt });
+  document.getElementById(`cinput-${pid}`).value = ''; toggleComments(pid);
+  const { data: p } = await client.from('posts').select('author').eq('id', pid).single();
+  if(p && p.author!==me) await client.from('notifications').insert({ user_id: p.author, from_user: me, type: 'comment', message: `commented: "${txt}"`, link_id: pid });
+}
+async function loadProfiles() { const { data } = await client.from('profiles').select(); allProfiles = data || []; renderProfiles(allProfiles); }
+function renderProfiles(list) { document.getElementById('profileGrid').innerHTML = list.map(u => `<div class="profile-card" onclick="openProfile('${u.username}')"><img src="${u.avatar || 'https://ui-avatars.com/api/?name='+u.username}"><div style="font-weight:bold; font-size:14px;">@${u.username}</div><div style="font-size:11px; color:var(--muted)">${u.occupation || 'Citizen'}</div></div>`).join(''); }
+function filterProfiles() { const q = document.getElementById('profileSearch').value.toLowerCase(); renderProfiles(allProfiles.filter(u => u.username.toLowerCase().includes(q) || (u.real_name||'').toLowerCase().includes(q))); }
+async function openProfile(u) {
+  nav('profileView'); const { data } = await client.from('profiles').select().eq('username', u).single();
+  document.getElementById('pvName').innerText = '@'+data.username; document.getElementById('pvCover').src = data.cover_url||''; document.getElementById('pvAvatar').src = data.avatar||'';
+  document.getElementById('pvReal').innerText = data.real_name||''; document.getElementById('pvAge').innerText = data.age||'-';
+  document.getElementById('pvOcc').innerText = data.occupation||'-'; document.getElementById('pvStat').innerText = data.status||'-';
+  document.getElementById('pvLoc').innerText = data.location||'-'; document.getElementById('pvBio').innerText = data.bio||'';
+  loadUserPosts(u);
+}
+async function loadUserPosts(u) {
+  const { data } = await client.from('posts').select(`*`).eq('author', u).order('created_at', {ascending:false});
+  document.getElementById('pvPosts').innerHTML = (data||[]).map(p => `<div class="card"><b>@${u}</b><p>${p.text||''}</p></div>`).join('');
+}
 async function saveProfile() {
-  await client.from('profiles').update({ bio: document.getElementById('editBio').value }).eq('username', me);
-  alert('Saved!');
+  await client.from('profiles').update({ avatar: s('editAvatar'), cover_url: s('editCover'), real_name: s('editReal'), age: s('editAge'), occupation: s('editOcc'), status: s('editStatus'), location: s('editLoc'), bio: s('editBio') }).eq('username', me);
+  alert('Saved!'); loadMyProfile();
 }
-
+async function loadMyProfile() {
+  const { data } = await client.from('profiles').select().eq('username', me).single(); if(!data) return;
+  document.getElementById('editAvatar').value = data.avatar||''; document.getElementById('editCover').value = data.cover_url||'';
+  document.getElementById('editReal').value = data.real_name||''; document.getElementById('editAge').value = data.age||'';
+  document.getElementById('editOcc').value = data.occupation||''; document.getElementById('editStatus').value = data.status||'Single';
+  document.getElementById('editLoc').value = data.location||''; document.getElementById('editBio').value = data.bio||'';
+  document.getElementById('myBal').innerText = data.balance||0;
+}
+async function uploadAvatar() { const file = document.getElementById('avatarUpload').files[0]; if(!file) return; const name = `av_${Date.now()}`; await client.storage.from('uploads').upload(name, file); const { data } = client.storage.from('uploads').getPublicUrl(name); document.getElementById('editAvatar').value = data.publicUrl; }
+async function uploadCoverFile() { const file = document.getElementById('coverUpload').files[0]; if(!file) return; const name = `cv_${Date.now()}`; await client.storage.from('uploads').upload(name, file); const { data } = client.storage.from('uploads').getPublicUrl(name); document.getElementById('editCover').value = data.publicUrl; }
+async function transfer() {
+  const to = s('payTo'), amt = parseInt(s('payAmt')), note = s('payNote');
+  const { data: my } = await client.from('profiles').select('balance').eq('username', me).single();
+  if(my.balance<amt) return alert('No funds');
+  const { data: dest } = await client.from('profiles').select('balance').eq('username', to).single();
+  if(!dest) return alert('No user');
+  await client.from('profiles').update({ balance: my.balance - amt }).eq('username', me);
+  await client.from('profiles').update({ balance: dest.balance + amt }).eq('username', to);
+  await client.from('transactions').insert({ from_user: me, to_user: to, amount: amt, note: note });
+  await client.from('notifications').insert({ user_id: to, from_user: me, type: 'money', message: `sent you $${amt}` });
+  alert('Sent'); loadMyProfile(); loadTx();
+}
+async function loadTx() { const { data } = await client.from('transactions').select().or(`from_user.eq.${me},to_user.eq.${me}`).order('created_at',{ascending:false}); document.getElementById('txList').innerHTML = (data||[]).map(t => `<div class="tx-item"><div>${t.to_user===me?'From '+t.from_user:'To '+t.to_user}</div><div class="${t.to_user===me?'tx-in':'tx-out'}">${t.to_user===me?'+':'-'}${t.amount}</div></div>`).join(''); }
+async function loadRules() {
+  const { data } = await client.from('rules').select();
+  const render = (r) => `<div class="law-row"><div><b>${r.title}</b><br><small>${r.is_percent?r.amount+'%':'$'+r.amount}</small></div><button class="btn small" onclick="issueRequest('${r.title}', ${r.amount}, '${r.type}', ${r.is_percent})">Issue</button></div>`;
+  document.getElementById('crimeList').innerHTML = data.filter(r=>r.type==='crime').map(render).join('');
+  document.getElementById('rewardList').innerHTML = data.filter(r=>r.type==='reward').map(render).join('');
+}
+async function addRule() { await client.from('rules').insert({ title: s('ruleTitle'), description: s('ruleDesc'), type: s('ruleType'), amount: parseInt(s('ruleAmt')), is_percent: document.getElementById('ruleIsPercent').checked }); loadRules(); }
+async function issueRequest(reason, amt, type, isP) { const t = prompt('Username?'); if(!t) return; await client.from('requests').insert({ to_user: t, amount: amt, type: type, reason: reason, status: 'pending', is_percent: isP }); alert('Sent'); }
+async function loadRequests() {
+  const { data } = await client.from('requests').select().eq('to_user', me).eq('status', 'pending');
+  document.getElementById('requestList').innerHTML = (data||[]).map(r => `<div class="req-item"><b>${r.reason}</b>: ${r.is_percent?r.amount+'%':'$'+r.amount} <button class="btn small" onclick="processRequest(${r.id}, ${r.amount}, '${r.type}', ${r.is_percent})">Process</button></div>`).join('');
+}
+async function processRequest(id, amt, type, isP) {
+  const { data: u } = await client.from('profiles').select('balance').eq('username', me).single();
+  let f = isP ? Math.floor(u.balance * (amt/100)) : amt;
+  if(type==='crime') await client.from('profiles').update({ balance: u.balance - f }).eq('username', me);
+  else await client.from('profiles').update({ balance: u.balance + f }).eq('username', me);
+  await client.from('requests').update({ status: 'completed' }).eq('id', id); loadMyProfile(); loadRequests();
+}
+async function loadNews() { const { data } = await client.from('news').select().order('created_at',{ascending:false}); document.getElementById('newsList').innerHTML = (data||[]).map(n => `<div class="card"><h3>${n.headline}</h3><p>${n.body}</p></div>`).join(''); }
+async function addNews() { await client.from('news').insert({ headline: s('newsHead'), body: s('newsBody'), author: me }); loadNews(); }
+async function loadJobs() { const { data } = await client.from('jobs').select().order('created_at',{ascending:false}); document.getElementById('jobList').innerHTML = (data||[]).map(j => `<div class="card"><b>${j.title}</b><p>${j.description}</p></div>`).join(''); }
+async function addJob() { await client.from('jobs').insert({ author: me, title: s('jobTitle'), description: s('jobDesc'), pay: s('jobPay') }); loadJobs(); }
+async function loadEvents() { const { data } = await client.from('events').select().order('created_at',{ascending:false}); document.getElementById('eventList').innerHTML = (data||[]).map(e => `<div class="card"><b>${e.title}</b><br>${e.location}</div>`).join(''); }
+async function addEvent() { await client.from('events').insert({ author: me, title: s('evtTitle'), location: s('evtLoc'), event_date: s('evtTime') }); loadEvents(); }
 function initMap() {
-    if(mapObj) return;
-    mapObj = L.map('map').setView([40.7128, -74.0060], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapObj);
+  if(mapObj) { mapObj.invalidateSize(); return; }
+  mapObj = L.map('map').setView([40.7128, -74.0060], 13);
+  L.tileLayer(document.documentElement.getAttribute('data-theme')==='dark'?'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png':'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(mapObj);
+  loadPins();
+  mapObj.on('click', async (e) => { if(mapArmed){ await client.from('pins').insert({owner:me, lat:e.latlng.lat, lng:e.latlng.lng, title:s('pinTitle')||'Pin'}); mapArmed=false; document.getElementById('armMapBtn').style.background=''; loadPins(); } });
 }
-
-// Stubs for your other systems (Logic remains as per your original file)
-async function loadNews() { /* logic from original file */ }
-async function loadJobs() { /* logic from original file */ }
-async function loadRules() { /* logic from original file */ }
-async function loadTx() { /* logic from original file */ }
-async function loadProfiles() {
-  const { data } = await client.from('profiles').select();
-  document.getElementById('profileGrid').innerHTML = (data||[]).map(u => `<div class="room-card"><b>@${u.username}</b></div>`).join('');
+async function searchAddress() { const q = s('mapSearch'); const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`); const data = await res.json(); if(data[0]){ mapObj.setView([data[0].lat, data[0].lon], 18); document.getElementById('pinTitle').value = data[0].display_name.split(',')[0]; mapArmed=true; document.getElementById('armMapBtn').style.background='#22c55e'; } }
+async function loadPins() { const { data } = await client.from('pins').select(); (data||[]).forEach(p => L.marker([p.lat, p.lng]).addTo(mapObj).bindPopup(p.title)); document.getElementById('pinList').innerHTML = (data||[]).map(p => `<div class="list-item" onclick="mapObj.setView([${p.lat},${p.lng}],18)">${p.title} (@${p.owner})</div>`).join(''); }
+function toggleMapArm(){ mapArmed=!mapArmed; document.getElementById('armMapBtn').style.background=mapArmed?'#22c55e':''; }
+async function loadNotifs() {
+  const { data } = await client.from('notifications').select().eq('user_id', me).order('created_at',{ascending:false});
+  const u = (data||[]).filter(n => !n.is_read).length;
+  if(u>0){ document.getElementById('notifBadge').style.display='inline-block'; document.getElementById('notifBadge').innerText=u; }
+  document.getElementById('notifList').innerHTML = (data||[]).map(n => `<div class="card" style="opacity:${n.is_read?0.6:1}"><b>@${n.from_user}</b> ${n.message}</div>`).join('');
 }
+async function markAllRead() { await client.from('notifications').update({ is_read: true }).eq('user_id', me); loadNotifs(); }
+function s(id){ return document.getElementById(id).value; }
 </script>
 </body>
 </html>
